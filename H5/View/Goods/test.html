@@ -1,0 +1,155 @@
+<span class="a" data-start-time="2017-11-03 19:00:00" >aaa</span></br>
+<span class="b"  data-start-time="2017-11-03 18:00:00" >aaa</span></br>
+<select name="" id="d1">
+    <option value="0" selected>请选择</option>
+</select>
+<select name="" id="d2">
+    <option value="0">请选择</option>
+</select>
+<select name="" id="d3">
+    <option value="0">请选择</option>
+</select>
+
+<hr/>
+<select class="form-control m-b" name="account">
+<select>
+
+<script src="/Public/H5/js/allcity.js"></script>
+<script>
+    $(function() {
+
+        $.ajax({
+            type: 'get',
+            url: '__CONTROLLER__/test',
+            data: {},
+            dataType: 'json',
+            success: function (res) {
+                if (res.code == 10000) {
+                    console.log(res);
+                    var html = '<option>==请选择==</option>';
+                    for (var i = 0; i < res.info.length; i++) {
+                        html += '<option>' + res.info[i].type_name + '</option>';
+                    }
+                    console.log(html);
+                    $('.form-control').append(html);
+                }
+
+            }
+        });
+
+
+        console.log(allCity);
+        var html = '';
+        for(var i=0;i<allCity.province.length;i++){
+            html += '<option value="' + allCity.province[i].id + '">' + allCity.province[i].name + '</option>';
+        }
+        $('#d1').html(html);
+
+        $(document).on('change','#d1',function(){
+            var pid = $(this).find('option:selected').val();
+            var html2 = '<option value="0">请选择</option>';
+            if(pid != 99999) {
+                for (var j = 0; j < allCity.city[pid].length; j++) {
+                    html2 += '<option value="' + allCity.city[pid][j].id + '">' + allCity.city[pid][j].name + '</option>'
+                }
+            }
+            $('#d2').html(html2);
+        });
+
+        $(document).on('change','#d2',function(){
+            var pid = $(this).find('option:selected').val();
+            var html2 = '<option value="0">请选择</option>';
+            for (var j = 0; j < allCity.district[pid].length; j++) {
+                html2 += '<option value="' + allCity.district[pid][j].id + '">' + allCity.district[pid][j].name + '</option>'
+            }
+            $('#d3').html(html2);
+
+        });
+
+        $(document).on('change','#d3',function(){
+            var name = $('#d1').find('option:selected').html();
+            var name1 = $('#d2').find('option:selected').html();
+            var name2 = $('#d3').find('option:selected').html();
+            var string = name + name1 +name2;
+            console.log(string);
+            //将得到的string添加到数据库
+            $.ajax({
+                   // ...
+            })
+        });
+
+    });
+</script>
+
+
+
+
+
+
+
+
+
+
+<script>
+$(function(){
+
+    /**
+     *startime 应该是毫秒数
+     *
+     */
+
+    var Alarm = function (startime, endtime, countFunc, endFunc) {
+        this.time = Math.floor((endtime - startime) / 1000); //时间
+        this.countFunc = countFunc; //计时函数
+        this.endFunc = endFunc; //结束函数
+        this.flag = 't' + Date.parse(new Date()); //
+    };
+    Alarm.prototype.start = function () {
+        var self = this;
+
+        self.flag = setInterval(function () {
+            if (self.time < 0) {
+                clearInterval(self.flag);
+                self.endFunc();
+                console.log('计时结束');
+            } else {
+
+                var minute, hour, day, second;
+                day = Math.floor(self.time / 60 / 60 / 24) < 10 ? '0' + Math.floor(self.time / 60 / 60 / 24) : Math.floor(self.time / 60 / 60 / 24);
+                hour = Math.floor(self.time / 60 / 60 % 24) < 10 ? '0' + Math.floor(self.time / 60 / 60 % 24) : Math.floor(self.time / 60 / 60 % 24);
+                minute = Math.floor(self.time / 60 % 60) < 10 ? '0' + Math.floor(self.time / 60 % 60) : Math.floor(self.time / 60 % 60);
+                second = Math.floor(self.time % 60) < 10 ? '0' + Math.floor(self.time % 60) : Math.floor(self.time % 60);
+                //倒计时执行函数
+                self.countFunc(second, minute, hour, day);
+                self.time--;
+
+            }
+        }, 1000);
+    }
+    function a(){
+        var startTime = Date.parse(new Date($('.a').attr('data-start-time')));
+        var endTime = Date.parse(new Date())
+        var time1 = new Alarm(startTime, endTime, function (second, minute, hour, day) {
+            $('.a').text(hour + ':' + minute + ':' + second);
+        }, function () { //倒计时结束
+            $('.a').text('00:00:00');
+//            window.location.reload();
+        });
+        time1.start();
+    }a();
+
+    function b(){
+        startTime =  Date.parse(new Date($('.b').attr('data-start-time')));
+        endTime = Date.parse(new Date())
+        var time2 = new Alarm(startTime, endTime, function (second, minute, hour, day) {
+            $('.b').text(hour + ':' + minute + ':' + second);
+        }, function () { //倒计时结束
+            $('.b').text('00:00:00');
+//            window.location.reload();
+        });
+        time2.start();
+    }b();
+});
+
+
+</script>

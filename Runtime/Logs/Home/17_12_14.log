@@ -1,0 +1,352 @@
+[ 2017-12-14T19:07:26+08:00 ] 192.168.0.61 /
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.003000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.002000s ]
+ERR: SQLSTATE[HY000] [2000] mysqlnd cannot connect to MySQL 4.1+ using the old insecure authentication. Please use an administration tool to reset your password with the command SET PASSWORD = PASSWORD('your_existing_password'). This will store a new, and more secure, hash value in mysql.user. If this user is used in other scripts executed by PHP 5.2 or earlier you might need to remove the old-passwords flag from your my.cnf file
+
+[ 2017-12-14T19:07:56+08:00 ] 192.168.0.61 /
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.000000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_category` [ RunTime:0.0570s ]
+SQL: SELECT `id`,`pid`,`cate_name` FROM `zhouyuting_category`  [ RunTime:0.0030s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_goods` [ RunTime:0.0100s ]
+SQL: SELECT goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,is_act,b.id cid,b.cate_name cn FROM zhouyuting_goods AS a LEFT JOIN zhouyuting_category AS b ON a.cate_id=b.id
+WHERE 20 > ( SELECT COUNT(*) FROM zhouyuting_goods WHERE cate_id=a.cate_id AND goods_id > a.goods_id ) AND cate_id in (246,311,213,186)
+ORDER BY a.click_num DESC [ RunTime:0.0070s ]
+SQL: SELECT a.id,cate_name cn,cate_img img,count(cate_id) sum FROM zhouyuting_category a join zhouyuting_goods b  on a.id = b.cate_id  GROUP BY cate_id LIMIT 0,6   [ RunTime:0.0010s ]
+SQL: SELECT goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,`is_act`,b.id spid,b.shop_name FROM `zhouyuting_goods` left join zhouyuting_shop b on zhouyuting_goods.shop_id = b.id  ORDER BY click_num desc  [ RunTime:0.0050s ]
+SQL: SELECT goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,`is_act` FROM `zhouyuting_goods` ORDER BY click_num desc LIMIT 0,4   [ RunTime:0.0010s ]
+SQL: SELECT goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,is_act,b.id cid,b.cate_name cn FROM zhouyuting_goods AS a LEFT JOIN zhouyuting_category AS b ON a.cate_id=b.id
+WHERE 6 > ( SELECT COUNT(*) FROM zhouyuting_goods WHERE cate_id=a.cate_id AND goods_id > a.goods_id ) AND cate_id in (167,169,186)
+ORDER BY a.click_num DESC [ RunTime:0.0010s ]
+INFO: [ view_parse ] --START--
+INFO: [ template_filter ] --START--
+INFO: Run Behavior\ContentReplaceBehavior [ RunTime:0.003000s ]
+INFO: [ template_filter ] --END-- [ RunTime:0.003000s ]
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+INFO: Run Behavior\ParseTemplateBehavior [ RunTime:0.077004s ]
+INFO: [ view_parse ] --END-- [ RunTime:0.077004s ]
+INFO: [ view_filter ] --START--
+INFO: Run Behavior\WriteHtmlCacheBehavior [ RunTime:0.002000s ]
+INFO: [ view_filter ] --END-- [ RunTime:0.002000s ]
+INFO: [ app_end ] --START--
+INFO: Run Behavior\ShowPageTraceBehavior [ RunTime:0.002000s ]
+INFO: [ app_end ] --END-- [ RunTime:0.002000s ]
+
+[ 2017-12-14T19:08:06+08:00 ] 192.168.0.61 /Public/Home/js/plugin/bootstrap-select.js.map
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.001000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.002000s ]
+ERR: 非法操作:Home
+
+[ 2017-12-14T19:08:07+08:00 ] 192.168.0.61 /Public/Home/css/plugin/bootstrap.min.css.map
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.000000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+ERR: 非法操作:Home
+
+[ 2017-12-14T19:08:10+08:00 ] 192.168.0.61 /User/heart
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.000000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+NOTIC: [8] A session had already been started - ignoring session_start() C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Home\Controller\CommonController.class.php 第 18 行.
+
+[ 2017-12-14T19:08:28+08:00 ] 192.168.0.61 /Public/login
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.001001s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_user` [ RunTime:0.0250s ]
+SQL: SELECT * FROM `zhouyuting_user` WHERE ( username='313564624@qq.com' or email='313564624@qq.com' or phone='313564624@qq.com' ) LIMIT 1   [ RunTime:0.0020s ]
+NOTIC: [8] Undefined index: is_check C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Home\Controller\PublicController.class.php 第 97 行.
+
+[ 2017-12-14T19:08:31+08:00 ] 192.168.0.61 /Public/sendEmail
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.001000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_user` [ RunTime:0.0190s ]
+SQL: SELECT `id` FROM `zhouyuting_user` WHERE `email` = '313564624@qq.com' LIMIT 1   [ RunTime:0.0010s ]
+
+[ 2017-12-14T19:09:09+08:00 ] 192.168.0.61 /Public/login
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.001000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_user` [ RunTime:0.0220s ]
+SQL: SELECT * FROM `zhouyuting_user` WHERE ( username='313564624@qq.com' or email='313564624@qq.com' or phone='313564624@qq.com' ) LIMIT 1   [ RunTime:0.0010s ]
+
+[ 2017-12-14T19:09:12+08:00 ] 192.168.0.61 /Public/sendEmail
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.001000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_user` [ RunTime:0.0060s ]
+SQL: SELECT `id` FROM `zhouyuting_user` WHERE `email` = '313564624@qq.com' LIMIT 1   [ RunTime:0.0010s ]
+SQL: UPDATE `zhouyuting_user` SET `email_code`='433627' WHERE `id` = 1 [ RunTime:0.0050s ]
+
+[ 2017-12-14T19:12:52+08:00 ] 192.168.0.61 /Public/sendEmail
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.001000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.002000s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_user` [ RunTime:0.0080s ]
+SQL: SELECT `id` FROM `zhouyuting_user` WHERE `email` = '313564624@qq.com' LIMIT 1   [ RunTime:0.0010s ]
+SQL: UPDATE `zhouyuting_user` SET `email_code`='673623' WHERE `id` = 1 [ RunTime:0.0010s ]
+
+[ 2017-12-14T19:16:02+08:00 ] 192.168.0.61 /
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.001000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_goods` [ RunTime:0.0070s ]
+SQL: SELECT goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,is_act,b.id cid,b.cate_name cn FROM zhouyuting_goods AS a LEFT JOIN zhouyuting_category AS b ON a.cate_id=b.id
+WHERE 20 > ( SELECT COUNT(*) FROM zhouyuting_goods WHERE cate_id=a.cate_id AND goods_id > a.goods_id ) AND cate_id in (246,311,213,186)
+ORDER BY a.click_num DESC [ RunTime:0.0030s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_category` [ RunTime:0.0110s ]
+SQL: SELECT a.id,cate_name cn,cate_img img,count(cate_id) sum FROM zhouyuting_category a join zhouyuting_goods b  on a.id = b.cate_id  GROUP BY cate_id LIMIT 0,6   [ RunTime:0.0010s ]
+SQL: SELECT goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,`is_act`,b.id spid,b.shop_name FROM `zhouyuting_goods` left join zhouyuting_shop b on zhouyuting_goods.shop_id = b.id  ORDER BY click_num desc  [ RunTime:0.0000s ]
+SQL: SELECT goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,`is_act` FROM `zhouyuting_goods` ORDER BY click_num desc LIMIT 0,4   [ RunTime:0.0000s ]
+SQL: SELECT goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,is_act,b.id cid,b.cate_name cn FROM zhouyuting_goods AS a LEFT JOIN zhouyuting_category AS b ON a.cate_id=b.id
+WHERE 6 > ( SELECT COUNT(*) FROM zhouyuting_goods WHERE cate_id=a.cate_id AND goods_id > a.goods_id ) AND cate_id in (167,169,186)
+ORDER BY a.click_num DESC [ RunTime:0.0010s ]
+INFO: [ view_parse ] --START--
+INFO: [ template_filter ] --START--
+INFO: Run Behavior\ContentReplaceBehavior [ RunTime:0.000000s ]
+INFO: [ template_filter ] --END-- [ RunTime:0.000000s ]
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+INFO: Run Behavior\ParseTemplateBehavior [ RunTime:0.081005s ]
+INFO: [ view_parse ] --END-- [ RunTime:0.081005s ]
+INFO: [ view_filter ] --START--
+INFO: Run Behavior\WriteHtmlCacheBehavior [ RunTime:0.002000s ]
+INFO: [ view_filter ] --END-- [ RunTime:0.002000s ]
+INFO: [ app_end ] --START--
+INFO: Run Behavior\ShowPageTraceBehavior [ RunTime:0.003000s ]
+INFO: [ app_end ] --END-- [ RunTime:0.003000s ]
+
+[ 2017-12-14T19:16:04+08:00 ] 192.168.0.61 /Public/Home/js/plugin/bootstrap-select.js.map
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.000000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.003000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.003000s ]
+ERR: 非法操作:Home
+
+[ 2017-12-14T19:16:05+08:00 ] 192.168.0.61 /Public/Home/css/plugin/bootstrap.min.css.map
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.000000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+ERR: 非法操作:Home
+
+[ 2017-12-14T19:16:10+08:00 ] 192.168.0.61 /User/heart
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.002000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+NOTIC: [8] A session had already been started - ignoring session_start() C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Home\Controller\CommonController.class.php 第 18 行.
+
+[ 2017-12-14T19:16:22+08:00 ] 192.168.0.61 /Public/login
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.001000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.003001s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.004001s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_user` [ RunTime:0.0100s ]
+SQL: SELECT * FROM `zhouyuting_user` WHERE ( username='313564624@qq.com' or email='313564624@qq.com' or phone='313564624@qq.com' ) LIMIT 1   [ RunTime:0.0000s ]
+
+[ 2017-12-14T19:16:32+08:00 ] 192.168.0.61 /Public/sendEmail
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.001000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_user` [ RunTime:0.0110s ]
+SQL: SELECT `id` FROM `zhouyuting_user` WHERE `email` = '313564624@qq.com' LIMIT 1   [ RunTime:0.0010s ]
+SQL: UPDATE `zhouyuting_user` SET `email_code`='234197' WHERE `id` = 1 [ RunTime:0.0030s ]
+
+[ 2017-12-14T19:38:09+08:00 ] 192.168.0.61 /
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.004001s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.002000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.002000s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_goods` [ RunTime:0.0540s ]
+SQL: SELECT goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,is_act,b.id cid,b.cate_name cn FROM zhouyuting_goods AS a LEFT JOIN zhouyuting_category AS b ON a.cate_id=b.id
+WHERE 20 > ( SELECT COUNT(*) FROM zhouyuting_goods WHERE cate_id=a.cate_id AND goods_id > a.goods_id ) AND cate_id in (246,311,213,186)
+ORDER BY a.click_num DESC [ RunTime:0.0210s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_category` [ RunTime:0.0090s ]
+SQL: SELECT a.id,cate_name cn,cate_img img,count(cate_id) sum FROM zhouyuting_category a join zhouyuting_goods b  on a.id = b.cate_id  GROUP BY cate_id LIMIT 0,6   [ RunTime:0.0010s ]
+SQL: SELECT goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,`is_act`,b.id spid,b.shop_name FROM `zhouyuting_goods` left join zhouyuting_shop b on zhouyuting_goods.shop_id = b.id  ORDER BY click_num desc  [ RunTime:0.0020s ]
+SQL: SELECT goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,`is_act` FROM `zhouyuting_goods` ORDER BY click_num desc LIMIT 0,4   [ RunTime:0.0010s ]
+SQL: SELECT goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,is_act,b.id cid,b.cate_name cn FROM zhouyuting_goods AS a LEFT JOIN zhouyuting_category AS b ON a.cate_id=b.id
+WHERE 6 > ( SELECT COUNT(*) FROM zhouyuting_goods WHERE cate_id=a.cate_id AND goods_id > a.goods_id ) AND cate_id in (167,169,186)
+ORDER BY a.click_num DESC [ RunTime:0.0020s ]
+INFO: [ view_parse ] --START--
+INFO: [ template_filter ] --START--
+INFO: Run Behavior\ContentReplaceBehavior [ RunTime:0.003000s ]
+INFO: [ template_filter ] --END-- [ RunTime:0.003000s ]
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+INFO: Run Behavior\ParseTemplateBehavior [ RunTime:0.076005s ]
+INFO: [ view_parse ] --END-- [ RunTime:0.076005s ]
+INFO: [ view_filter ] --START--
+INFO: Run Behavior\WriteHtmlCacheBehavior [ RunTime:0.002000s ]
+INFO: [ view_filter ] --END-- [ RunTime:0.002000s ]
+INFO: [ app_end ] --START--
+INFO: Run Behavior\ShowPageTraceBehavior [ RunTime:0.002000s ]
+INFO: [ app_end ] --END-- [ RunTime:0.003000s ]
+
+[ 2017-12-14T19:38:12+08:00 ] 192.168.0.61 /Public/Home/js/plugin/bootstrap-select.js.map
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.001000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.000000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.000000s ]
+ERR: 非法操作:Home
+
+[ 2017-12-14T19:38:13+08:00 ] 192.168.0.61 /Public/Home/css/plugin/bootstrap.min.css.map
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.001000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+ERR: 非法操作:Home
+
+[ 2017-12-14T19:40:01+08:00 ] 192.168.0.61 /
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.000000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_goods` [ RunTime:0.0090s ]
+SQL: SELECT goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,is_act,b.id cid,b.cate_name cn FROM zhouyuting_goods AS a LEFT JOIN zhouyuting_category AS b ON a.cate_id=b.id
+WHERE 20 > ( SELECT COUNT(*) FROM zhouyuting_goods WHERE cate_id=a.cate_id AND goods_id > a.goods_id ) AND cate_id in (246,311,213,186)
+ORDER BY a.click_num DESC [ RunTime:0.1440s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_category` [ RunTime:0.0080s ]
+SQL: SELECT a.id,cate_name cn,cate_img img,count(cate_id) sum FROM zhouyuting_category a join zhouyuting_goods b  on a.id = b.cate_id  GROUP BY cate_id LIMIT 0,6   [ RunTime:0.0010s ]
+SQL: SELECT goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,`is_act`,b.id spid,b.shop_name FROM `zhouyuting_goods` left join zhouyuting_shop b on zhouyuting_goods.shop_id = b.id  ORDER BY click_num desc  [ RunTime:0.0010s ]
+SQL: SELECT goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,`is_act` FROM `zhouyuting_goods` ORDER BY click_num desc LIMIT 0,4   [ RunTime:0.0000s ]
+SQL: SELECT goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,is_act,b.id cid,b.cate_name cn FROM zhouyuting_goods AS a LEFT JOIN zhouyuting_category AS b ON a.cate_id=b.id
+WHERE 6 > ( SELECT COUNT(*) FROM zhouyuting_goods WHERE cate_id=a.cate_id AND goods_id > a.goods_id ) AND cate_id in (167,169,186)
+ORDER BY a.click_num DESC [ RunTime:0.0020s ]
+INFO: [ view_parse ] --START--
+INFO: [ template_filter ] --START--
+INFO: Run Behavior\ContentReplaceBehavior [ RunTime:0.000000s ]
+INFO: [ template_filter ] --END-- [ RunTime:0.000000s ]
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+NOTIC: [8] Use of undefined constant shop_name - assumed 'shop_name' C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Runtime\Cache\Home\2a94b8bda04ff446dcedd42276fc99ee.php 第 426 行.
+INFO: Run Behavior\ParseTemplateBehavior [ RunTime:0.054003s ]
+INFO: [ view_parse ] --END-- [ RunTime:0.054003s ]
+INFO: [ view_filter ] --START--
+INFO: Run Behavior\WriteHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ view_filter ] --END-- [ RunTime:0.001000s ]
+INFO: [ app_end ] --START--
+INFO: Run Behavior\ShowPageTraceBehavior [ RunTime:0.001000s ]
+INFO: [ app_end ] --END-- [ RunTime:0.001000s ]
+
+[ 2017-12-14T19:40:02+08:00 ] 192.168.0.61 /Public/Home/js/plugin/bootstrap-select.js.map
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.000000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+ERR: 非法操作:Home
+
+[ 2017-12-14T19:40:02+08:00 ] 192.168.0.61 /Public/Home/css/plugin/bootstrap.min.css.map
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.001000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+ERR: 非法操作:Home
+
+[ 2017-12-14T19:40:10+08:00 ] 192.168.0.61 /User/heart
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.002000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.001000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+NOTIC: [8] A session had already been started - ignoring session_start() C:\phpstudy\WWW\www.test.com\lingjiuyi\htdocs\Application\Home\Controller\CommonController.class.php 第 18 行.
+
+[ 2017-12-14T19:40:22+08:00 ] 192.168.0.61 /Public/login
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.001000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.002000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.003000s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_user` [ RunTime:0.0140s ]
+SQL: SELECT * FROM `zhouyuting_user` WHERE ( username='313564624@qq.com' or email='313564624@qq.com' or phone='313564624@qq.com' ) LIMIT 1   [ RunTime:0.0030s ]
+
+[ 2017-12-14T19:40:27+08:00 ] 192.168.0.61 /Public/sendEmail
+INFO: [ app_init ] --START--
+INFO: Run Behavior\BuildLiteBehavior [ RunTime:0.000000s ]
+INFO: [ app_init ] --END-- [ RunTime:0.001000s ]
+INFO: [ app_begin ] --START--
+INFO: Run Behavior\ReadHtmlCacheBehavior [ RunTime:0.000000s ]
+INFO: [ app_begin ] --END-- [ RunTime:0.001000s ]
+SQL: SHOW COLUMNS FROM `zhouyuting_user` [ RunTime:0.0070s ]
+SQL: SELECT `id` FROM `zhouyuting_user` WHERE `email` = '313564624@qq.com' LIMIT 1   [ RunTime:0.0000s ]
+SQL: UPDATE `zhouyuting_user` SET `email_code`='217608' WHERE `id` = 1 [ RunTime:0.0150s ]
+

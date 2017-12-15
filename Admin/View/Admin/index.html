@@ -1,0 +1,65 @@
+<include file="Common/header" />
+<body class="gray-bg">
+    <div class="wrapper wrapper-content animated fadeInRight">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="ibox float-e-margins">
+                    <div class="ibox-title">
+                        <h5>基本 <small>分类，查找</small></h5>
+                    </div>
+                    <div class="ibox-content">
+                        <table class="table table-striped table-bordered table-hover dataTables-example">
+                            <thead>
+                                <tr>
+                                    <th>用户名</th>
+                                    <th>所属角色</th>
+                                    <th>最后登录IP</th>
+                                    <th>最后登录时间</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr>
+                                    <th>用户名</th>
+                                    <th>所属角色</th>
+                                    <th>最后登录IP</th>
+                                    <th>最后登录时间</th>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- 全局js -->
+    <script src="/Public/Admin/js/jquery.min.js?v=2.1.4"></script>
+    <script src="/Public/Admin/js/bootstrap.min.js?v=3.3.6"></script>
+    <script src="/Public/Plugins/jeditable/jquery.jeditable.js"></script>
+
+    <!-- Data Tables -->
+    <script src="/Public/Plugins/dataTables/jquery.dataTables.js"></script>
+    <script src="/Public/Plugins/dataTables/dataTables.bootstrap.js"></script>
+
+    <!-- 自定义js -->
+    <script src="/Public/Admin/js/content.js?v=1.0.0"></script>
+
+    <!-- Page-Level Scripts -->
+    <script>
+        $(document).ready(function () {
+            $('.dataTables-example').dataTable({
+                "ajax": "{:U('Admin/lst')}",
+                "columns": [
+                    { "data": "username" },
+                    { "data": "role.rolename" },
+                    { "data": "lastloginip" },
+                    { "data": "lastlogintime" }
+                ]
+            });
+        });
+    </script>
+    <!--统计代码，可删除-->
+
+</body>
+
+</html>

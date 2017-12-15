@@ -1,0 +1,388 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <meta name="format-detection" content="telephone=no, email=no"/>
+    <title></title>
+    <link href="__PUBLIC__/H5/css/style/style.css" type="text/css" rel="stylesheet">
+    <link href="__PUBLIC__/H5/css/style/bootstrap.min.css" type="text/css" rel="stylesheet">
+    <link href="__PUBLIC__/H5/css/style/base.css" type="text/css" rel="stylesheet">
+
+    <script src="__PUBLIC__/H5/js/base/jquery.min.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/swiper.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/layer.js" type="text/javascript"></script>
+    <script src='https://cdn.bootcss.com/socket.io/2.0.3/socket.io.js'></script>
+    <style>
+        .percentcube {margin-bottom:10px;}
+        .percentcube font{float: left; margin-right: 3%;margin-top: 1%;}
+        .percentcube button{border:1px solid #ccc;padding:1% 2%;width:10%;float: left;text-align: center;border-right:none;background: #fff}
+        .percentcube div button:first-child{border-radius:3px 0px 0px 3px;}
+        .percentcube div button:last-child{border-radius:0px 3px 3px 0px;border-right:1px solid #ccc;}
+        .percentcube div:first-child button{border-bottom: none;}
+        .percentcube div:first-child button.ac{background: #f7836a}
+        .percentcube div:last-child button.ac{background: #90b830}
+
+    </style>
+</head>
+<body class="graybg" style="position:static; height:100%; margin:0; background: #f5f5f5">
+<div class="container J_widget">
+    <div class="row item-detail-title bgwhite">
+        <div class="col-xs-4 item ac" ><a>国际参考线</a></div>
+        <div class="col-xs-4 item" ><a>商品活动</a></div>
+        <div class="col-xs-4 item on" ><a>详情</a></div>
+    </div>
+    <div style="height:5px;"></div>
+    <div class="row item-detail">
+        <div class="col-xs-12 item-content i1" >
+            <div class="bgwhite boxshadow">
+                <div class="linebox" style="padding:10px">
+                    <div id="container" style="width: 100%; height: 250px; margin: 0 auto;display:none"></div>
+                    <div id="kline" style="width: 100%; height: 250px; margin: 0 auto;"></div>
+                </div>
+            </div>
+            <div class="Linebtn">
+                <div class="col-xs-2 sbtn">分时线</div>
+                <div class="col-xs-2 kbtn">k线图</div>
+            </div>
+            <div style="height: 10px;"></div>
+        </div>
+        <div class="col-xs-12 item-content i2" style="display:none">
+            <div class="col-xs-12  xqimg  boxshadow">
+            </div>
+        </div>
+        <div class="col-xs-12 item-content i3" style="display:none"></div>
+    </div>
+</div>
+<div class="col-xs-12">
+    <div class="container bgwhite boxshadow">
+        <div class="activetime">
+            <i class="time"></i>
+        </div>
+        <div class="activebox">
+            <p class="title"></p>
+            <div class="col-xs-6">
+                <span class="active">基础价位:</span>
+                <span class="jprice basep" name="price">￥<font></font></span>
+            </div>
+            <div class="col-xs-6">
+                <span class="active">市场参考价:</span>
+                <span class="jprice marketp" name="price"></span>
+            </div>
+            <div class="col-xs-12" style="padding-left:0;">
+                <span class="active col-xs-6">国际最新价:</span>
+                <span class="col-xs-6 globalprice gprice" name="price" id="newPirce"></span>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid oh pf b0 l0 r0 z1">
+    <div class="row item-btn">
+        <div class="col-xs-6 button rl" style="width:50%;"><a href="javascript:;" class="submit-btn js-show-item-attr" style="background:#f7836a;" type="2">预定⇧</a></div>
+        <div class="col-xs-6 button" style="width:50%;"><a href="javascript:;" class="submit-btn js-show-item-attr-rengou"  type="1">贷售⇩</a></div>
+    </div>
+</div>
+<script type="text/javascript"  src="__PUBLIC__/H5/js/base/highcharts.js"></script>
+<script type="text/javascript" src="__PUBLIC__/H5/js/base/echart.js"></script>
+</body>
+</html>
+<script>
+$(function(){
+    //导航切换
+    $('.item-detail-title .item').click(function(){
+        var $this=$(this);
+        $('.item-detail-title .item').removeClass('ac');
+        $this.addClass('ac');
+        $('.item-content').hide();
+        $('.item-content').eq($this.index()).show();
+    });
+    $('.col-xs-2.sbtn').click(function () {
+        $("#container").css("display","block");
+        $("#kline").css("display","none");
+    });
+    $('.col-xs-2.kbtn').click(function () {
+        $("#kline").css("display","block");
+        $("#container").css("display","none");
+    });
+
+    //K线
+    var dates=[];
+    var linedata=[];
+    var json="";
+    var id = "{$Think.get.gid}";
+    $.ajax({
+        type     : 'GET',
+        url      : '__CONTROLLER__/ajax_goods',
+        dataType : 'json',
+        async    : false,
+        data     : {gid:id},
+        success  : function(data){
+            if(data.code == 10000){
+                $('.title').html(data.info.goodsinfo.goods_name);
+                $('.title').attr('number',data.info.goodsinfo.goods_number);
+                $('.basep font').html(data.info.goodsinfo.goods_price);
+                $('.marketp').html(data.info.goodsinfo.goods_bigprice);
+                $('.xqimg').html("<img src="+data.info.goodsinfo.goods_small_img+" style='height: 265px; margin: 0px auto;' class='cut-img'>");
+                $('.i3').html(data.info.goodsinfo.goods_introduce);
+
+                json = 1;
+                $('.jprice font').html()
+            }else{
+            }
+        },
+        error: function(xhr, type){
+            // 即使加载出错，也得重置
+        }
+    });
+
+    for(i=0;i<json.length;i++){
+        dates.push(json[i].time);
+        linedata.push(parseFloat(json[i].price)+Number($('.basep font').html()));
+    }
+
+    dates[dates.length]=getLocalTime(new Date().getTime()/1000);
+    // 使用时替换成真实的uid，这里方便演示使用时间戳
+    var uid = Date.parse(new Date());
+    // 连接服务端
+    var socket = io('http://101.201.73.190:2120');
+    // 连接后登录
+    socket.on('connect', function(){
+        socket.emit('login', uid);
+    });
+    // 后端推送来消息时
+    socket.on('new_msg', function(msg){
+        // $('#newPirce').html(msg)
+        var arr=msg.split('.');
+        var price = Number($('.basep font').html())+arr[1];
+        $('#newPirce').html(price);
+        $('#J_item_sku_price').html(price);
+    });
+
+
+    function popup(){
+        var userinfo = "{$Think.session.userinfo.id}";
+        if(!userinfo){
+            layer.open({
+                content : '您还未登录',
+                skin    : 'msg',
+                time    : 1,
+                end     : function(){
+                    localStorage.currenturl = window.location.href;
+                    location.href="__MODULE__/User/login";
+                }
+            });
+        }else{
+
+            //var rulehtml='<span class="no" >1111</span>';
+            var html='';
+            $.ajax({
+                type     : 'GET',
+                async    :false,
+                url      :'__CONTROLLER__/ajax_detail',
+                dataType : 'json',
+                data     : {gid:id},
+                success  : function(data){
+                    html =  '<div class="item_attr_modal" id="COMPONENT_11">'+
+                            ' <div class="container choice-attr oh pf b0 l0 r0 z2 js-choice-attr" style="z-index: 1002; position: fixed; bottom: 0px;">'+
+                            '<div class="row brief">'+
+                            ' <div class="col-xs-12 bm">'+
+                            '<div class="layout sub80">'+
+                            '<div class="col-main mb8">'+
+                            '<div class="wrap">'+
+                            '<p class="title ml10 mr20 mb5">'+$('.title').html()+'</p>'+
+                            '<p class="fs-16 ml10 green">￥<span id="J_item_sku_price"></span></p>'+
+                            '<p class="fs-12 ml10 grey mb5">库存：<span id="J_item_sku_stock">'
+                            +$('.title').attr('number')+'</span></p>'+
+                            '</div>'+
+                            '</div>'+
+                            '<div class="col-sub"><div class="img"> <img src="'+$('.xqimg img').attr('src')+'"></div></div>'+
+                            '</div>'+
+                            '<a href="javascript:;" class="close js-choice-attr-close"></a>'+
+                            '</div>'+
+                            '</div>';
+                    if(data.info.attr_radio== undefined){
+                        html +='';
+                    }else{
+                        if(data.info.good.goods_number == 0){
+                            html += '<span >【商品已售完，请等待商家进货】</span>';
+                        }
+                        for(var i=0;i<data.info.attr_radio.length;i++){
+                            html +=
+                                    '<div class="row attr-list">' +
+                                    '<div class="col-xs-12 title">' + data.info.attr_radio[i][0].attr_name +'</div>'+
+                                    '<div class="col-xs-12 list bm" id="J_item_sku_list' + i + '" ' +
+                                    'style="max-height: 250px;overflow-y: scroll;">';
+                            for(var j = 0 ; j < data.info.attr_radio[i].length ; j++){
+                                html += '<button ';
+                                if(data.info.good.goods_number == 0){
+                                    html += 'class="no"';
+                                }else{
+                                    html += '';
+                                }
+                                html +=
+                                        'price="' +data.info.good.goods_price+ '" ' +
+                                        'rid="' + data.info.attr_radio[i][j].id +
+                                        '" stock="' + data.info.good.goods_number + '">' +
+                                        data.info.attr_radio[i][j].attr_value +
+                                        '</button>  ';
+                            }
+                            html+=
+                                    '</div>'+
+                                    '</div>';
+
+                        }
+                    }
+                    html += '<div class="row number-box">'+
+                            '<div class="col-xs-6 no-pd title fl">购买数量</div>'+
+                            '<div class="col-xs-6 no-pd number fr">'+
+                            '<span id="J_sku_num_plus">+</span>'+
+                            '<input type="text" value="1" id="J_goods_number" disabled="">'+
+                            '<span id="J_sku_num_minus">-</span>'+
+                            '</div>'+
+                            '</div>'+
+                            '<div class="row percentcube">'+
+                            '<div class="col-xs-12"><font>止赢</font>&emsp;<button>20%</button><button>40%</button>' +
+                            '<button >60%</button><button class="ac">80%</button><button>100%</button></div>'+
+                            '<div class="col-xs-12"><font>止损</font>&emsp;<button>20%</button><button>30%</button>' +
+                            '<button>40%</button><button class="ac">50%</button><button >60%</button></div>'+
+                            '</div>'+
+                            '<button class="row btn-box J_submit col-xs-12"><span class="submit">确 定</span>'+
+                            '</button>'+
+                            '</div>';
+                    //立即购买弹出框
+                    layer.open({
+                        type: 1
+                        ,content: html
+                        ,anim: 'up'
+                        ,style: 'position:fixed; bottom:0; left:0; width: 100%; height: 218px; padding:10px 0; border:none;'
+                    });
+                    //默认选择第一个有库存的规格
+                    $('#J_item_sku_list0 button:not(button.no)').eq(0).addClass('ac');
+                    $(document).on('click','#J_item_sku_list0 button:not(button.no)',function(){
+                        $('#J_item_sku_list0 button').removeClass('ac');
+                        $(this).addClass('ac');
+                        localStorage.rid=$(this).attr('rid')
+                        $('#J_item_sku_stock').html($(this).attr('stock'));
+                    });
+                    //默认选择第一个有库存的规格
+                    $('#J_item_sku_list1 button:not(button.no)').eq(0).addClass('ac');
+                    $(document).on('click','#J_item_sku_list1 button:not(button.no)',function(){
+                        $('#J_item_sku_list1 button').removeClass('ac');
+                        $(this).addClass('ac');
+                        localStorage.rid=$(this).attr('rid')
+                        $('#J_item_sku_stock').html($(this).attr('stock'));
+                    });
+                },
+                error: function(xhr, type){
+                    // 即使加载出错，也得重置
+                }
+            });
+
+        }
+    }
+
+    $(document).on('click','.js-show-item-attr',function(){
+        $('.item-btn').attr('type',$(this).attr('type'));
+        popup();
+    });
+    $(document).on('click','.js-show-item-attr-rengou',function(){
+        $('.item-btn').attr('type',$(this).attr('type'));
+        popup();
+    });
+
+    $(document).on('click','.js-choice-attr-close',function(){
+        layer.closeAll();
+    });
+    //增加减少购物数量
+    $(document).on('click','#J_sku_num_plus',function(){
+        var num=parseInt($('#J_goods_number').val());
+        $('#J_goods_number').val(num+1);
+    });
+    $(document).on('click','#J_sku_num_minus',function(){
+        var num=parseInt($('#J_goods_number').val())
+        if(num>1){
+            $('#J_goods_number').val(num-1);
+        }
+    });
+    $(document).on('click','.percentcube div:first button',function(){
+        $('.percentcube div:first button').removeClass('ac');
+        $(this).addClass('ac')
+    });
+    $(document).on('click','.percentcube div:last button',function(){
+        $('.percentcube div:last button').removeClass('ac');
+        $(this).addClass('ac')
+    });
+    $(document).on('click','.J_submit',function(){
+        order();
+    });
+});  //结束
+function order(){
+    var needpay = parseFloat($('#J_item_sku_price').html());
+    layer.open({
+        content: '购买此商品将使用'+needpay+'元,只能使用余额，确定要抢购吗?'
+        ,btn: ['确认', '取消']
+        ,yes: function(index){
+            var gid          = "{$Think.get.gid}";
+            var type         = $('.item-btn').attr('type');
+            var goods_number = parseInt($('#J_goods_number').val());
+            var stopProfit   = $('.percentcube div:first button.ac').html();
+            var stopLoss     = $('.percentcube div:last button.ac').html();
+            var ids          = $('#J_item_sku_list0').find('.ac').attr('rid');//属性列表0上的属性id
+            ids             += ',' + $('#J_item_sku_list1').find('.ac').attr('rid');//拼接属性列表1上的属性id
+            stopProfit       = Number(stopProfit.replace("%",""))/100;
+            stopLoss         = Number(stopLoss.replace("%",""))/100;
+            $.ajax({
+                type    : 'POST',
+                url     :'__MODULE__/Cart/ajax_actadd',
+                dataType: 'json',
+                async   : false,
+                data    : {gid:gid,type:type,price:needpay,num:goods_number,ids:ids,stopProfit:stopProfit,stopLoss:stopLoss},
+                success : function(data){
+                    if(data.code == 10000){
+                        //localStorage.oid=data.data;
+                        layer.open({
+                            content : '购买成功，正在跳转至活动订单！',
+                            skin    : 'msg',
+                            time    : 2,
+                            end     : function(){
+                                location.href = '__MODULE__/User/order/type/2';
+                            }
+                        });
+
+                    }else{
+                        layer:open({
+                            content : data.msg,
+                            skin    : 'msg',
+                            time    : 2
+                        });
+                    }
+                },
+                error: function(xhr, type){
+                    // 即使加载出错，也得重置
+                }
+            });
+            layer.close(index);
+        }
+    });
+}
+//格式化时间戳为日期
+function getLocalTime(fH) {
+    return  new Date(parseInt(fH) * 1000).Format("yyyy-MM-dd hh:mm:ss");
+}
+Date.prototype.Format = function (fmt) { //author: meizz
+    var o = {
+        "M+": this.getMonth() + 1, //月份
+        "d+": this.getDate(), //日
+        "h+": this.getHours(), //小时
+        "m+": this.getMinutes(), //分
+        "s+": this.getSeconds(), //秒
+        "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+        "S": this.getMilliseconds() //毫秒
+    };
+    if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+    for (var k in o)
+        if (new RegExp("(" + k + ")").test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+    return fmt;
+}
+
+</script>

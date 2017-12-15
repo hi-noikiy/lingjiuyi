@@ -1,0 +1,278 @@
+<include file="Common/header" />
+<style>
+  @font-face
+  {
+    font-family: myFirstFont;
+    src: url(__PUBLIC__/Admin/fonts/DS-DIGI.TTF);
+  }
+
+</style>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <h5>操作系统信息</h5>
+        </div>
+        <div class="ibox-content">
+          <table class="table table-striped table-bordered table-hover dataTables-example">
+            <tbody>
+              <tr class="gradeX">
+                <td width='20%'>系统版本</td>
+                <td>V1.0</td>
+              </tr>
+              <tr class="gradeX">
+                <td>操作系统</td>
+                <td>{$os}</td>
+              </tr>
+              <tr class="gradeX">
+                <td>PHP版本</td>
+                <td>{$version}</td>
+              </tr>
+              <tr class="gradeX">
+                <td>运行方式</td>
+                <td>{$sapi}</td>
+              </tr>
+              <tr class="gradeX">
+                <td>数据库</td>
+                <td>{$mysql}</td>
+              </tr>
+              <tr class="gradeX">
+                <td>ThinkPHP版本</td>
+                <td>{$tp}</td>
+              </tr>
+              <tr class="gradeX">
+                <td>最大上传附件</td>
+                <td>{$uploadmax}</td>
+              </tr>
+              <tr class="gradeX">
+                <td>技术支持</td>
+                <td>零玖一官方网站</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="ibox-title">
+          <h5>图表可视化</h5>
+        </div>
+        <div class="ibox-content">
+          <div id="container" style="min-width:400px;height:400px"></div>
+          <div id="pieChart" style="min-width:400px;height:400px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 全局js --> 
+<script src="/Public/Admin/js/jquery.min.js?v=2.1.4"></script> 
+<script src="/Public/Admin/js/bootstrap.min.js?v=3.3.6"></script> 
+<script src="/Public/Plugins/jeditable/jquery.jeditable.js"></script> 
+
+<!-- Data Tables --> 
+<script src="/Public/Plugins/dataTables/jquery.dataTables.js"></script> 
+<script src="/Public/Plugins/dataTables/dataTables.bootstrap.js"></script> 
+
+<!-- 自定义js --> 
+<script src="/Public/Admin/js/content.js?v=1.0.0"></script>
+<script src="https://img.hcharts.cn/highcharts/highcharts.js"></script>
+<script src="https://img.hcharts.cn/highcharts/modules/exporting.js"></script>
+<script>
+  var chart = null;
+  $(function () {
+    var title = 0;
+    var unit  = '';
+    $.ajax({
+      type : 'GET',
+      url  : '__CONTROLLER__/charts',
+      dataType : 'json',
+      success : function(data){
+          if(data.code == 0) {
+
+          }else{
+            var html  = '';
+            var htmlcontent  = '';
+            var name  = '';
+            var num   = 0;
+            var num1  = 0;return false;
+            for(var i=0;i < data.info.length;i++){
+              htmlcontent += '<div id="charts' + i + '" style="float: left;border: solid 1px #ccc;width:50%;height: 450px;padding: 20px;"><h5>'
+                      + data.info[i][0].title +
+                      '</h5><hr/>' +
+                      '<div id="context' + i + '" style="min-width:200px;height:350px;">' +
+                      '</div>' +
+                      '</div>';
+              $('#container').html(htmlcontent);
+              //show(data.info[i],i);
+              num   = Number(data.info[0][0].num) + Number(data.info[0][1].num);
+              num1  = Number(data.info[1][0].num) + Number(data.info[1][1].num);
+              $('#context0').highcharts({
+                credits: {
+                  enabled: false,//去掉版权信息
+                },
+                chart : {
+                  type : 'pie'//图表类型是pie图
+                },
+                title : {
+                  text : '<div style="text-align:center;"><span style="color:#c2a96a;font-family:myFirstFont;font-size: 60px; ">' + num + '</span>' + '<br/>' + '<span>' + data.info[0][0].mintitle + '</span></div>',
+                  x : -120,
+                  y : 180,
+                  useHTML : true,
+                  fontFamily : "微软雅黑"
+                },
+                plotOptions : {
+                  pie : {
+                    size : 200,//饼状图的大小
+                    innerSize : '150',//饼状图的内径大小，也可以配置为20%的百分比形式
+                    colors : [//饼块颜色控制
+                      '#F48689',
+                      '#3DCFCF',
+                      '#6AB9F4',
+                    ],
+                    dataLabels : {
+                      distance : 15,//数据标签距离饼图边缘的距离，为负数越靠近饼图圆心
+                      formatter : function (){
+                        return this.y + '%';
+                      },
+                      style :{
+                        fontWeight : 'bold',
+                        color : '#fff',
+                      },
+                      enabled : false//去除折线
+                    },
+                    showInLegend: true,//是否显示图例
+                    point : {
+                      events : {
+                        legendItemClick : function(event){
+                          //图例点击事件
+                          //alert("点击了："+this.url);
+                          location.href = this.url;
+                          //window.open(this.url);
+                          return false;
+                        },
+                        click: function(e) {
+                          //图形点击事件
+                          location.href = this.url; //上面是当前页跳转，如果是要跳出新页面，那就用
+                          //window.open(e.point.url);
+                          //这里的url要后面的data里给出
+                        }
+                      }
+                    }
+                  }
+                },
+                legend:{
+                  layout : 'vertical',//图例布局：垂直排列
+                  align : 'right',//图例水平位置：左对齐
+                  verticalAlign : 'middle',//图例框的垂直对齐方式：顶端对齐
+                  labelFormatter : function(){
+                    //图例的内容
+                    var msg;
+                    msg = this.name;
+                    if(this.name.length > 20){
+                      msg = (this.name).substring(0,20) + '<br>' + (this.name).substring(20,this.name.length - 1);
+                    }else{
+                      msg += this.name;
+                    }
+                    return msg;
+                  }
+                },
+                series : [{
+                  type : 'pie',
+                  data : [
+                    {name : data.info[0][0].name ,y : Number(data.info[0][0].num) , url : '__MODULE__/Goods/edit/id/' + data.info[0][0].goods_id},
+                    {name : data.info[0][1].name ,y : Number(data.info[0][1].num) , url : '__MODULE__/Goods/edit/id/' + data.info[0][1].goods_id},
+                  ]
+                }]
+              });
+
+              $('#context1').highcharts({
+                credits: {
+                  enabled: false,//去掉版权信息
+                },
+                chart : {
+                  type : 'pie'//图表类型是pie图
+                },
+                title : {
+                  text : '<div style="text-align:center;"><span style="color:#c2a96a;font-family:myFirstFont;font-size: 60px; ">' + num1 + '</span>' + '<br/>' + '<span>' + data.info[1][0].mintitle + '</span></div>',
+                  x : -80,
+                  y : 180,
+                  useHTML : true,
+                  fontFamily : "微软雅黑"
+                },
+                plotOptions : {
+                  pie : {
+                    size : 200,//饼状图的大小
+                    innerSize : '150',//饼状图的内径大小，也可以配置为20%的百分比形式
+                    colors : [//饼块颜色控制
+                      '#F48689',
+                      '#3DCFCF',
+                      '#6AB9F4',
+                    ],
+                    dataLabels : {
+                      distance : 15,//数据标签距离饼图边缘的距离，为负数越靠近饼图圆心
+                      formatter : function (){
+                        return this.y + '%';
+                      },
+                      style :{
+                        fontWeight : 'bold',
+                        color : '#fff',
+                      },
+                      enabled : false//去除折线
+                    },
+                    showInLegend: true,//是否显示图例
+                    point : {
+                      events : {
+                        legendItemClick : function(event){
+                          //图例点击事件
+                          //alert("点击了："+this.url);
+                          location.href = this.url;
+                          //return false;
+                        },
+                        click: function(e) {
+                          //图形点击事件
+                          location.href = this.url;
+                          return false;
+                          //location.href = e.point.url; //上面是当前页跳转，如果是要跳出新页面，那就用
+                          //window.open(e.point.url);
+                          //这里的url要后面的data里给出
+                        }
+                      }
+                    }
+                  }
+                },
+                legend:{
+                  layout : 'vertical',//图例布局：垂直排列
+                  align : 'right',//图例水平位置：左对齐
+                  verticalAlign : 'middle',//图例框的垂直对齐方式：顶端对齐
+                },
+                series : [{
+                  type : 'pie',
+                  data : [
+                    {name :data.info[1][0].name ,y: Number(data.info[1][0].num),url:'__MODULE__/User/edit/id/' + data.info[1][0].user_id},
+                    {name :data.info[1][1].name ,y: Number(data.info[1][1].num),url:'__MODULE__/User/edit/id/' + data.info[1][1].user_id},
+                  ]
+                }]
+              });
+
+            }
+          }
+
+
+        }
+    });
+    function show(data,i){
+      var num = 0;
+      var html = '';
+      var series = [];
+        num  += Number(data[i].num);
+
+        //html = '{name:"' + data[j].name + '",y:' + data[j].num+ '},';
+        //series.push({name:data[j].name,y:data[j].num});
+    }
+  });
+
+
+
+</script>
+</body>
+</html>

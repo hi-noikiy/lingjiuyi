@@ -1,0 +1,257 @@
+<include file="Common/header" />
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>基本 <small>分类，查找</small></h5>
+                </div>
+                <div class="ibox-content">
+                    <table class="table table-striped table-bordered table-hover dataTables-example">
+                        <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>用户名</th>
+                            <th>手机号码</th>
+                            <th>邮箱</th>
+                            <th>微信/微博/QQ</th>
+                            <th>用户头像</th>
+                            <th>性别</th>
+                            <th>生日</th>
+                            <th>余额</th>
+                            <th>积分</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 全局js -->
+<script src="/Public/Admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/Public/Admin/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/Public/Plugins/jeditable/jquery.jeditable.js"></script>
+
+<!-- Data Tables -->
+<script src="/Public/Plugins/dataTables/jquery.dataTables.js"></script>
+<script src="/Public/Plugins/dataTables/dataTables.bootstrap.js"></script>
+
+<!-- 自定义js -->
+<script src="/Public/Admin/js/content.js?v=1.0.0"></script>
+<script src="/Public/Plugins/layer/2.4/layer.js"></script>
+
+<!-- Page-Level Scripts -->
+<script>
+    $(document).ready(function () {
+        $('.dataTables-example').dataTable({
+            "ajax": "{:U('User/infolst')}",
+            "columns": [
+                { "data": "id" },
+                { "data": "username" },
+                { "data": "phone" },
+                { "data": "email" },
+                { "data": "sanfang"},
+                { "data": "header_img"},
+                { "data": "gender"},
+                { "data": "birthday"},
+                { "data": "balance"},
+                { "data": "integral"},
+                { "data": null}
+            ],
+            "columnDefs": [
+                {
+                    "targets":-1,
+                    "render":function(data,type,row,meta) {
+                        var id = row.id;
+                        var html = '';
+                        html += "&nbsp;<a href='javascript:void(0);' onclick='editArticle("+ id + ")' class='up btn btn-default btn-xs'><i class='fa fa-arrow-up'></i>冻结</a>";
+                        html += "&nbsp;<a href='javascript:void(0);' onclick='delArticle("+ id + ")' class='down btn btn-default btn-xs'><i class='fa fa-arrow-down'></i>解冻</a><br/>";
+                        html += "&nbsp;<a href='javascript:void(0);' onclick='showaddr("+ id + ")' class='up btn btn-default btn-xs'><i class='fa fa-arrow-up'></i>查看地址</a>";
+                        html += "&nbsp;<a href='javascript:void(0);' onclick='showprice("+ id + ")' class='down btn btn-default btn-xs'><i class='fa fa-arrow-down'></i>消费明细</a><br/>";
+                        return html;
+                    }
+                },
+                {
+                    "targets":5,
+                    "render":function(data,type,row,meta) {
+                        var html = '';
+                        if(row.header_img == null || row.header_img == ''){
+                            html += '暂无头像';
+                        }else{
+                            html += '<img src="'+row.header_img+'" style="width: 40px;" alt="暂无头像"/>';
+                        }
+                        return html;
+                    }
+                }
+            ]
+        });
+    });
+</script>
+<script>
+    function editArticle(id) {
+        $.ajax({
+            type: 'get',
+            url: '__CONTROLLER__/list/id/' + id,
+            dataType: 'json',
+            success  : function(data){
+
+            },
+            error : function(xhr){
+                layer.msg('服务器出错了~~');
+            }
+        });
+    }
+    function delArticle(id) {
+        alert(id);
+    }
+    function showaddr(id){
+        $.ajax({
+            type : 'get',
+            url  : '__CONTROLLER__/addrlst/id/' + id,
+            dataType : 'json',
+            success  : function(data){
+                if(data.code == 10000){
+                    var html =  '<div class="ibox-content">'+
+                                '<table class="table">'+
+                                '<thead>'+
+                                '<tr>'+
+                                '<th>地址编号</th>'+
+                                '<th>收货人姓名</th>'+
+                                '<th>收货地址</th>'+
+                                '<th>收货人手机号</th>'+
+                                '<th>邮编</th>'+
+                                '<th>默认地址</th>'+
+                                '</tr>'+
+                                '</thead>'+
+                                '<tbody>';
+                    for(var i = 0 ; i < data.info.length ; i++){
+                        html += '<tr>'+
+                                '<td>' + data.info[i].id + '</td>'+
+                                '<td>' + data.info[i].consignee + '</td>'+
+                                '<td>' + data.info[i].address + '</td>'+
+                                '<td>' + data.info[i].phone + '</td>'+
+                                '<td>' + data.info[i].zipcode + '</td>';
+                        if(data.info[i].default_addr == 1){
+                            html += '<td>YES</td>';
+                        }else if(data.info[i].default_addr == 0){
+                            html += '<td>NO</td>';
+                        }
+                        html += '</tr>';
+                    }
+                    html += '</tbody>'+
+                            '</table>'+
+                            '</div>';
+                    layer.open({
+                         type: 1
+                        ,skin: 'layui-layer-newadd' //自定义样式
+                        ,title: '用户地址信息'
+                        ,closeBtn: false
+                        ,area: ['80%', '80%'] //宽高
+                        ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                        ,resize: false
+                        ,btn: ['确定']
+                        ,btnAlign: 'c'
+                        ,moveType: 1 //拖拽模式，0或者1
+                        ,content: html
+                        ,yes: function(){
+                            layer.closeAll();
+                        }
+                        ,success: function(layero){
+                            //不用管
+                        }
+                    });
+                }else{
+                    layer.msg(data.msg);
+                }
+
+            },
+            error : function(){
+                layer.msg('服务器出错了~~');
+            }
+        });
+
+    }
+    function showprice(id){
+        $.ajax({
+            type : 'get',
+            url  : '__CONTROLLER__/pricelst/id/' + id,
+            dataType : 'json',
+            success  :function(data){
+                if(data.code == 10000){
+                    var html =  '<div class="ibox-content">'+
+                                '<table class="table">'+
+                                '<thead>'+
+                                '<tr>'+
+                                '<th>消费编号</th>'+
+                                '<th>余额详细</th>'+
+                                '<th>消费类别</th>'+
+                                '<th>变动时间</th>'+
+                                '<th>消费明细</th>'+
+                                '</tr>'+
+                                '</thead>'+
+                                '<tbody>';
+                    for(var i = 0 ; i < data.info.length ; i++){
+                        var price = Number(data.info[i].price);
+                        var action = data.info[i].action;
+                        html += '<tr>'+
+                                '<td>' + data.info[i].id + '</td>';
+                        price > 0 ?
+                                html += "<td style='color:green'>+" + price + "</td>" :
+                                html += "<td style='color:red'>-" + price + "</td>";
+                        switch (action){
+                            case 'order_refund':
+                                html += '<td>订单退款</td>';
+                                break;
+                            case 'admin':
+                                html += '<td>后台调整</td>';
+                                break;
+                            case 'order':
+                                html += '<td>订单消费</td>';
+                                break;
+                            case 'express':
+                                html += '<td>支付邮费</td>';
+                                break;
+                        }
+                        html += '<td>' + data.info[i].add_time + '</td>'+
+                                '<td>' + data.info[i].remark + '</td>'+
+                                '</tr>';
+                    }
+                    html += '</tbody>'+
+                            '</table>'+
+                            '</div>';
+                    layer.open({
+                        type: 1
+                        ,skin: 'layui-layer-newadd' //自定义样式
+                        ,title: '用户消费信息明细'
+                        ,closeBtn: false
+                        ,area: ['80%', '80%'] //宽高
+                        ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                        ,resize: false
+                        ,btn: ['确定']
+                        ,btnAlign: 'c'
+                        ,moveType: 1 //拖拽模式，0或者1
+                        ,content: html
+                        ,yes: function(){
+                            layer.closeAll();
+                        }
+                        ,success: function(layero){
+                            //不用管
+                        }
+                    });
+                }else{
+                    layer.msg(data.msg);
+                }
+            },
+            error : function(){
+                layer.msg('服务器出错了~~');
+            }
+        });
+    }
+</script>
+</body>
+</html>

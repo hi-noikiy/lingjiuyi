@@ -1,0 +1,248 @@
+<include file="Common/header" />
+<style>
+    .newone{
+        border-top:2px solid rgb(24, 166, 137);
+        border-left:2px solid rgb(24, 166, 137);
+        border-right:2px solid rgb(24, 166, 137);
+    }
+    .newtwo{
+        -webkit-transition:border linear .2s,-webkit-box-shadow linear .5s;
+        border-color: rgb(58, 179, 160);
+        -webkit-box-shadow:0 0 18px rgb(24, 166, 137);
+        border-bottom:2px solid rgb(24, 166, 137);
+        border-left:2px solid rgb(24, 166, 137);
+        border-right:2px solid rgb(24, 166, 137);
+    }
+    .form-control{
+        text-align: center;
+    }
+</style>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>商品 <small>属性列表 &emsp;<a href='__CONTROLLER__/add' class="btn btn-default btn-xs">添加</a></small></h5>
+                </div>
+                <div class="ibox-content">
+                    <table class="table" style="text-align: center;border-collapse:collapse;">
+                        <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>商品类型</th>
+                            <th>属性名称</th>
+                            <th>属性类型</th>
+                            <th>录入方式</th>
+                            <th>可选值</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 全局js -->
+<script src="/Public/Admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/Public/Admin/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/Public/Plugins/jeditable/jquery.jeditable.js"></script>
+
+<!-- Data Tables -->
+<script src="/Public/Plugins/dataTables/jquery.dataTables.js"></script>
+<script src="/Public/Plugins/dataTables/dataTables.bootstrap.js"></script>
+
+<!-- 自定义js -->
+<script src="/Public/Admin/js/content.js?v=1.0.0"></script>
+<script>
+    $(document).ready(function () {
+        //初始化表格数据
+        $('.table').dataTable({
+            "order": [[ 1, "asc" ]], //默认排序
+            "ajax": "{:U('Attribute/lst')}",
+            "serverSide" : true,// 服务器端分页处理
+            searching: false,//是否显示搜索框
+            "columns": [
+                { "data": "attr_id" },
+                { "data": "cate_name" },
+                { "data": "attr_name" },
+                { "data": "attr_type" },
+                { "data": "attr_input_type" },
+                { "data": "attr_values" },
+                { "data": null}
+            ],
+            "columnDefs": [
+                {
+                    "bSortable": false,//禁止排序
+                    "targets":-1,
+                    "render":function(data,type,row,meta) {
+                        var id = row.attr_id;
+                        var html = '';
+                        html += "&nbsp;<a href='javascript:void(0);' onclick='editAttribute(this,"+ id + ")' class='up btn btn-default btn-xs'><i class='fa fa-arrow-up'></i>编辑</a>";
+                        html += "&nbsp;<a href='javascript:void(0);' onclick='delAttribute("+ id + ")' class='down btn btn-default btn-xs'><i class='fa fa-arrow-down'></i>删除</a>";
+                        return html;
+                    }
+                },
+                {
+                    "targets":3,
+                    "render":function(data,type,row,meta) {
+                        var attr_type = row.attr_type;
+                        var html = '';
+                        if(attr_type == 0){
+                            html = '唯一属性';
+                        }else if(attr_type == 1){
+                            html = '单选属性';
+                        }else{
+                            html = '复选属性';
+                        }
+                        return html;
+                    }
+                },
+                {
+                    "targets":4,
+                    "render":function(data,type,row,meta) {
+                        var attr_input_type = row.attr_input_type;
+                        var html = '';
+                        if(attr_input_type == 0){
+                            html = '输入框';
+                        }else if(attr_input_type == 1){
+                            html = '下拉列表';
+                        }else{
+                            html = '多选框';
+                        }
+                        return html;
+                    }
+                }
+            ]
+        });
+
+    });
+    //修改
+    function editAttribute(now,id){
+        if($('#main').length >= 1){
+            $('#main').remove();//移除上一个动态添加的main
+            $('tr').removeClass('newone');//移除所有的tr上的新样式
+            if(localStorage.id == id){
+                return false;
+            }else{
+                localStorage.id = id;
+            }
+        }
+        localStorage.id = id;
+
+        var html = '<tr class="odd" id="main">';
+        $(now).closest('tr').each(function(i){                   // 遍历 tr
+            $(this).children('td').each(function(j){  // 遍历 tr 的各个 td
+
+                if(j+1 == 3){
+                    html += '<td><input type="text" id="attr_name" class="form-control" style="width: 120px;" value="'+$(this).text()+'"></td>';
+                }else if(j+1 == 4){
+                    html += '<td class="sorting_1">'+
+                            '<select class="form-control" id="attr_type">'+
+                            '<option value="0"';
+                    if($(this).text() == '唯一属性'){
+                        html += 'selected';
+                    }
+                    html += '>唯一属性</option>'+
+                            '<option value="1"';
+                    if($(this).text() == '单选属性'){
+                        html += 'selected';
+                    }
+                    html += '>单选属性</option>'+
+                            '<option value="2"';
+                    if($(this).text() == '复选属性'){
+                        html += 'selected';
+                    }
+                    html += '>复选属性</option>'+
+                            '</select>'+
+                            '</td>';
+                }else if(j+1 == 5){
+                    html += '<td class="sorting_1">'+
+                            '<select class="form-control" id="attr_input_type">'+
+                            '<option value="0"';
+                    if($(this).text() == '输入框'){
+                        html += 'selected';
+                    }
+                    html += '>输入框</option>'+
+                            '<option value="1"';
+                    if($(this).text() == '下拉列表'){
+                        html += 'selected';
+                    }
+                    html += '>下拉列表</option>'+
+                            '<option value="2"';
+                    if($(this).text() == '多选框'){
+                        html += 'selected';
+                    }
+                    html += '>多选框</option>'+
+                            '</select>'+
+                            '</td>';
+                }else if(j+1 == 6){
+                    html += '<td class="sorting_1"><input type="text" id="attr_values" class="form-control" style="width: 420px;" value="'+$(this).text()+'"></td>';
+                }else if(j+1 == 7){
+                    html += '<td class="sorting_1"><button class="btn btn-white btn-xs" type="submit">保存</button></td>';
+                }else{
+                    html += '<td class="sorting_1">' + $(this).text() + '</td>';
+                }
+
+                //console.log("第"+(i+1)+"行，第"+(j+1)+"个td的值："+$(this).text()+"。");
+            });
+        });
+        html += '</tr>';
+        $(now).closest('tr').after(html);
+        $(now).closest('tr').addClass('newone');
+        $('#main').addClass('newtwo');
+        $(document).on('click','.btn-white',function(){
+            var id = $(this).closest('tr').children('td').eq(0).text();
+            var attr_name  = $('#attr_name').val();
+            var attr_type  = $('#attr_type option:selected').val();
+            var attr_input_type = $('#attr_input_type option:selected').val();
+            var attr_values = $('#attr_values').val();
+            //console.log(id + '---' +attr_name + '---'+attr_type+'---'+attr_input_type+'---'+attr_values);
+            $.ajax({
+                type : 'post',
+                url  : '__CONTROLLER__/edit',
+                data : {id:id,attr_name:attr_name,attr_type:attr_type,attr_input_type:attr_input_type,attr_values:attr_values},
+                dataType : 'json',
+                success  : function(data){
+                    if(data.code == 10000){
+                        parent.layer.msg('修改成功');
+                        self.location.reload();
+                    }else{
+                        parent.layer.msg(data.msg);
+                        return false;
+                    }
+                }
+
+            });
+        });
+    }
+    //删除
+    function delAttribute(id){
+        parent.layer.confirm('确定要删除？', {
+            btn: ['没错','算了吧'], //按钮
+            shade: false //不显示遮罩
+        }, function(){
+            $.ajax({
+                type : 'get',
+                url  : '__CONTROLLER__/del/id/' + id,
+                dataType : 'json',
+                success  : function(data){
+                    if(data.code == 10000){
+                        parent.layer.msg('删除成功！你会后悔的！', {icon: 1});
+                        self.location.reload();
+                    }else{
+                        parent.layer.msg(data.msg, {shift: 6});
+                    }
+                },
+                error : function(){
+                    parent.layer.msg('服务器出错了！', {shift: 6});
+                }
+            });
+        }, function(){
+            parent.layer.msg('不删就不删', {shift: 6});
+        });
+    }
+</script>
+</body>
+</html>

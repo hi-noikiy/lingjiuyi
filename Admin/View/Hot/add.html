@@ -1,0 +1,151 @@
+<include file="Common/header" />
+<style type='text/css'>
+#uploadify {
+	position: relative;
+}
+.uploadify-queue {
+	display: none; /*去除uploadify滚动条*/
+}
+#uploadify object#SWFUpload_0 {
+	position: absolute;
+	left: 0
+}
+.uploadify-button {
+	border-radius: 0;
+}
+.uploadify-button-text {
+	position: absolute;
+	left: 35px;
+}
+#showpic {
+	position: relative;
+	width: 150px;
+	height: 120px;
+	text-align: center;
+	line-height: 120px;
+	border: 1px #E5E6E7 solid;
+	z-index: 999;
+}
+</style>
+<script src="/Public/Admin/js/jquery.min.js?v=2.1.4"></script>
+<script type="text/javascript" src="/Public/Plugins/uploadify/jquery.uploadify.min.js"></script>
+</head>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <h5>热门管理</h5>
+        </div>
+        <div class="ibox-content">
+          <form action="{:U('Hot/addok')}" method="post" class="form-horizontal">
+            <div class="form-group">
+              <label class="col-sm-1 control-label">标题信息</label>
+              <div class="col-sm-9">
+                <input type="text" name="title" placeholder="请输入标题" class="form-control">
+              </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group">
+              <label class="col-sm-1 control-label">上传图片</label>
+              <div class="col-sm-9">
+                <input type="hidden" name='small' id='small' />
+                <input type='hidden' name='thumb' id='thumb' />
+                <input type="file" name="uploadify" id="uploadify" />
+                <div id="showpic">ShowPic</div>
+              </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group">
+              <label class="col-sm-1 control-label">链接地址</label>
+              <div class="col-sm-9">
+                <input type="text" name="link" placeholder="请输入链接地址" class="form-control">
+              </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group">
+              <label class="col-sm-1 control-label">排序编号</label>
+              <div class="col-sm-9">
+                <input type="text" name="listorder" placeholder="50" class="form-control">
+              </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group">
+              <label class="col-sm-1 control-label">信息描述</label>
+              <div class="col-sm-9">
+                <textarea name="description" cols="40" rows="5" placeholder="请输入文章描述" class="form-control"></textarea>
+              </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group">
+              <div class="col-sm-4">
+                <button class="btn btn-primary" type="submit">保存内容</button>
+                <button class="btn btn-white" type="submit">取消</button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 全局js --> 
+<script src="/Public/Admin/js/bootstrap.min.js?v=3.3.6"></script> 
+
+<!-- 自定义js --> 
+<script src="/Public/Admin/js/content.js?v=1.0.0"></script> 
+
+<!-- iCheck --> 
+<script src="/Public/Plugins/iCheck/icheck.min.js"></script>
+
+<!-- SUMMERNOTE --> 
+<script src="/Public/Plugins/summernote/summernote.min.js"></script>
+<script src="/Public/Plugins/summernote/summernote-zh-CN.js"></script>
+<script>
+	$(document).ready(function () {
+		$("button[type='submit']").bind('click',function(){
+			$('#content').val($('.summernote').code());
+		});
+		$("#uploadify").uploadify({
+			//指定swf文件
+			'swf': '/Public/Admin/uploadify/uploadify.swf',
+			//后台处理的页面
+			'uploader': '{:U("Admin/Hot/uploadify")}',
+			//按钮显示的文字
+			'buttonText': '上传图片',
+			//显示的高度和宽度，默认 height 30；width 120
+			//'height': 15,
+			//'width': 80,
+			//上传文件的类型  默认为所有文件    'All Files'  ;  '*.*'
+			//在浏览窗口底部的文件类型下拉菜单中显示的文本
+			'fileTypeDesc': 'Image Files',
+			//允许上传的文件后缀
+			'fileTypeExts': '*.gif; *.jpg; *.png',
+			//发送给后台的其他参数通过formData指定
+			//'formData': { 'someKey': 'someValue', 'someOtherKey': 1 },
+			//上传文件页面中，你想要用来作为文件队列的元素的id, 默认为false  自动生成,  不带#
+			//'queueID': 'fileQueue',
+			//选择文件后自动上传
+			'auto': true,
+			//上传成功后
+			'onUploadSuccess': function(file, data, response){
+				//使用split方法对字符串data进行分割，返回数组（explode)
+				var arr = data.split('|');
+				//big大图 = arr[0],small小图 = arr[1]
+				$('#small').val(arr[1]);
+				$('#thumb').val(arr[0]);
+				//在showPic区域显示缩略图
+				$('#showpic').html('<img src="/Uploads/images/'+arr[1]+'" />');
+			}
+		});
+
+		$('.summernote').summernote({
+			lang: 'zh-CN'
+		});
+	});
+</script>
+</body>
+</html>

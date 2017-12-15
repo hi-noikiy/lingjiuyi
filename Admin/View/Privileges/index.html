@@ -1,0 +1,84 @@
+<include file="Common/header" />
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+  <div class="row">
+    <div class="col-sm-12">
+      <div class="ibox float-e-margins">
+        <div class="ibox-title">
+          <h5>基本 <small>分类，查找</small></h5>
+        </div>
+        <form action="{:U('Privileges/editok')}" method="post">
+          <div class="ibox-content">
+            <table class="table table-striped table-bordered table-hover dataTables-example">
+              <thead>
+                <tr>
+                  <th>选择</th>
+                  <th>菜单名称</th>
+                  <th>模块</th>
+                  <th>控制器</th>
+                  <th>方法</th>
+                  <th>添加时间</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <th>选择</th>
+                  <th>菜单名称</th>
+                  <th>模块</th>
+                  <th>控制器</th>
+                  <th>方法</th>
+                  <th>添加时间</th>
+                </tr>
+              </tbody>
+            </table>
+            <input type="hidden" name="roleid" value="{$roleid}" />
+            <input class="btn btn-default" type="submit" name="submit" value="设置权限" />
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- 全局js --> 
+<script src="/Public/Admin/js/jquery.min.js?v=2.1.4"></script> 
+<script src="/Public/Admin/js/bootstrap.min.js?v=3.3.6"></script> 
+<script src="/Public/Plugins/jeditable/jquery.jeditable.js"></script>
+
+<!-- Data Tables --> 
+<script src="/Public/Plugins/dataTables/jquery.dataTables.js"></script>
+<script src="/Public/Plugins/dataTables/dataTables.bootstrap.js"></script>
+
+<!-- 自定义js --> 
+<script src="/Public/Admin/js/content.js?v=1.0.0"></script> 
+
+<!-- Page-Level Scripts --> 
+<script>
+	$(document).ready(function () {
+		$('.dataTables-example').dataTable({
+			"ajax": "{:U('Menu/lst')}",
+			"bSort": false,
+			"aLengthMenu": [20, 30, 50, -1],
+			"columns": [
+				{
+				  "sClass": "text-center",
+				  "data": "menuid",
+				  "render": function (data, type, row, meta) {
+					 console.log(row);
+					 return '<input type="checkbox" name="menuid[]" value="' + row.menuid + '" />';
+				   },
+				   "bSortable": false
+				},
+				{ "data": "name" },
+				{ "data": "m" },
+				{ "data": "c" },
+				{ "data": "a" },
+				{ "data": "addtime" }
+			],
+			"paging": false,
+			"bInfo": false
+		});
+	});
+</script>
+</body>
+</html>

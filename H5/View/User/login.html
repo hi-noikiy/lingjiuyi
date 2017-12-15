@@ -1,0 +1,83 @@
+
+<script src="__PUBLIC__/H5/js/base/layer.js" type="text/javascript"></script>
+<style type="text/css">
+.form-list .name {
+    padding-left: 15px;
+}
+</style>
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12 tc mt20 mb20">
+            <img src="__PUBLIC__/H5/css/images/logo.png" class="pc-20"/>
+        </div>
+    </div>
+    <div class="row form-list bgwhite">
+        <div class="col-xs-3 name">手机号</div>
+        <div class="col-xs-9 input-text">
+            <input type="text" id="J_username" name="username" placeholder="手机号/用户名/邮箱" />
+        </div>
+        <div class="col-xs-3 name">登录密码</div>
+        <div class="col-xs-9 input-text">
+            <input type="password" id="J_password" name="password" placeholder="请输入登录密码" >
+        </div>
+    </div>
+    <div class="row form-list">
+        <div class="col-xs-12 mt20"> <button class="submit-btn" >登录</button></div>
+        <div class="col-xs-12 mt10">
+            <a href="__CONTROLLER__/register" class="fl fs-12">快速注册！</a>
+            <a href="forget_pass.html" class="fr fs-12">忘记密码？</a>
+        </div>
+    </div>
+</div>
+<script>
+    $(function(){
+        $(".submit-btn").on("click", function() {
+            var username = $("#J_username").val();
+            var password= $("#J_password").val();
+            if (username== ""||password=="") {
+                layer.open({
+                    content: '账号或密码不能为空'
+                    ,skin: 'msg'
+                    ,time: 2 //2秒后自动关闭
+                });
+            }else{
+                $.ajax({
+                    type: 'post',
+                    url:'__MODULE__/User/ajax_login',
+                    dataType: 'json',
+                    data : {username:username,password:password},
+                    success: function(data){
+                        if(data.code==10000){
+                            //localStorage.apiTocken=data.data.apiTocken;
+                            //localStorage.uid=data.data.id;
+                            layer.open({
+                                content: '登录成功'
+                                ,skin: 'msg'
+                                ,time: 2 //2秒后自动关闭
+                                ,end:function(){
+                                    if(!localStorage.currenturl){
+                                        location.href="__MODULE__/User/my";
+                                    }else{
+                                        location.href=localStorage.currenturl;
+                                    }
+
+                                }
+                            });
+
+                        }else{
+                            layer.open({
+                                content: data.msg
+                                ,skin: 'msg'
+                                ,time: 2 //2秒后自动关闭
+                            });
+                        }
+
+                    },
+                    error: function(xhr, type){
+
+                    }
+                });
+            }
+        })
+    });
+</script>

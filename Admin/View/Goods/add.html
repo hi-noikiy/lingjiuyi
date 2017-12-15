@@ -1,0 +1,491 @@
+<include file="Common/header" />
+<style>
+    .clearfix:after{content:"\20";display:block;height:0;clear:both;visibility:hidden}.clearfix{zoom:1}
+    .tabBar {border-bottom: 2px solid #8c8c8c}
+    .tabBar span {background-color: #e8e8e8;cursor: pointer;display: inline-block;float: left;font-weight: bold;height: 40px;line-height: 40px;padding: 0 15px}
+    .tabBar span.current{background-color: #8c8c8c;color: #fff}
+    .tabCon {display: none;padding: 20px 20px;}
+
+    .btn-upload{position: relative; display:inline-block;height:36px; *display:inline;overflow:hidden;vertical-align:middle;cursor:pointer;padding: 0 15px;}
+    .upload-url{cursor: pointer}
+    .input-file{position:absolute; right:0; top:0; cursor: pointer; z-index:1; font-size:30em; *font-size:30px;opacity:0;filter: alpha(opacity=0)}
+    .btn-upload .input-text{ width:auto;}
+    .form-group .upload-btn{ margin-left:-1px}
+
+    .codeView {
+        height: auto;
+    }
+
+    .docs-example {
+        position: relative;
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    .form legend {
+        width: 100%;
+        margin-bottom: 20px;
+        font-size: 21px;
+        line-height: 40px;
+        border: 0;
+        border-bottom: 1px solid #e5e5e5;
+    }
+    legend {
+        width: 100%;
+        margin-bottom: 20px;
+        font-size: 21px;
+        line-height: 40px;
+        border: 0;
+        border-bottom: 1px solid #e5e5e5;
+    }
+    .form .row {
+        margin-top: 15px;
+    }
+    .row {
+        box-sizing: border-box;
+        margin-left: -15px;
+        margin-right: -15px;
+    }
+    .cl, .clearfix {
+        zoom: 1;
+    }
+    .form-horizontal .form-label {
+        text-align: left;
+    }
+    .form-horizontal .form-label {
+        margin-top: 3px;
+        cursor: text;
+        text-align: right;
+    }
+    .form-label {
+        display: block;
+        color: #555;
+    }
+    .col-xs-4 {
+        width: 20%;
+    }
+    .col-xs-6 {
+        width: 40%;
+    }
+
+    .formControls {
+        position: relative;
+    }
+
+    input[type="submit"], input[type="reset"], input[type="button"], input[type="text"], input[type="password"] {
+        -webkit-appearance: none;
+        outline: 0;
+        border:none;
+        border-bottom: solid 1px #ddd;
+    }
+    .formControls>* {
+        vertical-align: middle;
+    }
+    .input-text, .textarea {
+        box-sizing: border-box;
+        width: 100%;
+        -webkit-transition: all .2s linear 0s;
+        -moz-transition: all .2s linear 0s;
+        -o-transition: all .2s linear 0s;
+        transition: all .2s linear 0s;
+    }
+    .input-text, .btn, .input-text.size-M, .btn.size-M {
+        font-size: 14px;
+        height: 31px;
+        line-height: 1.42857;
+        padding: 4px;
+    }
+    .select-box{border:solid 1px #ddd;box-sizing:border-box;vertical-align:middle; width:100%; display:inline-block}
+    .select{border:solid 1px #ddd;box-sizing:border-box;cursor: pointer;line-height:normal;font-weight: normal;width:100%; white-space:nowrap}
+    .select-box .select{ border:none}
+    select[multiple], select[size] {
+        height: 20px;
+    }
+    .webuploader-pick {
+        position: relative;
+        display: inline-block;
+        cursor: pointer;
+        background: #1ab394;
+        padding: 0px 0px;
+        color: #fff;
+        text-align: center;
+        border-radius: 3px;
+        overflow: hidden;
+    }
+</style>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>商品 <small>添加商品 &emsp;<a href="__CONTROLLER__/index"><i class="fa fa-share" aria-hidden="true"></i> 商品列表页</a></small></h5>
+                </div>
+                <div class="ibox-content">
+                    <form action="__SELF__" method="post"  enctype="multipart/form-data" id="form_add">
+                    <div id="tab_demo" class="HuiTab">
+                        <div class="tabBar clearfix">
+                            <span>相册</span><span>基本信息</span><span>详细信息</span>
+                        </div>
+                        <div class="tabCon">
+                            <div class="codeView docs-example form form-horizontal" style="padding-bottom: 40px;">
+                                <div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3">商品相册：</label>
+                                    <br/>
+                                    <span>提示：请上传像素大于800px的图片，图片尺寸需要1:1,否则将自动剪裁成1:1</span>
+                                </div>
+                                <div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3"></label>
+                                    <div class="formControls col-xs-6 col-sm-8">
+                                    <span class="btn-upload form-group">
+                                    <a href="javascript:void(0);" id="show-file" class="btn btn-primary"><i class="fa fa-plus-circle"></i> 添加图片</a>
+                                    </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tabCon">
+                            <div class="codeView docs-example form form-horizontal" style="padding-bottom: 40px;">
+                                <div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3">商品名称：</label>
+                                    <div class="formControls col-xs-6 col-sm-8">
+                                        <input type="text" name="goods_name" class="input-text" autocomplete="off" placeholder="商品名称" >
+                                    </div>
+                                </div>
+                                <div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3">商品原价：</label>
+                                    <div class="formControls col-xs-4 col-sm-8">
+                                        <input type="text" name="goods_bigprice" class="input-text" autocomplete="off" placeholder="商品原价" >
+                                    </div>
+                                </div>
+                                <div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3">商品售价：</label>
+                                    <div class="formControls col-xs-4 col-sm-8">
+                                        <input type="text" name="goods_price" class="input-text" autocomplete="off" placeholder="商品售价" >
+                                    </div>
+                                </div>
+                                <div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3">商品进价：</label>
+                                    <div class="formControls col-xs-4 col-sm-8">
+                                        <input type="text" name="goods_smallprice" class="input-text" autocomplete="off" placeholder="商品进价" >
+                                    </div>
+                                </div>
+                                <div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3">商品库存：</label>
+                                    <div class="formControls col-xs-4 col-sm-8">
+                                        <input type="text" name="goods_number" class="input-text" autocomplete="off" placeholder="商品库存" >
+                                    </div>
+                                </div>
+                                <div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3">商品logo：</label>
+                                    <div class="formControls col-xs-9 col-sm-9">
+                                        <span class="btn-upload form-group">
+                                        <a href="javascript:void(0);" class="btn btn-primary upload-btn">
+                                            <i class="fa fa-cloud-upload"></i> 上传图片
+                                        </a>
+                                        <input type="file" id="goods_small_img" name="goods_small_img" value="" class="input-file">
+                                        </span>
+                                        <div>
+                                            <span>提示：请上传像素大于350px的图片，图片尺寸需要1:1</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3">活动商品：</label>
+                                    <div class="formControls skin-minimal col-xs-6 col-sm-8">
+                                        <div class="radio-box">
+                                            <input type="radio" id="act-1" name="act" value="1" checked>
+                                            <label for="act-1">是</label>
+                                            &emsp;&emsp;
+                                            <input type="radio" id="act-0" name="act" value="0">
+                                            <label for="act-0">否</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3">所属分类：</label>
+                                    <div class="col-xs-4 col-sm-3">
+                                        <select class="dfinput select" size="1" name="cate_id">
+                                            <option value="0">==请选择==</option>
+                                            <volist name="cates" id="val">
+                                                <option value="{$val.id}">{$val.cate_name}</option>
+                                            </volist>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tabCon">
+                            <div class="codeView docs-example form form-horizontal" style="padding-bottom: 40px;">
+                                <div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3">商品详情：</label>
+                                    <div class="col-xs-6 col-sm-8">
+                                        <textarea id="ueditor" class="textarea" placeholder="说点什么..." style="width: 800px;height:400px;" name="goods_introduce"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="text-align:center;">
+                        <button class="btn btn-primary" id="submit">提交</button>
+                    </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 全局js -->
+<script src="/Public/Admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/Public/Admin/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/Public/Plugins/jeditable/jquery.jeditable.js"></script>
+
+<!-- Data Tables -->
+<script src="/Public/Plugins/dataTables/jquery.dataTables.js"></script>
+<script src="/Public/Plugins/dataTables/dataTables.bootstrap.js"></script>
+
+<!-- 自定义js -->
+<script src="/Public/Admin/js/content.js?v=1.0.0"></script>
+<script src="/Public/Plugins/layer/layer.min.js"></script>
+
+<script src="/Public/Plugins/ajaxfileuploader/ajaxfileupload.js"></script>
+<script src="/Public/Plugins/ueditor/1.4.3/ueditor.config.js"></script>
+<script src="/Public/Plugins/ueditor/1.4.3/ueditor.all.min.js"></script>
+<!-- Page-Level Scripts -->
+<script>
+    jQuery.Huitab =function(tabBar,tabCon,class_name,tabEvent,i){
+        var $tab_menu=$(tabBar);
+        // 初始化操作
+        $tab_menu.removeClass(class_name);
+        $(tabBar).eq(i).addClass(class_name);
+        $(tabCon).hide();
+        $(tabCon).eq(i).show();
+
+        $tab_menu.bind(tabEvent,function(){
+            $tab_menu.removeClass(class_name);
+            $(this).addClass(class_name);
+            var index=$tab_menu.index(this);
+            $(tabCon).hide();
+            $(tabCon).eq(index).show();
+        });
+    };
+    var ue = UE.getEditor('ueditor', {
+        autoHeight: false
+    });
+    $(function(){
+        $.Huitab("#tab_demo .tabBar span","#tab_demo .tabCon","current","click","1");
+        //获取商品分类
+        $(document).on('change','.dfinput',function(){
+            var id = $(this).find('option:selected').val();
+            var _this = this;
+            $(_this).nextAll().remove();
+
+            if(id != 0 ){
+                $.ajax({
+                    type : 'POST',
+                    url  : '__MODULE__/Category/get_cate',
+                    dataType : 'json',
+                    data : {id:id},
+                    success : function(data){
+                        var html = '';
+                        if(data.code == 10000){
+                            html = '<div style="height: 10px;"></div><select name="cate_id" class="dfinput select" size="1"><option value="0">--请选择--</option>';
+                            for(var i = 0; i < data.info.cate.length; i++){
+                                html +=  '<option value="' + data.info.cate[i].id + '">' + data.info.cate[i].cate_name + '</option>';
+                            }
+                            html += '</select>';
+                            $(html).appendTo($(_this).closest('.col-xs-4'));
+                            var attrs = '';
+                            if(data.info.attrs.length != 0){
+                                //pid== 0 有属性 当pid ！=0时 为''
+                                for(var j = 0; j < data.info.attrs.length; j++){
+                                    var attr = data.info.attrs[j];
+                                            if(attr.attr_input_type == 0){
+                                                attrs +='<div class="row cl">'+
+                                                        '<label class="form-label col-xs-4 col-sm-3">'+ attr.attr_name +'：</label>'+
+                                                        '<div class="formControls col-xs-4 col-sm-8">'+
+                                                        '<input type="text" name="attr_value['+ attr.attr_id +
+                                                        '][]" class="input-text" autocomplete="off" placeholder="" value="">'+
+                                                        '</div>'+
+                                                        '</div>';
+                                            }else if(attr.attr_input_type == 1){
+                                                attrs +='<div class="row cl">'+
+                                                        '<label class="form-label col-xs-4 col-sm-3">'+ attr.attr_name +'：</label>'+
+                                                        '<div class="formControls col-xs-4 col-sm-8">'+
+                                                        '<span class="select-box">'+
+                                                        '<select class="select" size="1" name="attr_value['+ attr.attr_id +'][]">';
+                                                for(var k = 0;k < attr.attr_values.length; k++){
+                                                    attrs +='<option value="'+ attr.attr_values[k] +'" >'+ attr.attr_values[k] +'</option>';
+                                                }
+                                                attrs +='</select>'+
+                                                        '</span>'+
+                                                        '</div>'+
+                                                        '</div>';
+                                            }else if(attr.attr_input_type == 2){
+                                                attrs +='<div class="row cl">'+
+                                                        '<label class="form-label col-xs-4 col-sm-3">'+ attr.attr_name +'：</label>'+
+                                                        '<div class="formControls skin-minimal col-xs-9 col-sm-9">'+
+                                                        '<div class="check-box">';
+                                                for(var h = 0;h < attr.attr_values.length; h++){
+                                                    attrs +='<input type="checkbox" id="checkbox-5" name="attr_value['+ attr.attr_id +'][]" value="'
+                                                            + attr.attr_values[h] +'">'+
+                                                            '<label for="checkbox-5">'+attr.attr_values[h]+'</label>&emsp;&emsp;';
+                                                }
+
+                                                attrs +='</div>'+
+                                                        '</div>'+
+                                                        '</div>';
+                                            }
+                                }
+                                $(_this).closest('.row').nextAll('.row').remove();
+                                $(_this).closest('.row').after(attrs);
+                            }else if(data.info.attrs.length == 0){
+                                //pid == 0 需要清除属性
+                                $(_this).closest('.row').nextAll('.row').remove();//如果
+                            }
+
+                        }
+
+//                        var gid = $("select:last").find('option:selected').val();
+//                        console.log(gid);
+                    }
+                });
+            }
+        });
+        //点击添加图片
+        $('#show-file').click(function(){
+
+            var html =  '<div class="row cl">'+
+                        '<label class="form-label col-xs-4 col-sm-3"></label>'+
+                        '<div class="formControls col-xs-6 col-sm-8">'+
+                        '<span class="btn-upload form-group">'+
+                        '<a href="javascript:void(0);" class="btn btn-primary upload-btn">'+
+                        '<i class="fa fa-cloud-upload"></i> 上传图片'+
+                        '</a>'+
+                        '<input type="file" multiple id="goods_pics" name="goods_pics[]" class="input-file">'+
+                        '</span>'+
+                        '</div>'+
+                        '</div>';
+            $(this).closest('.row').before(html);
+
+        });
+        //上传相册图片预览
+        $(document).on('change','#goods_pics',function(){
+            show_img(this,'goods_pics');
+        });
+
+
+        $('#goods_small_img').change(function(){
+            show_img(this,'goods_small_img');
+        });
+        function show_img(obj,name){
+            var _this = obj;//obj不能直接获取，所以在这里接收一下
+            //判断浏览器是否支持FileReader接口
+            if (typeof FileReader == 'undefined') {
+                layer.msg('当前浏览器不支持FileReader接口', {icon: 5});
+                //使选择控件不可操作
+                document.getElementById('"'+name+'"').setAttribute("disabled", "disabled");
+            }
+            var file = obj.files[0];
+            // 获取文件路径
+            var filePath = file['name'];
+            // 获取“.”位置
+            var extStart = filePath.lastIndexOf(".");
+            // 获取文件格式后缀，并全部大写
+            var ext = filePath.substring(extStart, filePath.length).toUpperCase();
+            // 判断文件格式
+            if (ext != ".BMP" && ext != ".PNG" && ext != ".JPG" && ext != ".JPEG") {
+                layer.open({
+                    content: "图片仅限于.gif .png .jpg .jpeg文件。"
+                    ,skin: 'msg'
+                    ,time: 1 //2秒后自动关闭
+                });
+                // alert("图片仅限于.gif .png .jpg .jpeg文件。");
+                return false;
+            }else{
+                var html = '';
+                var reader = new FileReader();
+                //读取文件过程方法
+                reader.onloadstart = function (e) {
+                    console.log("开始读取....");
+                };
+                reader.onprogress = function (e) {
+                    console.log("正在读取中....");
+                };
+                reader.onabort = function (e) {
+                    console.log("中断读取....");
+                };
+                reader.onerror = function (e) {
+                    console.log("读取异常....");
+                };
+                reader.onload = function (e) {
+                    console.log("成功读取....");
+                    if(name == 'goods_pics'){
+                        html += '<div class="row cl">'+
+                                '<label class="form-label col-xs-4 col-sm-3"></label>'+
+                                '<div class="formControls col-xs-6 col-sm-8">'+
+                                '<img src="'+ e.target.result +'" alt="暂无图片" style="width: 100px;padding-bottom: 10px;">'+
+                                '<span class="btn-upload form-group">'+
+                                '<a href="javascript:void(0);" id="del_pics" class="btn btn-primary upload-btn">'+
+                                '<i class="fa fa-minus-square" aria-hidden="true"></i> 删除图片'+
+                                '</a>'+
+                                '</span>'+
+                                '</div>'+
+                                '</div>';
+                        $(_this).closest('.row').before(html);
+                        $(_this).closest('.row').hide();
+
+                    }else{
+                        //商品图片添加
+                        html += '<img src="'+ e.target.result +'" alt="暂无图片" style="width: 100px;">';
+                        var obj = $('#'+name).closest('div').find('div').find('img');
+                        var length = obj.length;
+                        if(length >= 1){
+                           obj.remove();
+                        }
+                        $('#'+name).closest('div').find('div').find('span').before(html);
+                    }
+                };
+                reader.readAsDataURL(file);
+
+            }
+        }
+
+    });
+    //删除相册
+    $(document).on('click','#del_pics',function(){
+        var _this = this;
+        $(this).closest('.row').remove();//移除图片一行
+        $('#goods_pics').closest('.row').remove();
+    });
+    //验证表单数据
+    $('#submit').click(function(){
+
+        var res = true;
+        $("input[type=text]").each(function(i){
+            if($(this).val() ==""){
+                res = false;
+                layer.msg('商品属性不能为空哦！', {icon: 5});
+                return false;
+            }
+        });
+        if(!res)return false;
+        $('.input-file').each(function(){
+            if($(this).val() == ''){
+                res = false;
+                layer.msg('基本信息中的商品logo为必填哦！相册中点击上传图片之后必须上传图片，不能为空哦！', {icon: 5});
+                return false;
+            }
+        });
+        if(!res)return false;
+        $('#form_add').submit();
+
+    });
+
+
+
+
+</script>
+</body>
+</html>

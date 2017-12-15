@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <meta name="format-detection" content="telephone=no, email=no"/>
+    <title>零玖一</title>
+    <link href="__PUBLIC__/H5/css/style/swiper-3.3.1.min.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/style/style.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/style/bootstrap.min.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/style/base.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/layer.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/pullToRefresh.css" type="text/css" rel="stylesheet"/>
+
+    <script src="__PUBLIC__/H5/js/base/layer.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/jquery.min.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/swiper.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/iscroll.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/pullToRefresh.mini.js" type="text/javascript"></script>
+    <style>
+        ::-webkit-input-placeholder { /* WebKit browsers */
+            color: #ff608a;
+        }
+        :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+            color: #ff608a;
+        }
+        ::-moz-placeholder { /* Mozilla Firefox 19+ */
+            color: #ff608a;
+        }
+        :-ms-input-placeholder { /* Internet Explorer 10+ */
+            color: #ff608a;
+        }
+        .scroller li{padding:0;}
+    </style>
+
+</head>
+<body class="graybg" style="position:static; height:100%; margin:0; background: #f5f5f5">
+{__CONTENT__}
+
+<!--底部导航-->
+<div style="height:50px;"></div>
+<div class="container-fluid oh footer pf b0 l0 r0" style="z-index: 10;">
+    <div class="row">
+        <div class="col-xs-2 bnav">
+            <a <if condition=" '__CONTROLLER__' == '/H5/Index' ">class='ac'</if>>
+                <i class="home"></i>
+                <span>首页</span>
+            </a>
+        </div>
+
+        <div class="col-xs-2 bnav">
+            <a <if condition=" '__CONTROLLER__' == '/H5/Goods' ">class='ac'</if>>
+                <i class="promotion"></i>
+                <span>特惠精品</span>
+            </a>
+        </div>
+        <div class="col-xs-2 bnav">
+            <a <if condition=" '__CONTROLLER__' == '/H5/Activity' ">class='ac'</if>>
+                <i class="category"></i>
+                <span>限时活动</span>
+            </a>
+        </div>
+        <div class="col-xs-2 bnav">
+            <a id="order" <if condition=" '__CONTROLLER__' == '/H5/Cart' ">class='ac'</if>>
+                <i class="news"></i>
+                <span>购物车</span>
+            </a>
+        </div>
+        <div class="col-xs-2">
+            <a id='wode' userinfo="{$Think.session.userinfo}" <if condition=" '__CONTROLLER__' == '/H5/User' ">class='ac'</if>>
+                <i class="user"></i>
+                <span>账户</span>
+            </a>
+        </div>
+    </div>
+</div>
+<script>
+    $(function(){
+        $('.home').click(function(){
+            location.href= '/H5/Index/index';
+        });
+        $('.promotion').click(function(){
+            location.href= '/H5/Goods/index';
+        });
+        $('.category').click(function(){
+            location.href= '/H5/Activity/index';
+        });
+
+        //点击购物车
+        $('#order').click(function(){
+            var userinfo = "{$Think.session.userinfo.id}";
+            //console.log(userinfo);
+            if(!userinfo){
+                layer.open({
+                    content: '请先登录'
+                    ,skin: 'msg'
+                    ,time: 2 //2秒后自动关闭
+                    ,end:function(){
+                        localStorage.currenturl = '__MODULE__/Cart/index';
+                        location.href='__MODULE__/User/login';
+                    }
+                });
+            }else{
+                location.href='__MODULE__/Cart/index';
+            }
+
+        });
+
+        //点击账户
+        $('#wode').click(function(){
+            var userinfo = "{$Think.session.userinfo.id}";
+            if(!userinfo){
+                layer.open({
+                    content: '请先登录'
+                    ,skin: 'msg'
+                    ,time: 2 //2秒后自动关闭
+                    ,end:function(){
+                        localStorage.currenturl = '__MODULE__/User/my';
+                        location.href='__MODULE__/User/login';
+                    }
+                });
+            }else{
+                location.href='__MODULE__/User/my';
+            }
+
+        });
+
+    });
+</script>
+</body>
+</html>
+
+

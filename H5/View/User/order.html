@@ -1,0 +1,688 @@
+
+    <style>
+        a.choise {
+             color: #90b830;
+        }
+    </style>
+    <link href="__PUBLIC__/H5/css/wuliu.css" type="text/css" rel="stylesheet"/>
+
+<div class='container-fluid mt40 mb10'>
+    <div class="row global-top">
+        <div class="col-xs-2">
+            <a class="return" href="Javascript:history.go(-1)"></a>
+        </div>
+        <div class="col-xs-8">
+            <div class="text">
+                <if condition=" $Think.get.type == 0 ">普通订单
+                    <elseif condition=" $Think.get.type == 2 " />活动订单
+                </if></div>
+        </div>
+        <div class="col-xs-2">
+        </div>
+    </div>
+    <div class="row white-bg b-b goods-class">
+        <div class="col-xs-12">
+            <a style="border-left: 1px solid #f1eef5;" class="col-xs-3 swiper choise getall" status="0"></a>
+            <a style="border-left: 1px solid #f1eef5;" class="col-xs-3 swiper getnot" status="1"></a>
+            <a style="border-left: 1px solid #f1eef5;" class="col-xs-3 swiper getstatus" status="2"></a>
+            <a style="border-left: 1px solid #f1eef5;" class="col-xs-3 swiper getover" status="3"></a>
+        </div>
+    </div>
+</div>
+
+<div id="wrapper">
+    <div class="order_content container row order-info"></div>
+    <div style="height: 50px;"></div>
+</div>
+<script type="text/javascript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+<script>
+
+    $(function(){
+        isall = true;
+        isnopay=false;
+        //var status = $('.choise').attr('status');
+        localStorage.status == undefined ? localStorage.status = 0 : localStorage.status = localStorage.status;
+        // 头部点击
+        $('.swiper').click(function(){
+            $(this).addClass('choise').siblings('a').removeClass('choise');
+            localStorage.status = $(this).attr('status');
+            Load();
+        });
+        if(localStorage.status == 0){
+            $('.getall').addClass('choise').siblings('a').removeClass('choise');
+        }else if(localStorage.status == 1){
+            $('.getnot').addClass('choise').siblings('a').removeClass('choise');
+        }else if(localStorage.status == 2){
+            $('.getstatus').addClass('choise').siblings('a').removeClass('choise');
+        }else if(localStorage.status == 3){
+            $('.getover').addClass('choise').siblings('a').removeClass('choise');
+        }
+
+        var gotpage=1;
+        var tehui='';
+        Load();
+//    Refresh();
+//    refresher.init({
+//        id: "J_waterfall",
+//        pullDownAction: Refresh,
+//        pullUpAction: Load
+//    });
+
+
+        function Load(){
+            empty      = false;
+            var result = '';
+            var huang  = '';
+            var _price = '';
+            var p      = '';
+            var type   = "{$Think.get.type}" ? "{$Think.get.type}" : 0;
+            if(type == 0 || type == 3){
+                $('.getall').html('待付款');
+                $('.getnot').html('待发货');
+                $('.getstatus').html('发货中');
+                $('.getover').html('已完成');
+            }else if(type == 2){
+                $('.getall').html('待付款');
+                $('.getnot').html('持有');
+                $('.getstatus').html('已提货');
+                $('.getover').html('已解约');
+
+                var i = '';
+                //点击持有
+                $(document).on('touchend','.getnot',function(){
+                    $('.nav-down').remove();
+                    $(".goods-class").css("margin-bottom","0");
+                    var nav ='<div class="nav-down whole clear"></div>';
+                    $('.container').before(nav);
+                    i = setInterval("nav()",1000);
+                    //Refresh();
+
+                });
+                //点击其他属性赋值
+                $(document).on('touchend','.getstatus',function(){
+                    $(".nav-down").css("display","none");
+                    $(".goods-class").css("margin-bottom","10px");
+                    clearInterval(i);
+                    //Refresh();
+                });
+                //点击其他属性赋值
+                $(document).on('touchend','.getall',function(){
+                    $(".nav-down").css("display","none");
+                    $(".goods-class").css("margin-bottom","10px");
+                    clearInterval(i);
+                    //Refresh();
+                });
+                //点击其他属性赋值
+                $(document).on('touchend','.getover',function(){
+                    $(".nav-down").css("display","none");
+                    $(".goods-class").css("margin-bottom","10px");
+                    clearInterval(i);
+                    //Refresh();
+                });
+            }
+            $.ajax({
+                type: 'GET',
+                url:'__CONTROLLER__/ajax_order/type/'+ type + '/status/' + localStorage.status,
+                dataType: 'json',
+                success: function(data){
+                    if(data.code == 10000){
+                        for(var i =0; i < data.info.neworderlist.length; i++){
+                            result += '<div class="row order-item mb10 J_order_item" style="padding-right:1" id="'+data.info.neworderlist[i].id+'">'+
+                                    '<div class="col-xs-12">'+
+                                    '<div class="time fl pc-100">'+
+                                    '<div class="fs-12 fl">'+
+                                    ' 订单号：<span class="grey">'+data.info.neworderlist[i].sn+'</span>'+
+                                    '</div>'+
+                                    '<div class="fs-12 fr">'+
+                                    '<span class="green">'+ order_status(data.info.neworderlist[i].status) +'</span>'+
+                                    '</div>'+
+                                    '</div>'+
+                                    '</div>';
+                            var jslength=0;
+                            for(var js2 in data.info.neworderlist[i]){
+                                jslength++;
+                            }
+                            var number = 0;
+                            for(var k =0; k < jslength-4; k++){
+                                number += parseInt(data.info.neworderlist[i][k].number);
+                                _price = data.info.neworderlist[i][k].order_desc;
+                                //_price = _price.slice(5,6);
+                                p ='<p class="grey">价格变动:<span class="J_buy" style="display:none">'+ data.info.neworderlist[i][k].order_amount+'</span>'
+                                if(_price == 1 && data.info.neworderlist[i].status == 1){
+                                    p += '<span class="green dPirce"></span>'+'</p>';
+                                }else if(_price == 2 && data.info.neworderlist[i].status == 1){
+                                    p += '<span class="zPirce" style="color: #fb6464"></span>'+'</p>';
+                                }
+                                result += '<a class="col-xs-12 item" href="__MODULE__/Goods/detail/gid/'
+                                        +data.info.neworderlist[i][k].goods_id +
+                                        '">'+
+                                        '<div class="layout sub60ex70">'+
+                                        '<div class="col-main">'+
+                                        '<div class="wrap">'+
+                                        '<p class="title">'+data.info.neworderlist[i][k].goods_name+'</p>';
+                                if(type == 2){
+                                    result += p;
+                                }else if(type == 0){
+                                    result += '';
+                                }
+                                result +='</div>'+
+                                        '</div>'+
+                                        '<div class="col-sub">'+
+                                        '<div class="img">'+
+                                        '<img  src="'+data.info.neworderlist[i][k].goods_small_img+'" width="100%">'+
+                                        '</div>'+
+                                        '</div>'+
+                                        '<div class="col-extra">'+
+                                        '<p class="tr green title">￥'+data.info.neworderlist[i][k].goods_price+'</p>'+
+                                        '<p class="tr grey">X' + data.info.neworderlist[i][k].number +
+                                        '</p>'+
+                                        '</div>'+
+                                        '</div>'+
+                                        '</a> ';
+
+                            }
+                            result+='<div class="col-xs-12">'+
+                                    '<div class="item-total fl pc-100">'+
+                                    '<span class="fl">共'+number+'件商品</span>'+
+                                    '<span class="fr">邮费：<font color="#000">￥'+0.00+'</font>&nbsp;&nbsp;&nbsp;'+
+                                    ' 实付：<font color="#000">￥'+data.info.neworderlist[i].amount+'</font></span>'+
+                                    ' </div>'+
+                                    '</div>'+
+                                    '<div class="col-xs-12 tr order-btn">'+
+                                    '<div class="clearfix">'+
+                                    '<div class="fl">' +
+                                    '</div>'+
+                                    '<div class="fr">';
+                            if(type == 0){
+                                if(data.info.neworderlist[i].status == 0){
+                                    result +=
+                                            '<a href="javascript:;" class="J_payment colour" style="margin-right:5px;">立即付款</a>'+
+                                            '<a href="javascript:;" class="J_see colour" style="margin-right:5px;">查看</a>';
+                                }else if(data.info.neworderlist[i].status == 1){
+                                    result +=
+                                            '<a href="javascript:;" class="J_deliver colour" style="margin-right:5px;">提醒卖家发货</a>'+
+                                            '<a href="javascript:;" class="J_see colour" style="margin-right:5px;">查看</a>'+
+                                            '<a href="javascript:;" class="J_refund colour" style="color:#fb6464;border:1px solid #fb6464;">申请退款</a> ';
+                                }else if(data.info.neworderlist[i].status == 2){
+                                    result +=
+                                            '<a href="javascript:;" class="J_receipt colour" style="margin-right:5px;">确认收货</a>'+
+                                            '<a href="javascript:;" class="J_see colour" style="margin-right:5px;">查看</a>'+
+                                            '<a href="javascript:;" class="J_seewl colour" style="color:#fb6464;border:1px solid #fb6464;">查看物流</a> '+
+                                            '<a href="javascript:;" class="J_tuihuo colour" style="color:#fb6464;border:1px solid #fb6464;">申请退货</a> ';
+
+                                }else if(data.info.neworderlist[i].status == 3){
+                                    result +=
+                                            '<a href="javascript:;" class="J_evaluate colour" style="margin-right:5px;">立即评价</a>' +
+                                            '<a href="javascript:;" class="J_see colour" style="margin-right:5px;">查看</a>';
+                                }else if(data.info.neworderlist[i].status == 4){
+                                    result +=
+                                            '<a href="javascript:;" class="J_evaluate colour" style="margin-right:5px;">追加评论</a>'+
+                                            '<a href="javascript:;" class="J_see colour" style="margin-right:5px;">查看</a>';
+                                }else if(data.info.neworderlist[i].status == 5){
+                                    result += '';
+                                }else if(data.info.neworderlist[i].status == 6){
+                                    result +=
+                                            '<a href="javascript:;" class="J_tuihuoinfo colour" style="margin-right:5px;">填写退货信息</a>'+
+                                            '<a href="javascript:;" class="J_see colour" style="margin-right:5px;">查看</a>';
+                                }else if(data.info.neworderlist[i].status >= 7){
+                                    result +=
+                                            '<a href="javascript:;" class="J_see colour" style="margin-right:5px;">查看</a>';
+                                }
+                            }else if(type == 2){
+                                if(data.info.neworderlist[i].status == 2){
+                                    result +=
+                                            '<a href="javascript:;" class="J_affirm colour" style="margin-right:5px;">确认收货</a>'+
+                                            '<a href="javascript:;" class="J_see colour" style="margin-right:5px;">查看</a>'+
+                                            '<a href="javascript:;" class="J_seewl colour" data-id="400"' +
+                                            '  style="color:#fb6464;border:1px solid #fb6464;">查看物流</a> ';
+                                }else if(data.info.neworderlist[i].status == 1){
+                                    result +=
+                                            '<a href="javascript:;" data-id="400" class="J_take_delivery colour"' +
+                                            ' style="margin-right:5px;">提货</a>'+
+                                            '<a href="javascript:;" data-id="400" class="J_see colour" style="margin-right:5px;">查看</a>'+
+                                            '<a href="javascript:;" class="J_refund_order colour" ' +
+                                            'style="color:#fb6464;border:1px solid #fb6464;">解约</a> ';
+                                }else if(data.info.neworderlist[i].status == 9){
+                                    result +=
+                                            '<a href="javascript:;" data-id="400" class="J_see colour" style="margin-right:5px;">查看</a>';
+                                }
+                            }
+
+
+                            result += '</div>'+
+                                    '</div>'+
+                                    '</div>'+
+                                    '</div>';
+                        }
+                    }else{
+                        result = '<span>暂时没有订单信息！</span>';
+                    }
+
+                    $('.order_content').html(result);
+                },
+                error: function(xhr, type){
+                    layer.closeAll();
+                }
+            });
+        }
+    });
+    function nav(){
+        var yk='';
+        $.ajax({
+            type     : 'GET',
+            url      : '__CONTROLLER__/ajax_acttotal',
+            dataType : 'json',
+            data     : {},
+            success: function(data){
+                if (data.code == 10000) {
+                    var loss=data.data.profitLoss;
+                    if(loss == 1 || loss > 1){
+                        yk='<i id="Profit" class="pr-col" style="color: #fb6464">'+data.data.price+'</i>'
+
+                    }else{
+                        yk='<i id="Profit" class="pr-col">'+data.data.price+'</i>'
+                    }
+                    var _nav ='<ul class="clear">'+
+                            '<li class="col-xs-4">'+
+                            '<span>订单订金</span>'+
+                            '<i id="Bond" class="pr-col">'+data.data.total+'</i>'+
+                            '</li>'+
+                            '<li class="col-xs-5">'+
+                            '<span>订单总盈亏</span>'+yk+
+                            '</li>'+
+                            '<li class="col-xs-3">'+
+                            '<button id="wholePosition">全部解约</button>'+
+                            '</li>'+
+                            '</ul>';
+                    $('.nav-down').html(_nav);
+                }else{
+                }
+            },
+            error: function(xhr, type){
+
+            }
+        });
+    };
+    function order_status(status){
+        status = Number(status);
+        switch (status){
+            case 0:
+                return '<span style="color:#fb6464">待付款</span>';
+                break;
+            case 1:
+                return '待发货';
+                break;
+            case 2:
+                return '已发货';
+                break;
+            case 3:
+                return '已收货';
+                break;
+            case 4:
+                return '已评价';
+                break;
+            case 5:
+                return '取消订单';
+                break;
+            case 6:
+                return '<span style="color:#fb6464">申请退货/退款中</span>';
+                break;
+            case 7:
+                return '退货成功';
+                break;
+            case 8:
+                return '退款成功';
+                break;
+            case 9:
+                return '<span style="color:#fb6464">申请退款中</span>';
+                break;
+        }
+    }
+    //立即付款
+    $(document).on('click','.J_payment',function(){
+        var id = $(this).closest('.J_order_item').attr('id');
+        $.ajax({
+            type : 'GET',
+            url  : '__MODULE__/User/ajax_pay',
+            dataType : 'json',
+            data : {id:id},
+            success : function(data){
+
+            }
+
+        });
+        $.ajax({
+            type : 'GET',
+            url  : '__MODULE__/Pay/index',
+            dataType : 'json',
+            data : {id:id},
+            success : function(data){
+                if(data.code == 0){
+                    layer.open({
+                        content: data.msg
+                        ,skin: 'msg'
+                        ,time: 5 //5秒后自动关闭
+                    });
+                }else if(data.code == 10001){
+                    var html = '<img alt="微信支付二维码" src="' + data.info + ' "><br/><span style="font-size: 10px;color:#ccc;">如在微信中请长按图片识别图中二维码！</span>';
+                    layer.open({
+                        title:"微信扫码",
+                        content: html,
+                        btn: ['取消']
+                    });
+                }else if(data.code == 10002){
+                    /*
+                    var res = JSON.parse(data.info);
+                    if(!data.info.code_url && !data.info.return_msg){
+                        wx.config({
+                            debug: false,
+                            appId: res.appId ,
+                            timestamp: res.timeStamp,
+                            nonceStr: res.noncestr,
+                            signature: res.signature,
+                            jsApiList: ['chooseWXPay']
+                        });
+                        wx.ready(function(){
+                            wx.chooseWXPay({
+                                appId: res.appId,
+                                timestamp: res.timeStamp,
+                                nonceStr: res.noncestr,
+                                package: res.package,
+                                signType: res.signType,
+                                paySign: res.paySign,
+                                success: function (res) {
+                                    console.log('OK');
+                                    //window.location.href = "{$ret_url}";
+                                },
+                                cancel: function () {
+                                    //window.location.href = "{$ret_url}";
+                                }
+                            });
+                        });
+                    }else if(data.info.code_url){
+                        var html = '<img alt="微信扫码支付" src="' + data.info.code_url + ' ">';
+                        layer.open({
+                            title:"000",
+                            content: html,
+                            btn: ['取消']
+                        });
+                    }else if(data.info.return_msg){
+                        layer.open({
+                            title:"000",
+                            content: data.info.return_msg,
+                            btn: ['取消']
+                        });
+                    }
+                    */
+
+                    layer.open({
+                        content: '贡献一下？！'
+                        , btn: ['确认', '取消']
+                        , yes: function () {
+                            callpay();
+                        }
+                    });
+                    //调用微信JS api 支付
+                    function jsApiCall()
+                    {
+                        WeixinJSBridge.invoke(
+                            'getBrandWCPayRequest',
+                            data.info,
+                            function(res){
+                                WeixinJSBridge.log(res.err_msg);
+                                alert(res.err_code+res.err_desc+res.err_msg);
+                            }
+                        );
+                    }
+
+                    function callpay()
+                    {
+                        if (typeof WeixinJSBridge == "undefined"){
+                            if( document.addEventListener ){
+                                document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
+                            }else if (document.attachEvent){
+                                document.attachEvent('WeixinJSBridgeReady', jsApiCall);
+                                document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
+                            }
+                        }else{
+                            jsApiCall();
+                        }
+                    }
+
+                }
+
+            }
+        });
+    });
+    //查看
+    $(document).on('click','.J_see',function(){
+        var id = $(this).closest('.J_order_item').attr('id');
+        location.href = '__MODULE__/Order/detail/id/' + id;
+    });
+
+
+    var storedMycars = '';
+    var msg = '';
+    //提醒卖家发货
+    //条件：一天一个订单可以点击10次，如果超过10次则提示不能点击，不同的订单点击次数都需要记录
+    $(document).on('click','.J_deliver',function(){
+        var id = $(this).closest('.J_order_item').attr('id');//获取订单id
+        localStorage['mycars'] == undefined ? localStorage['mycars'] = '[]' : localStorage['mycars'];
+        storedMycars = JSON.parse(localStorage['mycars']);
+        console.log(storedMycars.hasOwnProperty(id));
+        //如果第一次点击 获取的订单id == 之前存储的订单id，则 clicknum++，否组 clicknum = 1
+        if(localStorage.clicknum == undefined || storedMycars.hasOwnProperty(id) == false){
+            var year = (new Date()).getFullYear();
+            var month = (new Date()).getMonth();
+            var day   = (new Date()).getDate();
+            localStorage.nowTime = year + '.' + month + '.' + day;//将当前时间存储在本地
+            //第一次点击
+            storedMycars[id] = 1;
+            localStorage.clicknum = storedMycars[id];
+            localStorage['mycars'] = JSON.stringify(storedMycars);
+            $.ajax({
+                type : 'GET',
+                url  : '__MODULE__/Order/ajax_deliver',
+                dataType : 'json',
+                data : {id:id},
+                success : function(data){
+                    layer.open({
+                        content: data.msg
+                        ,skin: 'msg'
+                        ,time: 2 //2秒后自动关闭
+                    });
+                }
+            });
+        }else if(localStorage.clicknum != undefined  && storedMycars.hasOwnProperty(id) == true){
+            storedMycars[id]++;
+            localStorage.clicknum = storedMycars[id];
+            localStorage['mycars'] = JSON.stringify(storedMycars);
+            if(storedMycars[id] >= 5 || localStorage.clicknum >= 5){
+                layer.open({
+                    content: '今日提醒已超过上限'
+                    ,skin: 'msg'
+                    ,time: 2 //2秒后自动关闭
+                });
+                return false;
+            }else{
+                $.ajax({
+                    type : 'GET',
+                    url  : '__MODULE__/Order/ajax_deliver',
+                    dataType : 'json',
+                    data : {id:id},
+                    success : function(data){
+                        layer.open({
+                            content: data.msg
+                            ,skin: 'msg'
+                            ,time: 2 //2秒后自动关闭
+                        });
+                    }
+                });
+            }
+        }
+
+    });
+    var nowyear = (new Date()).getFullYear();
+    var nowmonth = (new Date()).getMonth();
+    var nowday   = (new Date()).getDate();
+    var nowTime =  nowyear + '.' + nowmonth + '.' + nowday;
+    if(localStorage.nowTime != undefined && localStorage.nowTime !== nowTime){
+        localStorage.removeItem('clicknum');
+        localStorage.removeItem('mycars');
+    }
+    //申请退款
+    $(document).on('click','.J_refund',function(){
+        var id = $(this).closest('.J_order_item').attr('id');//获取订单id
+        var _this = this;
+        $.ajax({
+            type : 'GET',
+            url  : '__MODULE__/Order/ajax_refund',
+            dataType : 'json',
+            data : {id:id},
+            success : function(data){
+                if(data.code == 10000){
+                    $(_this).closest('.J_order_item').attr('style','display:none;');
+                }
+                layer.open({
+                    content: data.msg
+                    ,skin: 'msg'
+                    ,time: 2
+                });
+            }
+        });
+    });
+    //确认收货
+    $(document).on('click','.J_receipt',function(){
+        var id = $(this).closest('.J_order_item').attr('id');//获取订单id
+        var _this = this;
+        $.ajax({
+            type : 'GET',
+            url  : '__MODULE__/Order/ajax_receipt',
+            dataType : 'json',
+            data : {id:id},
+            success  : function(data){
+                if(data.code == 10000){
+                    $(_this).closest('.J_order_item').attr('style','display:none;');
+                }
+                layer.open({
+                    content: data.msg
+                    ,skin: 'msg'
+                    ,time: 2
+                });
+            }
+        });
+    });
+    //查看物流
+    $(document).on('click','.J_seewl',function(){
+        var id = $(this).closest('.J_order_item').attr('id');//获取订单id
+        var _this = this;
+        var html = '';
+        $.ajax({
+            type : 'GET',
+            url  : '__MODULE__/Order/ajax_seewl',
+            dataType : 'json',
+            data : {id:id},
+            success  : function(data){
+                if(data.code == 10000){
+                    html =  '<div class="track-rcol"> ' +
+                            '<div class="track-list"> ' +
+                            '<ul>' ;
+                    for(i=0;i<3;i++){
+                        if(i == 0 ){
+                            html += '<li class="first">';
+                        }else{
+                            html += '<li> ';
+                        }
+                        html += '<i class="node-icon"></i> <p class="time">' + data.info[i].time +
+                                '</p> <p class="txt">' + data.info[i].context +
+                                '</p> </li> ';
+                    }
+
+                    html += '</ul> </div> </div>';
+                    layer.open({
+                        title:"物流详情",
+                        content: html,
+                        btn: ['取消']
+                    });
+                }else{
+                    layer.open({
+                        content: data.msg
+                        ,skin: 'msg'
+                        ,time: 2
+                    });
+                }
+            }
+        });
+    });
+    //申请退货
+    $(document).on('click','.J_tuihuo',function(){
+        var id = $(this).closest('.J_order_item').attr('id');//获取订单id
+        var _this = this;
+        $.ajax({
+            type : 'GET',
+            url  : '__MODULE__/Order/ajax_tuihuo',
+            dataType : 'json',
+            data : {id:id},
+            success  : function(data){
+                if(data.code == 10000){
+                    $(_this).closest('.J_order_item').attr('style','display:none;');
+                }
+                layer.open({
+                    content: data.msg
+                    ,skin: 'msg'
+                    ,time: 2
+                });
+            }
+        });
+    });
+    //填写退货信息
+    $(document).on('click','.J_tuihuoinfo',function(){
+        var id = $(this).closest('.J_order_item').attr('id');//获取订单id
+        var _this = this;
+        var html = '<form style="font-size: 12px;olor: #999999;">' +
+                '<table><tr><td>物流公司&emsp;</td><td style="float: left;"><select id="express_code">' +
+                '<option value="yuantong" selected>圆通</option>' +
+                '<option value="shentong">申通</option>' +
+                '<option value="yunda">韵达</option>' +
+                '<option value="zhongtong">中通</option>' +
+                '<option value="shunfeng">顺丰</option>' +
+                '</select></td></tr><tr><td>物流单号&emsp;</td>' +
+                '<td><input type="text" id="express_sn" ' +
+                'style="border: none;border-bottom: 1px solid #f1eef5;"/></td></tr></table></form>';
+        layer.open({
+            content: html
+            ,btn: ['确认', '取消']
+            ,yes: function(index){
+                var com = $('option:selected').attr('value');
+                var nu  = $('#express_sn').val();
+                var companyReg = new Array();
+                companyReg[0] = /\w{10,}/;
+                //companyReg[1] = /^[a-z-A-Z]{2}[0-9]{9}[a-z-A-Z]{2}$/;
+                if (!companyReg[0].exec(nu)) {  //no 是快递编号
+                    alert("物流编号格式不正确!");
+                    return false;
+                }
+                $.ajax({
+                    type:"POST",
+                    data:{id:id,com:com,nu:nu},
+                    url :'__MODULE__/Order/ajax_tuihuoinfo',
+                    dataType:'json',
+                    success:function(data){
+                        if(data.code == 10000){
+                            $(_this).closest('.J_order_item').attr('style','display:none;');
+                        }
+                        layer.open({
+                            content: data.msg
+                            ,skin: 'msg'
+                            ,time: 1 //2秒后自动关闭
+                        });
+                    },
+                    error: function(xhr, type){
+                        // 即使加载出错，也得重置
+                    }
+                });
+                layer.close(index);
+            }
+        });
+    });
+</script>

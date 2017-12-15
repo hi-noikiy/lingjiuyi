@@ -1,0 +1,108 @@
+<include file="Common/header" />
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>基本 <small>分类，查找 &emsp;<a href="__CONTROLLER__/index"><i class="fa fa-share" aria-hidden="true"></i> 上一页</a></small></h5>
+                </div>
+                <div class="ibox-content">
+                    <table class="table table-striped table-bordered table-hover dataTables-example">
+                        <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>用户名</th>
+                            <th>类型</th>
+                            <th>充值/提现金额</th>
+                            <th>手续费</th>
+                            <th>实际金额</th>
+                            <th>充值方式</th>
+                            <th>支付状态</th>
+                            <th>充值/提现状态</th>
+                            <th>操作时间</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 全局js -->
+<script src="/Public/Admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/Public/Admin/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/Public/Plugins/jeditable/jquery.jeditable.js"></script>
+
+<!-- Data Tables -->
+<script src="/Public/Plugins/dataTables/jquery.dataTables.js"></script>
+<script src="/Public/Plugins/dataTables/dataTables.bootstrap.js"></script>
+
+<!-- 自定义js -->
+<script src="/Public/Admin/js/content.js?v=1.0.0"></script>
+
+<!-- Page-Level Scripts -->
+<script>
+    $(document).ready(function () {
+        $('.dataTables-example').dataTable({
+            "ajax": "{:U('User/reclst')}",
+            "columns": [
+                { "data": "id" },
+                { "data": "username" },
+                { "data": "type" },
+                { "data": "prices" },
+                { "data": "freeprice" },
+                { "data": "realprice"},
+                { "data": "pt"},
+                { "data": "ps"},
+                { "data": "cs"},
+                { "data": "add_time"},
+            ],
+            "columnDefs": [
+                {
+                    "targets":2,
+                    "render":function(data,type,row,meta) {
+                        var type = row.type;
+                        var html = '';
+                        type == 1 ? html += '充值' : html += '提现';
+                        return html;
+                    }
+                },
+                {
+                    "targets":4,
+                    "render":function(data,type,row,meta) {
+                        var type = row.type;
+                        var freeprice   = row.freeprice;
+                        var html = '';
+                        type == 2 ? html += freeprice : html += '空';
+                        return html;
+                    }
+                },
+                {
+                    "targets":5,
+                    "render":function(data,type,row,meta) {
+                        var type = row.type;
+                        var realprice   = row.realprice;
+                        var html = '';
+                        type == 2 ? html += realprice : html += '空';
+                        return html;
+                    }
+                }
+            ]
+        });
+    });
+</script>
+<script>
+    function editArticle(id) {
+        alert(id);
+    }
+    function delArticle(id) {
+        alert(id);
+    }
+</script>
+</body>
+</html>

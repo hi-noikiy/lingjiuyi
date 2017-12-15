@@ -1,0 +1,328 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <meta name="format-detection" content="telephone=no, email=no"/>
+    <title></title>
+    <link href="__PUBLIC__/H5/css/style/style.css" type="text/css" rel="stylesheet">
+    <link href="__PUBLIC__/H5/css/style/bootstrap.min.css" type="text/css" rel="stylesheet">
+    <link href="__PUBLIC__/H5/css/style/base.css" type="text/css" rel="stylesheet">
+    <link href="__PUBLIC__/H5/css/style/swiper-3.3.1.min.css" type="text/css" rel="stylesheet">
+
+    <script src="__PUBLIC__/H5/js/base/jquery.min.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/swiper.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/layer.js" type="text/javascript"></script>
+</head>
+<style>
+    .item-content{margin-bottom:40px;}
+    .swiper-pagination-bullet-active {
+        opacity: 1;
+        background: #90b830;
+    }
+    .choice-attr .attr-list .list button.ac {
+        color: #fff;
+        background: #90b830;
+        border-color: #90b830;
+    }
+    .choice-attr .attr-list .list button {
+        display: inline-block;
+        padding: 4px 9px;
+        margin-bottom: 8px;
+        border: 1px solid #e7e7e7;
+        border-radius: 6px;
+        background: #fff;
+    }
+</style>
+<body class="graybg" style="position:static; height:100%; margin:0; background: #f5f5f5">
+<div class="row mb10"><div class="gitem"></div></div>
+
+<div class="container"><div class="row item-brief mb10"> </div></div>
+
+<div class="container J_widget">
+    <h5 class="col-xs-12 ac"><i class="cube">&nbsp;</i><span class="pr z1">&nbsp;详情</span></h5>
+    <div class="row item-detail bgwhite">
+        <div class="col-xs-12 item-content"></div>
+    </div>
+</div>
+
+<div class="container-fluid oh pf b0 l0 r0 z1">
+    <div class="row item-btn">
+        <div class="col-xs-2 icon" id="J_member_contact" >
+            <a href="https://kefu.easemob.com/webim/im.html?tenantId=44552">
+                <i class="service"></i>
+                <span>客服</span>
+            </a>
+        </div>
+        <div class="col-xs-3 icon">
+            <a href="__MODULE__/Index/index">
+                <i class="index"></i>
+                <span>首页</span>
+            </a>
+        </div>
+        <div class="col-xs-6 button"><a href="javascript:;" class="submit-btn js-show-item-attr">立即购买</a></div>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    $(function(){
+        var id = "{$Think.get.gid}";//获取当前链接中的id参数
+        localStorage.currenturl=window.location.href;
+        $.ajax({
+            type: 'GET',
+            url:'__CONTROLLER__/ajax_detail',
+            dataType: 'json',
+            data : {gid:id},
+            success: function(data){
+                //商品轮播
+                var gitem='';
+                for(var i=0;i<data.info.pics_big.length;i++){
+                    gitem+='<div class="swiper-slide"><img  src="'+data.info.pics_big[i].pics_big+'" width="100%"></div>';
+                }
+                var gbanner='<div class="swiper-container" id="J_goods_img">'+
+                        '<div class="swiper-wrapper">'+gitem+'</div>'+
+                        '<div class="swiper-pagination"></div>'+
+                        '</div>';
+                $('.gitem').html(gbanner);
+                var gbswiper = new Swiper('.swiper-container', {
+                    pagination: '.swiper-pagination',
+                    loop:false,
+                    grabCursor: true,
+                    centeredSlides: true,
+                    paginationClickable: true,
+                    spaceBetween: 30,
+                    autoplay: 3000
+                });
+                //商品属性
+                var gintro='<div class="col-xs-12">'+
+                        ' <p class="title"  num="'+data.info.good.goods_number+'" gsrc="'+data.info.good+'">'+data.info.good.goods_name+'</p>'+
+                        '<p class="price">'+
+                        '<span class="green fs-16 fl">￥'+data.info.good.goods_price+'</span>'+
+                        '<span class="grey sthrough fs-12 fl mt5 ml5 mr5">市场价￥'+data.info.good.goods_bigprice+'</span>'+
+                        '</p>'+
+                        '</div>';
+                $('.item-brief').html(gintro);
+
+                //商品详情
+                var gdetail='';
+                //for(var i=0;i<data.info.good.length;i++ ){
+                    //gdetail+='<img src="'+data.info.good.goods_introduce+'">';
+                //}
+                gdetail+=data.info.good.goods_introduce;
+                $('.item-content').html(gdetail);
+            },
+            error: function(xhr, type){
+                // 即使加载出错，也得重置
+            }
+        });
+        $(document).on('click','.js-show-item-attr',function(){
+            var userinfo = "{$Think.session.userinfo.id}";
+            //console.log(userinfo);
+            if(!userinfo){
+                layer.open({
+                    content: '您还未登录'
+                    ,skin: 'msg'
+                    ,time: 1
+                    ,end:function(){
+                        localStorage.currenturl = window.location.href;
+                        location.href = '__MODULE__/User/login';
+                    }
+                });
+            }else{
+
+                var rulehtml='';
+                var grule='';
+                $.ajax({
+                    type: 'GET',
+                    async:false,
+                    url:'__CONTROLLER__/ajax_detail',
+                    dataType: 'json',
+                    data : {gid:id},
+                    success: function(data){
+                        if(data.info.attr_radio.length==0){
+                            grule='';
+                        }else{
+                            if(data.info.good.goods_number == 0){
+                                rulehtml += '<span >【商品已售完，请等待商家进货】</span>';
+                            }
+                            for(var i=0;i<data.info.attr_radio.length;i++){
+                                rulehtml +=
+                                '<div class="row attr-list">' +
+                                '<div class="col-xs-12 title">' + data.info.attr_radio[i][0].attr_name +'</div>'+
+                                '<div class="col-xs-12 list bm" id="J_item_sku_list' + i + '" ' +
+                                'style="max-height: 250px;overflow-y: scroll;">';
+                                for(var j = 0 ; j < data.info.attr_radio[i].length ; j++){
+                                    rulehtml += '<button ';
+                                    if(data.info.good.goods_number == 0){
+                                        rulehtml += 'class="no"';
+                                    }else{
+                                        rulehtml += '';
+                                    }
+                                    rulehtml +=
+                                        'price="' +data.info.good.goods_price+ '" ' +
+                                        'rid="' + data.info.attr_radio[i][j].id +
+                                        '" stock="' + data.info.good.goods_number + '">' +
+                                        data.info.attr_radio[i][j].attr_value +
+                                        '</button>  ';
+                                }
+                                rulehtml+=
+                                '</div>'+
+                                '</div>';
+
+                            }
+                            rulehtml += '<div class="row number-box">'+
+                                    '<div class="col-xs-6 no-pd title fl">购买数量</div>'+
+                                    '<div class="col-xs-6 no-pd number fr">'+
+                                    '<span id="J_sku_num_plus">+</span>'+
+                                    '<input type="text" value="1" id="J_goods_number" disabled="">'+
+                                    '<span id="J_sku_num_minus">-</span>'+
+                                    '</div>'+
+                                    '</div>';
+                            grule = rulehtml;
+                        }
+                        return grule;
+                    },
+                    error: function(xhr, type){
+                        // 即使加载出错，也得重置
+                    }
+                });
+                var html='<div class="item_attr_modal" id="COMPONENT_11">'+
+                        ' <div class="container choice-attr oh pf b0 l0 r0 z2 js-choice-attr modal-content" style="z-index: 1002; position: fixed; bottom: 0px;">'+
+                        '<div class="row brief">'+
+                        ' <div class="col-xs-12 bm">'+
+                        '<div class="layout sub80">'+
+                        '<div class="col-main mb8">'+
+                        '<div class="wrap">'+
+                        '<p class="title ml10 mr20 mb5">'+$('.title').html()+'</p>'+
+                        '<p class="fs-16 ml10 green"><span id="J_item_sku_price">'+$('.green ').html()+'</span></p>'+
+                        '<p class="fs-12 ml10 grey mb5">库存：<span id="J_item_sku_stock">'+$('.title').attr('num')+'</span></p>'+
+                        '</div>'+
+                        '</div>'+
+                        '<div class="col-sub"><div class="img"> <img src="'+$('.title').attr('gsrc')+'"></div></div>'+
+                        '</div>'+
+                        '<a href="javascript:;" class="close js-choice-attr-close"></a>'+
+                        '</div>'+
+                        '</div>'+grule+
+
+                        '<button class="row btn-box J_submit col-xs-12"><span class="submit">确 定</span>'+
+                        '</button>'+
+                        ' </div>';
+                //立即购买弹出框
+                layer.open({
+                    type: 1
+                    ,content: html
+                    ,anim: 'up'
+                    ,style: 'position:fixed; bottom:0; left:0; width: 100%; height: 200px; padding:10px 0; border:none;'
+                });
+                $(document).on('click','.js-choice-attr-close',function(){
+                    layer.closeAll();
+                });
+                if($('.title').attr('num') != 0){
+                    //默认选择第一个有库存的规格
+                    $('#J_item_sku_list0 button:not(button.no)').eq(0).addClass('ac');
+                    $(document).on('click','#J_item_sku_list0 button:not(button.no)',function(){
+                        $('#J_item_sku_list0 button').removeClass('ac');
+                        $(this).addClass('ac');
+                        localStorage.rid=$(this).attr('rid')
+                        $('#J_item_sku_stock').html($(this).attr('stock'));
+                    });
+                    if($('#J_item_sku_list1')){
+                        //默认选择第一个有库存的规格
+                        $('#J_item_sku_list1 button:not(button.no)').eq(0).addClass('ac');
+                        $(document).on('click','#J_item_sku_list1 button:not(button.no)',function(){
+                            $('#J_item_sku_list1 button').removeClass('ac');
+                            $(this).addClass('ac');
+                            localStorage.rid=$(this).attr('rid')
+                            $('#J_item_sku_stock').html($(this).attr('stock'));
+                        });
+                    }
+                    if($('#J_item_sku_list2')){
+                        //默认选择第一个有库存的规格
+                        $('#J_item_sku_list2 button:not(button.no)').eq(0).addClass('ac');
+                        $(document).on('click','#J_item_sku_list2 button:not(button.no)',function(){
+                            $('#J_item_sku_list1 button').removeClass('ac');
+                            $(this).addClass('ac');
+                            localStorage.rid=$(this).attr('rid')
+                            $('#J_item_sku_stock').html($(this).attr('stock'));
+                        });
+                    }
+
+                }
+
+
+
+            }
+        });
+
+        //增加减少购物数量
+        $(document).on('click','#J_sku_num_plus',function(){
+            var num=parseInt($('#J_goods_number').val());
+            $('#J_goods_number').val(num+1);
+        });
+        $(document).on('click','#J_sku_num_minus',function(){
+            var num=parseInt($('#J_goods_number').val())
+            if(num>1){
+                $('#J_goods_number').val(num-1);
+            }
+        });
+        //点击确定按钮的时候
+        $(document).on('click','.J_submit',function(){
+            var number = $('#J_item_sku_stock').html();//获取商品库存数量
+            if( Number(number) == 0 ){
+                return false;//如果库存小于等于0，则不能点击确定
+            }else{
+                //如果库存大于0，则发送数量到后台创建订单
+                var goods_number = parseInt($('#J_goods_number').val());//购买数量
+                var goods_id = {$Think.get.gid};//商品id
+                var ids = $('#J_item_sku_list0').find('.ac').attr('rid');//属性列表0上的属性id
+                if($('#J_item_sku_list1').length > 0){
+                    ids += ',' + $('#J_item_sku_list1').find('.ac').attr('rid');//拼接属性列表1上的属性id
+                }else if($('#J_item_sku_list2').length > 0){
+                    ids += ',' + $('#J_item_sku_list2').find('.ac').attr('rid');//拼接属性列表1上的属性id
+                }
+                console.log(ids);
+                $.ajax({
+                    type: 'POST',
+                    url:'__MODULE__/Cart/ajax_add',
+                    dataType: 'json',
+                    data : {goods_id:goods_id,goods_number:goods_number,ids:ids},
+                    success: function(data){
+                        if(data.code == 10000){
+                            layer.open({
+                                content: '添加购物车成功！30分钟后会删除商品！'
+                                ,btn: ['去结算', '继续浏览']
+                                ,yes: function(index){
+                                    location.href = '__MODULE__/Cart/index';
+                                    layer.close(index);
+                                },
+                                no:function(){
+                                    layer.closeAll();
+                                    history.go(0);
+                                }
+                            });
+                        }
+                    },
+                    error: function(xhr, type){
+                        // 即使加载出错，也得重置
+                    }
+                });
+            }
+
+        });
+
+    });
+
+//(function(m, ei, q, i, a, j, s) {
+//    m[i] = m[i] || function() {
+//                (m[i].a = m[i].a || []).push(arguments)
+//            };
+//    j = ei.createElement(q),
+//            s = ei.getElementsByTagName(q)[0];
+//    j.async = true;
+//    j.charset = 'UTF-8';
+//    j.src = 'https://static.meiqia.com/dist/meiqia.js?_=t';
+//    s.parentNode.insertBefore(j, s);
+//})(window, document, 'script', '_MEIQIA');
+//_MEIQIA('entId', 82624);
+</script>

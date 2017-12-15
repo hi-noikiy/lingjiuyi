@@ -1,0 +1,408 @@
+
+    <style>
+        .J_item {
+            padding: 8px 18px;
+            overflow: hidden;
+        }
+        .J_item .name {
+            font-size: 14px;
+            line-height: 22px;
+            overflow: hidden;
+        }
+        .J_item .text {
+            font-size: 12px;
+            line-height: 16px;
+            overflow: hidden;
+        }
+        .J_item .editbtn {
+            text-align: right;
+            font-size: 16px;
+            padding: 5px 0 0;
+        }
+        .J_item .editbtn a {
+            color: #051b28;
+            font-size: 14px;
+            border: 1px solid #b5b5b5;
+            padding: 5px 10px;
+            border-radius: 3px;
+        }
+    </style>
+<div class='container-fluid mb50 mt40 address_list'>
+    <div class="row global-top">
+        <div class="col-xs-2">
+            <a href="Javascript:history.go(-1)" class="return"></a>
+        </div>
+        <div class="col-xs-8">
+            <div class="text">地址管理</div>
+        </div>
+        <div class="col-xs-2">
+        </div>
+    </div>
+    <div class="row J_list">
+
+    </div>
+    <footer class="bottom-bot mt20">
+            <div class="global-submit-bot1">
+                <a class="global-submit-btn newAddress">添加新地址</a>
+            </div>
+    </footer>
+</div>
+<div class='container-fluid mt40 new_address'  style="display:none">
+    <!-- <form action="/user/ajax_save_address.html" method="post" id="addressFrom"> -->
+    <form   method="post" id="addressFrom">
+        <input type="hidden" name="address_id" value="" class="recieve-id" />
+        <div class="row global-top ">
+            <div class="col-xs-2">
+                <a class="return returnAdd"></a>
+            </div>
+            <div class="col-xs-8">
+                <div class="text">编辑收货地址</div>
+            </div>
+            <div class="col-xs-2" style="padding:0;">
+            </div>
+        </div>
+        <div class="row white-bg">
+            <div class="form-list">
+                <div class="col-xs-3 name">收&nbsp;&nbsp;货&nbsp;&nbsp;人</div>
+                <div class="col-xs-9 input-text">
+                    <div class="change-dress">
+                        <input type="text" name="name" placeholder="收货人姓名" data-rule-required="true" value=""     class="recieve-name" />
+                    </div>
+                </div>
+            </div>
+            <div class="form-list">
+                <div class="col-xs-3 name">手机号码</div>
+                <div class="col-xs-9 input-text">
+                    <div class="change-dress">
+                        <input type="text" name="tele" maxlength="11" minlength="11" placeholder="手机号码" data-rule-required="true" value="" class="recieve-phone" />
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-list">
+                <div class="col-xs-3 name">邮政编码</div>
+                <div class="col-xs-9 input-text">
+                    <div class="change-dress">
+                        <input type="text" name="zipcode" maxlength="6" minlength="6" placeholder="邮政编码" data-rule-required="true" value="" class="recieve-code"/>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-list">
+                <div class="col-xs-3 name">所在地区</div>
+                <div class="col-xs-9 input-text">
+                    <div class="change-dress recieve-city" id="addressAjaxBox">                      
+                        <select id="province" runat="server" name="province"> </select> 
+                        <select id="city" runat="server" name="city"></select> 
+                        <select id="county" runat="server" name="county"> </select> 
+                    </div>                    
+                </div>
+            </div>
+            <div class="form-list">
+                <div class="col-xs-3 name">详细地址</div>
+                <div class='col-xs-9 input-text'>
+                    <div class="change-dress">
+                        <input type="text" name="address" placeholder="详细地址" data-rule-required="true" value="" class="recieve-detial"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row form-list mt20">
+            <div class="col-xs-1"></div>
+            <div class="col-xs-10">
+              <span class="submit-btn js-submit-btn" id="addBtn">保存</span>
+                
+            </div>
+            <div class="col-xs-1"></div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript"> 
+
+$(function(){
+    addList();
+//删除地址
+    $(document).on('click','.J_del',function(){
+        var self=$(this);
+        var del_id=self.parent().parent().parent().parent().attr('id');
+        layer.open({
+            content: '  确认删除？  '
+            ,btn: ['确认', '取消']
+            ,yes: function(index){
+
+                $.ajax({
+                    type:"POST",
+                    data:{id:del_id,apiTocken:localStorage.apiTocken},
+                    url:'__CONTROLLER__/ajax_del_address', //后台提供的删除接口
+                    dataType:'json',
+                    success:function(data){
+                        if(data.status=='200'){
+                            self.parent().parent().parent().parent().remove();
+                        } else {
+                            layer.open({
+                                content: data.msg
+                                ,skin: 'msg'
+                                ,time: 1 //2秒后自动关闭
+                            });
+                        }
+                    },
+                    error: function(xhr, type){
+                        // 即使加载出错，也得重置
+                    }
+                });
+                layer.close(index);
+            }
+        });
+    });
+
+//设置默认地址
+    $(document).on('click','.J_set_default',function(){
+        var self=$(this);
+        var default_id=$(this).parent().parent().parent().parent().attr('id');
+        $.ajax({
+            type:"POST",
+            url:specialsrc+'/newGuoLi_y/user/address_set_default?apiTocken='+localStorage.apiTocken,
+            data: {id:default_id},
+            dataType:'json',
+            success:function(data){
+                if(data.status=='200'){
+                    layer.open({
+                        content: data.msg
+                        ,skin: 'msg'
+                        ,time: 1 //2秒后自动关闭
+                    });
+
+                } else {
+                    layer.open({
+                        content: data.msg
+                        ,skin: 'msg'
+                        ,time: 1 //2秒后自动关闭
+                    });
+                }
+
+            },
+            error: function(xhr, type){
+                // 即使加载出错，也得重置
+            }
+        })
+    });
+//手机号正则
+    function telCheck(string){
+        var pattern = /^1[34578]\d{9}$/;
+        if (pattern.test(string)) {
+            return true;
+        }
+    }
+    //新建or编辑的保存按钮
+    $('#addBtn').on('click',function(){
+        var apiTocken=localStorage.apiTocken;
+        var recName= $(".recieve-name").val();
+        var recPhone = $(".recieve-phone").val();
+        var recCode = $(".recieve-code").val();
+
+        // 省市区
+        var recProvince=$("#province").val();
+        var recCity=$("#city").val();
+        var recCounty=$("#county").val();
+        var recDetial = $(".recieve-detial").val();
+        if(recName==""){
+            layer.open({
+                content: '收货人不能为空'
+                ,skin: 'msg'
+                ,time: 1
+            });
+        }else if(recPhone==""){
+            layer.open({
+                content: '联系电话不能为空'
+                ,skin: 'msg'
+                ,time: 1
+            });
+        }else if(!telCheck(recPhone)){
+            layer.open({
+                content: '联系电话格式不正确'
+                ,skin: 'msg'
+                ,time: 1
+            });
+        }else if(recCode==""){
+            layer.open({
+                content: '邮编不能为空'
+                ,skin: 'msg'
+                ,time: 1
+            });
+        }else if(recCity==""){
+            layer.open({
+                content: '所在城市未选'
+                ,skin: 'msg'
+                ,time: 1
+            });
+
+        }else if(recDetial.length<2){
+            layer.open({
+                content: '详细地址不能少于两个字符'
+                ,skin: 'msg'
+                ,time: 1
+            });
+        }else if(recName.length<2||recName.length>10){
+            layer.open({
+                content: '收货人2-10个字符'
+                ,skin: 'msg'
+                ,time: 1
+            });
+        }else {
+            if($(".recieve-id").val()==""){
+                setAdd(recName,recPhone,recCode,recProvince,recCity,recCounty,recDetial);
+            }else{
+                var recAddress_id=$(".recieve-id").val();
+                editAdd(recAddress_id,recName,recPhone,recCode,recProvince,recCity,recCounty,recDetial);
+            }
+            setTimeout("location.reload()",2000)
+        }
+
+    })
+
+//编辑地址
+    $(document).on('click','.J_edit',function(){
+        $('.new_address').css("display","block");
+        $('.address_list').css("display","none");
+        self=$(this).parent().parent().parent().parent();
+        var address_id=self.attr('id');
+        $(".recieve-name").val(self.find('.name .uname').text());
+        $(".recieve-phone").val(self.find('.name .fr').text());
+        change(0);
+        $("#province").val(self.find('.gray span.prov').text());
+        change(1);
+        $("#city").val(self.find('.gray span.city').text());
+        change(2);
+        $("#county").val(self.find('.gray span.area').text());
+        $(".recieve-code").val(self.find('.gray span.ma').text());
+        $(".recieve-detial").val(self.find('.gray span.addressxq').text());
+        $(".recieve-id").val(address_id);
+    })
+    // 添加新地址
+    $(document).on('click','.newAddress',function(){
+        $('.new_address').css("display","block");
+        $('.address_list').css("display","none");
+    })
+    // 添加新地址返回
+    $(document).on('click','.returnAdd',function(){
+        $('.new_address').css("display","none");
+        $('.address_list').css("display","block");
+    })
+});
+
+//新建地址
+function setAdd(name,tele,zipcode,province,city,area,address){
+    $.ajax({
+        type:"POST",
+        url:specialsrc+'/newGuoLi_y/user/ajax_save_address?apiTocken='+localStorage.apiTocken,
+        data: {address:address,area:area,city:city,name:name,province:province,tele:tele,zipcode:zipcode},
+        dataType:'json',
+        success:function(data){
+            if(data.status=='200'){
+                layer.open({
+                    content: data.msg
+                    ,skin: 'msg'
+                    ,time: 1 //2秒后自动关闭
+                });
+                addList();
+            } else {
+                layer.open({
+                    content: data.msg
+                    ,skin: 'msg'
+                    ,time: 1 //2秒后自动关闭
+                });
+            }
+
+        },
+        error: function(xhr, type){
+            // 即使加载出错，也得重置
+        }
+    })
+}
+//编辑地址
+function editAdd(address_id,name,tele,zipcode,province,city,area,address){
+    $.ajax({
+        type:"POST",
+        url:specialsrc+'/newGuoLi_y/user/edit_address?apiTocken='+localStorage.apiTocken,
+        data: {address_id:address_id,name:name,tele:tele,province:province,city:city,area:area,zipcode:zipcode,address:address},
+        dataType:'json',
+        success:function(data){
+            if(data.status=='200'){
+                layer.open({
+                    content: data.msg
+                    ,skin: 'msg'
+                    ,time: 1 //2秒后自动关闭
+                });
+            } else {
+                layer.open({
+                    content: data.msg
+                    ,skin: 'msg'
+                    ,time: 1 //2秒后自动关闭
+                });
+            }
+
+        },
+        error: function(xhr, type){
+            // 即使加载出错，也得重置
+        }
+    })
+}
+//加载地址列表
+function addList(){
+    var html='';
+    $.ajax({
+        type: 'GET',
+        url: '__CONTROLLER__/ajax_address',
+        data:{apiTocken:localStorage.apiTocken},
+        dataType: 'json',
+        // timeout : outtime,
+        success: function(data){
+            if(data.code == 10000){
+                for(var i=0;i<data.info.addresslist.length;i++){
+
+                    html+='<div class="col-xs-12 b-b J_item mt10 white-bg add_list" id='
+                            +data.info.addresslist[i].id+'>'+
+                                '<div class="name">'+
+                                    '<span class="fl">' +
+                                    '收货人：<span class="uname">' +data.info.addresslist[i].consignee+'</span>' +
+                                    '</span>'+
+                                    ' <span class="fr">'+data.info.addresslist[i].phone+'</span>'+
+                                '</div>'+
+                                '<div class="text gray">' +
+                                    '收货地址：<span class="prov">'+data.info.addresslist[i].province+'</span>' +
+                                    '<span class="city">'+data.info.addresslist[i].city+'</span>' +
+                                    '<span class="area">'+data.info.addresslist[i].area+'</span>' +
+                                    '<span class="addressxq">'+data.info.addresslist[i].address+'</span>' +
+                                    '<span class="ma">'+data.info.addresslist[i].zipcode+'</span>' +
+                                '</div>'+
+                                '<div class="row mt10 pt10 edit">'+
+                                    '<div class="col-xs-4">'+
+                                        '<div class="clearfix">';
+                    if(data.info.addresslist[i].default_addr == '1'){
+                        html += ' <input type="radio" name="checkbox" checked class="J_set_default" style="margin-top: 8px;float:left;">';
+                    }else{
+                        html += ' <input type="radio" name="checkbox" class="J_set_default" style="margin-top: 8px;float:left;">';
+                    }
+                    html+=  ' <label class="mt5">设为默认</label>'+
+                            '</div>'+
+                            '</div>'+
+                            '<div class="col-xs-8">'+
+                                '<div class="editbtn">'+
+                                '<a class="J_del">删除</a>&nbsp;'+
+                                '<a class="J_edit">编辑地址</a>'+
+                                '</div>'+
+                            '</div>'+
+                            '</div>'+
+                            '</div>';
+                };
+
+            }
+            $('.J_list').html(html);
+        },
+        error: function(xhr, type){
+            // 即使加载出错，也得重置
+        }
+    });
+}
+
+</script> 

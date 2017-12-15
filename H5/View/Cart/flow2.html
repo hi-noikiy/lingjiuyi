@@ -1,0 +1,358 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <meta name="format-detection" content="telephone=no, email=no"/>
+    <title>吉洛优品</title>
+    <link href="__PUBLIC__/H5/css/style/swiper-3.3.1.min.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/style/style.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/style/bootstrap.min.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/style/base.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/layer.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/flow2.css" type="text/css" rel="stylesheet"/>
+
+    <script src="__PUBLIC__/H5/js/base/layer.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/jquery.min.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/swiper.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/iscroll.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/pullToRefresh.mini.js" type="text/javascript"></script>
+
+
+</head>
+<!--<link href="../css/pullToRefresh.css" type="text/css" rel="stylesheet"/>-->
+<body>
+<html>
+<div class='container-fluid mt40 mb10'>
+    <div class="row global-top">
+        <div class="col-xs-2">
+            <a class="return" href="Javascript:history.go(-1)"></a>
+        </div>
+        <div class="col-xs-8">
+            <div class="text">
+                购物车
+            </div>
+        </div>
+        <div class="col-xs-2">
+        </div>
+    </div>
+    <div class="col-xs-12 b-b J_item mt10 white-bg add_list" id='0' style="display: none;">
+        <div class="name">
+            <span class="fl">收货人：<span class="uname"> </span>  <span class="tele"> </span></span>
+            <span class="fr"></span>
+        </div>
+        <div class="text gray">收货地址：
+            <span class="address"> </span>
+            <span class="ma"> </span>
+        </div>
+        <div class="row mt10 pt10 edit">
+            <div class="col-xs-4"></div>
+            <div class="col-xs-8"><div class="editbtn"><a class="J_choice">选择其它地址</a>&nbsp;</div></div>
+        </div>
+    </div>
+    <div class="col-xs-12 b-b J_item mt10 white-bg" style="display: none;">
+        <div class="logistics">
+            <ul class="op_express_delivery_hot" style="list-style: none;">
+                <li data-value="yuantong" class="OP_LOG_BTN  selected" st="0"><i class="c-gap-right" style="background-position:0px -468px"></i>圆通<span></span></li>
+                <li data-value="shentong" class="OP_LOG_BTN  " st="1"><i class="c-gap-right" style="background-position:0px -1008px"></i>申通<span></span></li>
+                <li data-value="yunda" class="OP_LOG_BTN  " st="2"><i class="c-gap-right" style="background-position:0px -576px"></i>韵达<span></span></li>
+                <li data-value="zhongtong" class="OP_LOG_BTN op_express_delivery_hot_last " st="3"><i class="c-gap-right" style="background-position:0px -324px"></i>中通<span></span></li>
+                <li data-value="shunfeng" class="OP_LOG_BTN  op_express_delivery_hot_bottom" st="4"><i class="c-gap-right" style="background-position:0px -180px"></i>顺丰<span></span></li>
+            </ul>
+        </div>
+        <div class="clear"></div>
+
+    </div>
+    <div class="col-xs-12 b-b J_item mt10 white-bg" style="display: none;">
+        <div class="logistics">
+            <ul class="pay-list">
+                <li class="pay card selected" pt="0">
+                    <img src="/Public/Home/images/wangyin.jpg" />银联<span></span>
+                </li>
+                <li class="pay qq"  pt="1">
+                    <img src="/Public/Home/images/weizhifu.jpg" />微信<span></span>
+                </li>
+                <li class="pay taobao"  pt="2">
+                    <img src="/Public/Home/images/zhifubao.jpg" />支付宝<span></span>
+                </li>
+                <li class="pay taobao"  pt="3">
+                    <img src="/Public/Home/images/yue.png" />余额<span></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div class="clear"></div>
+
+    <div id="J_waterfall" class="col-xs-12 b-b J_item mt10 white-bg ">
+        <div class="order_content">
+
+        </div>
+        <div style="height: 50px;"></div>
+    </div>
+
+
+    <div class="container-fluid oh pf b0 l0 r0 z1">
+        <div class="row item-btn">
+            <div class="col-xs-3 icon" id="J_member_contact" style="padding:10px 20px;">
+            </div>
+            <div class="col-xs-3 icon">
+            </div>
+            <div class="col-xs-6 button"><a href="javascript:;" class="submit-btn js-show-item-attr">提交订单</a></div>
+        </div>
+    </div>
+
+</div>
+</html>
+</body>
+<script>
+$(function(){
+    var gotpage=1;
+    var tehui='';
+    var id;
+    ('{$Think.get.ids}' == '' ) ? id = 0 : id = '{$Think.get.ids}';
+    //如果获取的ids为空，则id=0，否则id=ids
+    //console.log(id);
+    Load()
+//     Refresh();
+//     refresher.init({
+//         id: "J_waterfall",
+//         pullDownAction: Refresh,
+//         pullUpAction: Load
+//     });
+
+    function Load(){
+        empty = false;
+        var result='';
+        var huang='';
+        //console.log(type);
+        $.ajax({
+            type: 'GET',
+            url:'__CONTROLLER__/ajax_index',
+            data:{ids:id},
+            dataType: 'json',
+            success: function(data){
+                if(data.code == 0){
+                    html = '<div class="col-xs-12" style="text-align: center;padding-top: 10px;"><a href="__MODULE__/User/address">' + data.msg + '</a></div>';
+                    $('#J_waterfall').attr('style','display:show');
+                    $('#J_waterfall').html(html);
+
+                }else if(data.code == 10000){
+                    $('.J_item').attr('style','display:show');
+                    var address = data.info.addresslist[0];//地址信息，显示默认地址
+
+                    $('.add_list').attr('id',address.id);
+                    $('.uname').html(address.consignee);
+                    $('.tele').html(address.phone);
+                    $('.address').html(address.address);
+                    $('.ma').html(address.zipcode);
+                    if(address.default_addr == '1'){
+                        $('.fr').html('<ins class="deftip">默认地址</ins>');
+                    }
+                    for(var i =0; i < data.info.newcartlist.length; i++){
+                        result += '<div class="row order-item mb10 J_order_item" style="padding-right:1" id="'+data.info.newcartlist[i][0].shop_id+'">'+
+                                '<div class="col-xs-12">'+
+                                '<div class="time fl pc-100">'+
+                                '<div class="fs-12 fl">'+
+                                ' 店铺：<span class="grey">'+data.info.newcartlist[i][0].shop_name+'</span>'+
+                                '</div>'+
+                                '</div>'+
+                                '</div>';
+                        var jslength=0;
+                        for(var js2 in data.info.newcartlist[i]){
+                            jslength++;
+                        }
+                        //console.log(jslength);
+                        var number = 0;
+                        var price = 0;
+                        for(var k =0; k < jslength; k++){
+                            number += parseInt(data.info.newcartlist[i][k].number);
+                            price = number * parseFloat(data.info.newcartlist[i][k].goods_price);
+                            result +=
+                                    '<a class="col-xs-12 item" href="__MODULE__/Goods/detail/gid/'
+                                    +data.info.newcartlist[i][k].goods_id +
+                                    '">'+
+                                    '<div class="layout sub60ex70">'+
+                                    '<div class="col-main">'+
+                                    '<div class="wrap">'+
+                                    '<p class="title">'+data.info.newcartlist[i][k].goods_name+'</p>'+
+                                    '</div>'+
+                                    '</div>'+
+                                    '<div class="col-sub">'+
+                                    '<div class="img">'+
+                                    '<img  src="'+data.info.newcartlist[i][k].goods_small_img+'" width="100%">'+
+                                    '</div>'+
+                                    '</div>'+
+                                    '<div class="col-extra">'+
+                                    '<p class="tr green title">￥'+data.info.newcartlist[i][k].goods_price+'</p>'+
+                                    '<p class="tr grey">X' + data.info.newcartlist[i][k].number +
+                                    '</p>'+
+                                    '</div>'+
+                                    '</div>'+
+                                    '</a> ';
+
+                        }
+                        //console.log(number);
+                        result +=
+                                '<div class="col-xs-12">'+
+                                '<div class="item-total fl pc-100">'+
+                                '<span class="fl">共'+number+'件商品</span>'+
+                                '<span class="fr">邮费：<font color="#000">￥'+0.00+'</font>&nbsp;&nbsp;&nbsp;'+
+                                ' 实付：<font color="#000">￥'+price+'</font></span>'+
+                                ' </div>'+
+                                '</div>'+
+                                '<div class="col-xs-12 tr order-btn">'+
+                                '<div class="clearfix" >'+
+                                '<div class="fl"> ' + '</div>'+
+                                '<div class="fr">' +
+                                '</div>'+
+                                '</div>'+
+                                '</div>'+
+                                '</div>';
+                    }
+                    $('#J_waterfall .order_content').html(result);
+                    //点击选择其它收货地址之后
+                    $('.J_choice').click(function(){
+                        var html =
+                                '<div class="item_attr_modal" id="COMPONENT_11">'+
+                                ' <div class="container choice-attr oh pf b0 l0 r0 z2 js-choice-attr modal-content" style="z-index: 1002; position: fixed; bottom: 0px;">'+
+                                '<div class="row brief">'+
+                                '<div class="col-xs-12 bm">'+
+                                '<div class="layout sub80">'+
+                                '</div>'+
+                                '<a href="javascript:;" class="close js-choice-attr-close"></a>';
+                        for(n = 1; n < data.info.addresslist.length; n++){
+                            html +=
+                                    '<div class="col-xs-12 b-b J_item mt10 white-bg add_list" style="height: 60px;">'+
+                                    '<div class="name">'+
+                                    '<span class="fl">收货人：<span class="uname">' +data.info.addresslist[n].consignee +
+                                    ' </span>  <span class="tele">' +data.info.addresslist[n].phone +
+                                    ' </span></span>'+
+                                    '<span class="fr"><input type="radio" name="checkbox" class="J_set_default" style="margin-top: 8px;float:left;"></span>'+
+                                    '</div>'+
+                                    '<div class="text gray">收货地址：'+
+                                    '<span class="address"> ' +data.info.addresslist[n].address +
+                                    '</span>'+
+                                    '<span class="ma">' + data.info.addresslist[n].zipcode +
+                                    ' </span>'+
+                                    '</div>'+
+                                    '</div>';
+
+                        }
+                        html += '</div>'+
+                                '</div>'+
+
+                                '<div class="row btn-box J_submit"><div class="col-xs-12 no-pd"><span class="submit">确 定</span></div>'+
+                                '</div>'+
+                                ' </div>';
+                        ' </div>';
+                        //立即购买地址列表
+                        layer.open({
+                            type: 1
+                            ,content: html
+                            ,anim: 'up'
+                            ,style: 'position:fixed; bottom:0; left:0; width: 100%; height: 200px; padding:10px 0; border:none;'
+                        });
+                        //点击关闭按钮
+                        $(document).on('click','.js-choice-attr-close',function(){
+                            layer.closeAll();
+                        });
+                    });
+                }
+
+            },
+            error: function(xhr, type){
+                layer.closeAll();
+            }
+        });
+    }
+
+    //给提交订单按钮绑定onclick事件
+    $('.submit-btn').click(function(){
+        var pt = $('.pay.selected').attr('pt');//支付方式
+        var addr_id = $('.add_list').attr('id');//地址编号
+        var st = $('.OP_LOG_BTN.selected').attr('st');//配送方式
+
+        if(pt == 3){
+            layer.open({
+                content: '确定使用余额购买商品？'
+                ,btn: ['确认', '取消']
+                ,yes: function(index){
+                    pay();
+                    layer.close(index);
+                }
+            });
+        }else if(pt == 0){
+            layer.open({
+                content:'暂时不支持银联，请选择其他支付方式！'
+                ,skin: 'msg'
+                ,time: 2
+            });
+        }else{
+            pay();
+        }
+
+        function pay(){
+            $.ajax({
+                type : 'POST',
+                url  : '__CONTROLLER__/ajax_flow2',
+                data : {pt:pt,ids:id,addr_id:addr_id,st:st,ot:0},
+                dataType : 'json',
+                success  : function(data){
+                    if(data.code == 10010){
+                        //银联
+                        layer.open({
+                            content:data.msg
+                            ,skin: 'msg'
+                            ,time: 2
+                        });
+                    }else if(data.code == 10020){
+
+                        //1微信
+                        var url = '__MODULE__' + data.info.url;
+                        $.ajax({
+                            type : 'GET',
+                            url  : url,
+                            dataType : 'json',
+                            success  : function(res){
+                                if(res.code == 10001){
+                                    //支付二维码
+                                    var html = '<img alt="微信支付二维码" src="' + res.info + ' "><br/><span style="font-size: 10px;color:#ccc;">如在微信中请长按图片识别图中二维码！</span>';
+                                    layer.open({
+                                        title:"微信扫码",
+                                        content: html,
+                                        btn: ['取消']
+                                    });
+                                }
+                            },
+                        });
+
+                    }else if(data.code == 10030){
+                        //支付宝
+                        layer.open({
+                            content:'提交订单成功！'
+                            ,skin: 'msg'
+                            ,time: 2
+                            ,end : function(){
+                                //console.log('__MODULE__' + data.info.url);
+                                location.href = '__MODULE__' + data.info.url;
+                            }
+                        });
+                    }
+                }
+            });
+        }
+
+
+    });
+});
+
+$(document).ready(function() {
+    $(".logistics ul li").click(function(){
+        $(this).addClass("selected").siblings().removeClass("selected");
+    });
+});
+
+
+
+
+</script>

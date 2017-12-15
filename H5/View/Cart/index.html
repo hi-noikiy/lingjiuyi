@@ -1,0 +1,408 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <meta name="format-detection" content="telephone=no, email=no"/>
+    <title>吉洛优品</title>
+    <link href="__PUBLIC__/H5/css/style/swiper-3.3.1.min.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/style/style.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/style/bootstrap.min.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/style/base.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/layer.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/pullToRefresh.css" type="text/css" rel="stylesheet"/>
+
+    <script src="__PUBLIC__/H5/js/base/layer.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/jquery.min.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/swiper.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/iscroll.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/pullToRefresh.mini.js" type="text/javascript"></script>
+    <style>
+        ::-webkit-input-placeholder { /* WebKit browsers */
+            color: #ff608a;
+        }
+        :-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+            color: #ff608a;
+        }
+        ::-moz-placeholder { /* Mozilla Firefox 19+ */
+            color: #ff608a;
+        }
+        :-ms-input-placeholder { /* Internet Explorer 10+ */
+            color: #ff608a;
+        }
+        .scroller li{padding:0;}
+        a.choise {
+            color: #90b830;
+        }
+        .item-btn .button .submit-btn{padding:12px 0;background:#90b830;display:block;color:#fff;width:100%;border:0;text-align:center;}
+        .order-info .order-btn button.colour {
+            color: #90b830;
+            border: 1px solid #90b830;
+            background-color: white;
+        }
+        .order-info .order-btn button {
+            display: inline-block;
+            font-size: 12px;
+            padding: 3px 5px;
+            border-radius: 4px;
+        }
+        .order-info .order-btn button.default{color:#959595;border:1px solid #959595;}
+        #delall{
+            font-size: 12px;
+            color: #fb6464;
+            border: 1px solid #fb6464;
+            background-color: white;
+            border-radius: 4px;
+        }
+    </style>
+
+</head>
+<!--<link href="../css/pullToRefresh.css" type="text/css" rel="stylesheet"/>-->
+<body>
+<html>
+<div class='container-fluid mt40 mb10'>
+    <div class="row global-top">
+        <div class="col-xs-2">
+            <a class="return" href="Javascript:history.go(-1)"></a>
+        </div>
+        <div class="col-xs-8">
+            <div class="text">
+                购物车
+            </div>
+        </div>
+        <div class="col-xs-2">
+        </div>
+    </div>
+</div>
+<div id="J_waterfall" class="container row order-info">
+    <div class="order_content"></div>
+
+
+</div>
+<div style="height:50px;"></div>
+<div class="container-fluid oh pf b0 l0 r0 z1">
+    <div class="row item-btn">
+        <div class="col-xs-7" id="J_member_contact" style="padding:10px 20px;">
+            <input class="check check_all" name="select-all" type="checkbox" >
+            <span style="font-size: 12px;">全选</span>
+            <button id="delall" >删除</button>
+        </div>
+        <div class="col-xs-6 button"><button href="javascript:;" class="submit-btn js-show-item-attr">结算</button></div>
+    </div>
+</div>
+</html>
+</body>
+<script>
+$(function(){
+    var gotpage=1;
+    var tehui='';
+    Load()
+//     Refresh();
+//     refresher.init({
+//         id: "J_waterfall",
+//         pullDownAction: Refresh,
+//         pullUpAction: Load
+//     });
+
+    function Load(){
+        empty = false;
+        var result='';
+        var huang='';
+        $.ajax({
+            type: 'GET',
+            url:'__CONTROLLER__/ajax_index',
+            dataType: 'json',
+            success: function(data){
+                if(data.code == 0){
+                    html = '<div class="col-xs-12" style="text-align: center;padding-top: 10px;"><a href="__MODULE__/Goods/index">' + data.msg + '</a></div>';
+                    $('#J_waterfall').html(html);
+                }else if(data.code == 10001){
+                    layer.open({
+                        content: data.msg
+                        ,btn: ['确认']
+                        ,yes: function(index){
+                            layer.close(index);
+                        }
+                    });
+                    html = '<div class="col-xs-12" style="text-align: center;padding-top: 10px;"><a href="__MODULE__/Goods/index">' + data.msg + '</a></div>';
+                    $('#J_waterfall').html(html);
+                }else if(data.code == 10000){
+                    startTime = Date.parse(new Date());//现在时间
+                    endTime = ((data.info.newtime) + 60*30)*1000;//结束时间
+                    alarm = new Alarm(startTime, endTime, function (second, minute, hour, day) {
+                        $('.changeSeconds588:first').text('倒计时：' + hour + ':' + minute + ':' + second);
+                    }, function () { //倒计时结束
+                        $('.changeSeconds588').text('00:00:00');
+                    });
+                    alarm.start();
+                    for(var i =0; i < data.info.newcartlist.length; i++){
+                        result += '<div class="row order-item mb10 J_order_item" style="padding-right:1" id="'+data.info.newcartlist[i][0].shop_id+'">'+
+                                '<div class="col-xs-12">'+
+                                '<div class="time fl pc-100">'+
+                                '<div class="fs-12 fl">'+
+                                ' 店铺：<span class="grey">'+data.info.newcartlist[i][0].shop_name+'</span>'+
+                                '</div>'+
+                                '<span class="fs-12 fr">'+
+                                '<font color="#fb6464" class="changeSeconds588">' +
+                                '</font>'+
+                                '</span>'+
+                                '</div>'+
+                                '</div>';
+                        var jslength=0;
+                        for(var js2 in data.info.newcartlist[i]){
+                            jslength++;
+                        }
+                        var number = 0;
+                        var price = 0;
+                        var len = 0;
+                        for(var k =0; k < jslength; k++){
+                            number += parseInt(data.info.newcartlist[i][k].number);
+                            price = number * parseFloat(data.info.newcartlist[i][k].goods_price);
+                            result +=
+                                    '<div class="col-xs-1" >' +
+                                    '<input class="check row_check' +
+                                    '" name="items[]" type="checkbox" style="margin: 25px 0px;" ids="' +
+                                    data.info.newcartlist[i][k].id +
+                                    '"></div>'+
+                                    '<a class="col-xs-11 item" href="__MODULE__/Goods/detail/gid/'
+                                    +data.info.newcartlist[i][k].goods_id +
+                                    '">'+
+                                    '<div class="layout sub60ex70">'+
+                                    '<div class="col-main">'+
+                                    '<div class="wrap">'+
+                                    '<p class="title">'+data.info.newcartlist[i][k].goods_name+'</p>'+
+                                    '</div>'+
+                                    '</div>'+
+                                    '<div class="col-sub">'+
+                                    '<div class="img">'+
+                                    '<img  src="'+data.info.newcartlist[i][k].goods_small_img+'" width="100%">'+
+                                    '</div>'+
+                                    '</div>'+
+                                    '<div class="col-extra">'+
+                                    '<p class="tr green title">￥'+data.info.newcartlist[i][k].goods_price+
+                                    '</p>'+
+                                    '<p class="tr grey">X' + data.info.newcartlist[i][k].number +
+                                    '</p>'+
+                                    '</div>'+
+                                    '</div>'+
+                                    '</a> ';
+
+                        }
+                        result +='<div class="col-xs-1" >' +
+                                '<input class="check row_check_all' +
+                                '" name="items[]" type="checkbox" style="margin: 10px 0px;"></div>'+
+                                '<div class="col-xs-11">'+
+                                '<div class="item-total fl pc-100">'+
+                                '<span class="fl">共'+number+'件商品</span>'+
+                                '<span class="fr">邮费：<font color="#000">￥'+0.00+'</font>&nbsp;&nbsp;&nbsp;'+
+                                ' 实付：<font color="#000">￥'+price+'</font></span>'+
+                                ' </div>'+
+                                '</div>'+
+                                '<div class="col-xs-12 tr order-btn">'+
+                                '<div class="clearfix" >'+
+                                '<div class="fl"> ' + '</div>'+
+                                '<div class="fr">' +
+                                '<button data-id="400" class="J_take_delivery colour" style="margin-right:5px;">付款</button>'+
+                                '<button class="J_refund_order colour" data-id="400" style="color:#fb6464;border:1px solid #fb6464;">删除</button> ' +
+                                '</div>'+
+                                '</div>'+
+                                '</div>'+
+                                '</div>';
+                    }
+
+                    $('#J_waterfall .order_content').html(result);
+
+                    //多选按钮js效果：
+                    //点击单个商品的多选按钮时
+                    $('.row_check').change(function(){
+                        var checked_attr = $(this).prop('checked');//获取当前单个商品的状态
+                        var len = $(this).closest('.J_order_item').find('.row_check').length;//获取当前商品下的商品行数
+                        var checkedlen = $(this).closest('.J_order_item').find('.row_check:checked').length;//被选中行数
+                        if(len == checkedlen){
+                            //如果选中的行数 = 全部行数，则商铺的状态为选中状态
+                            $(this).closest('.J_order_item').find('.row_check_all').prop('checked',checked_attr);
+                        }else{
+                            //否则，移除商铺的全选状态
+                            $(this).closest('.J_order_item').find('.row_check_all').attr("checked",false);
+                        }
+                        var len1 = $(this).closest('.order_content').find('.row_check').length;//获取全部单选行数
+                        var checkedlen1 = $(this).closest('.order_content').find('.row_check:checked').length;//获取全部单选被选中行数
+                        if(len1 == checkedlen1){
+                            $('.check_all').prop('checked',checked_attr);
+                        }else{
+                            //否则，移除商铺的全选状态
+                            $('.check_all').attr("checked",false);
+                        }
+                    });
+                    //点击选择商铺中的所有商品按钮
+                    $('.row_check_all').change(function(){
+                        var checked_attr = $(this).prop('checked');//获取当前单个商铺的状态
+                        $(this).closest('.J_order_item').find('.row_check').prop('checked',checked_attr);
+                        var len = $(this).closest('.order_content').find('.row_check_all').length;//获取所有商铺行数
+                        var checkedlen = $(this).closest('.order_content').find('.row_check_all:checked').length;//被选中行数
+                        if(len == checkedlen){
+                            //如果选中的行数 = 全部行数，则商铺的状态为选中状态
+                            $('.check_all').prop('checked',checked_attr);
+                        }else{
+                            //否则，移除商铺的全选状态
+                            $('.check_all').attr("checked",false);
+                        }
+                    });
+                }
+
+            },
+            error: function(xhr, type){
+                layer.closeAll();
+            }
+        });
+    }
+
+    //点击全选按钮时，所有的都选中
+    $('.check_all').change(function(){
+        var checked_attr = $(this).prop('checked');
+        $('.check').prop('checked',checked_attr);
+    });
+    //给结算按钮绑定onclick事件
+    $('.submit-btn').click(function(){
+        flow()
+    });
+    $(document).on('click','.J_take_delivery',function(){
+        flow();
+    });
+    function flow(){
+        //获取选中的checkbox
+        var checked_checkbox = $('.row_check:checked');
+        if(checked_checkbox.length < 1){
+            return;
+        }
+        //拼接
+        var ids = '';
+        //遍历选中的checkbox
+        $.each(checked_checkbox,function(i,v){
+            //v表示一个document元素对象,需要转化为jQuery对象
+            //根据选中的checkbox,向上查找ul中自定义的cart_id
+            var cart_id = $(v).attr('ids');
+
+            //如果cart_id不为0
+            if(cart_id > 0){
+                //拼接
+                ids += cart_id+',';
+            }
+        });
+        //去除结尾逗号
+        ids = ids.slice(0,-1);
+        //携带参数跳转到结算页面
+        var url = "__CONTROLLER__/flow2/ids/"+ids;
+        location.href = url;
+    }
+
+    //点击全部删除按钮时
+    $(document).on('click','#delall',function(){
+        if($('.check_all:checked').length == 1){
+            layer.open({
+                content: '确定删除购物车中商品？'
+                ,btn: ['确认', '取消']
+                ,yes: function(index){
+                    delall();
+                    layer.close(index);
+                }
+                ,no: function(){
+                    layer.closeAll();
+                }
+            });
+        }else{
+            return false;
+        }
+
+    });
+    //点击删除按钮时
+    $(document).on('click','.J_refund_order',function(){
+        if($('.row_check:checked').length == 0){
+            return false;
+        }else{
+            layer.open({
+                content: '确定删除购物车中商品？'
+                ,btn: ['确认', '取消']
+                ,yes: function(index){
+                    delall();
+                    layer.close(index);
+                }
+                ,no: function(){
+                    layer.closeAll();
+                }
+            });
+        }
+    });
+
+});
+
+var Alarm = function (startime, endtime, countFunc, endFunc) {
+    this.time = Math.floor((endtime - startime) / 1000); //时间
+    this.countFunc = countFunc; //计时函数
+    this.endFunc = endFunc; //结束函数
+    this.flag = 't' + Date.parse(new Date()); //
+};
+Alarm.prototype.start = function () {
+    var self = this;
+
+    self.flag = setInterval(function () {
+        if (self.time < 0) {
+            clearInterval(self.flag);
+            self.endFunc();
+            console.log('计时结束');
+            //如果购物车商品超过半小时，则删除商品
+            $('.row_check').prop('checked',true);
+            delall();
+        } else {
+
+            var minute, hour, day, second;
+            day = Math.floor(self.time / 60 / 60 / 24) < 10 ? '0' + Math.floor(self.time / 60 / 60 / 24) : Math.floor(self.time / 60 / 60 / 24);
+            hour = Math.floor(self.time / 60 / 60 % 24) < 10 ? '0' + Math.floor(self.time / 60 / 60 % 24) : Math.floor(self.time / 60 / 60 % 24);
+            minute = Math.floor(self.time / 60 % 60) < 10 ? '0' + Math.floor(self.time / 60 % 60) : Math.floor(self.time / 60 % 60);
+            second = Math.floor(self.time % 60) < 10 ? '0' + Math.floor(self.time % 60) : Math.floor(self.time % 60);
+            //倒计时执行函数
+            self.countFunc(second, minute, hour, day);
+            self.time--;
+
+        }
+    }, 1000);
+};
+function delall(){
+//    var btns = ''; //或者写成：var btns= [];
+//    $('.row_check:checked').each(function(key,value){
+//        btns += $(this).attr('ids') ;
+//        btns += ',';
+//    });
+//    btns = btns.substring(0,btns.length-1);
+//    console.log(btns);
+//    $.ajax({
+//        type : 'GET',
+//        url  : '__CONTROLLER__/ajax_delcart',
+//        dataType : 'json',
+//        data : {ids:btns},
+//        success: function(data){
+//            if(data.code = 10000){
+//                layer.open({
+//                    content: data.msg
+//                    ,skin: 'msg'
+//                    ,time: 2
+//                    ,end:function(){
+//                        window.location.reload();
+//                    }
+//                });
+//            }else{
+//                layer.open({
+//                    content: data.msg
+//                    ,skin: 'msg'
+//                    ,time: 2
+//                });
+//            }
+//        },
+//        error:function(){
+//
+//        }
+//    });
+
+
+}
+</script>

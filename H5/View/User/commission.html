@@ -1,0 +1,115 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+	<meta name="format-detection" content="telephone=no, email=no"/>
+	<title>吉洛优品</title>
+	<link href="__PUBLIC__/H5/css/style/swiper-3.3.1.min.css" type="text/css" rel="stylesheet"/>
+	<link href="__PUBLIC__/H5/css/style/style.css" type="text/css" rel="stylesheet"/>
+	<link href="__PUBLIC__/H5/css/style/bootstrap.min.css" type="text/css" rel="stylesheet"/>
+	<link href="__PUBLIC__/H5/css/style/base.css" type="text/css" rel="stylesheet"/>
+	<link href="__PUBLIC__/H5/css/layer.css" type="text/css" rel="stylesheet"/>
+
+	<script src="__PUBLIC__/H5/js/base/layer.js" type="text/javascript"></script>
+	<script src="__PUBLIC__/H5/js/base/jquery.min.js" type="text/javascript"></script>
+	<script src="__PUBLIC__/H5/js/base/swiper.js" type="text/javascript"></script>
+	<script src="__PUBLIC__/H5/js/base/iscroll.js" type="text/javascript"></script>
+	<script src="__PUBLIC__/H5/js/base/pullToRefresh.mini.js" type="text/javascript"></script>
+	<style type="text/css">
+		.user_favs_page {
+			background: #f3f3f3;
+		}
+	</style>
+<body class="bg-f3 pb60 user_aboutus_page ">
+<div class="container">
+	<div class="row global-top">
+        <div class="col-xs-3">
+            <a href="Javascript:history.go(-1)" class="return"></a>
+        </div>
+        <div class="col-xs-6">
+            <div class="text">收益明细</div>
+        </div>
+        <div class="col-xs-3">
+			<if condition="$keywords eq ''">
+			<a href="javascript:;" class="js-show-search" style="display:block;line-height:44px;text-align:center;color:#fff;">搜索</a>
+			<else/>
+			<a style="display:block;line-height:44px;text-align:center;color:#fff;">取消搜索</a>
+			</if>
+        </div>
+    </div>
+	<div class="row mt40">
+		<div class="col-xs-12 js-search-box mt10 cate-search" <if condition="$keywords eq ''">style="display:none;"</if>>
+			<div class="layout ex50">
+                <form>
+                    <div class="col-main">
+                        <div class="wrap">
+							<div class="input-box">
+								<input type="text" name="keywords" placeholder="请输入会员帐号" value="{$keywords}">
+							</div>
+                        </div>
+                    </div>
+                    <div class="col-extra">
+                        <input type="hidden" name="m" value="user">
+                        <input type="hidden" name="a" value="commission">
+                        <div class="input-btn txt tc"><input type="submit" value="搜索"></div>
+                    </div>
+                </form>
+            </div>
+		</div>
+	</div>
+	<div class="row mt10 fs-13 bgwhite pt10 pb10 b-b">
+		<div class="col-xs-6 mt10">
+			今日交易额：￥{$order.days}元
+		</div>
+		<div class="col-xs-6 mt10">
+			总交易额：￥{$order.total}元
+		</div>
+		<div class="col-xs-6 mt10">
+			今日收益：￥{$commission.days}元
+		</div>
+		<div class="col-xs-6 mt10">
+			总收益：￥{$commission.total}元
+		</div>
+	</div>
+
+	<div class="row bgwhite tc pt10 pb10 b-b">
+		<div class="col-xs-3">
+			下单时间
+		</div>
+		<div class="col-xs-3">
+			订单金额
+		</div>
+		<div class="col-xs-3">
+			升级状态
+		</div>
+		<div class="col-xs-3">
+			退款/提货
+		</div>
+	</div>
+
+    <div id="J_waterfall" class="container bgwhite tc fs-13" data-uri="{:U(MODULE_NAME.'/'.ACTION_NAME)}">
+
+    </div>
+
+    <if condition="$show_loading">
+        <div id="J_wall_loading" class="wall_loading tc gray"></div>
+    </if>
+</div>
+<script>
+	$(function(){
+		$.ajax({
+			type: 'GET',
+			url : '__CONTROLLER__/ajax_commission',
+			cache: true,
+			dataType: 'json',
+			success: function(data){
+				if(data.code = 10000){
+
+				}
+			}
+		});
+	});
+</script>
+</body>
+</html>

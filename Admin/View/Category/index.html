@@ -1,0 +1,375 @@
+<include file="Common/header" />
+<style>
+    .form-label{
+        text-align: right;
+    }
+    .row{
+        padding: 10px;
+    }
+    input[type="text"], input[type="password"] {
+        -webkit-appearance: none;
+        outline: 0;
+        border:none;
+        border-bottom: solid 1px #ddd;
+    }
+</style>
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>基本 <small>分类，查找</small></h5>
+                </div>
+                <div class="ibox-content">
+                    <table class="table table-striped table-bordered table-hover dataTables-example">
+                        <thead>
+                        <tr>
+                            <th>编号</th>
+                            <th>分类名称</th>
+                            <th>分类图片</th>
+                            <th>分类级别</th>
+                            <th>是否显示</th>
+                            <th>操作</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+<!-- 全局js -->
+<script src="/Public/Admin/js/jquery.min.js"></script>
+<script src="/Public/Admin/js/bootstrap.min.js"></script>
+<script src="/Public/Plugins/jeditable/jquery.jeditable.js"></script>
+
+<!-- Data Tables -->
+<script src="/Public/Plugins/dataTables/jquery.dataTables.js"></script>
+<script src="/Public/Plugins/dataTables/dataTables.bootstrap.js"></script>
+<script src="/Public/Plugins/ajaxfileuploader/ajaxfileupload.js"></script>
+<!-- 自定义js -->
+<script src="/Public/Admin/js/content.js"></script>
+<script src="/Public/Plugins/layer/2.4/layer.js"></script>
+
+<!-- Page-Level Scripts -->
+<script>
+
+    $(document).ready(function () {
+        //初始化表格数据
+        $('.dataTables-example').dataTable({
+            'ordering':false,
+            "ajax": "{:U('Category/lst')}",
+            "columns": [
+                { "data": "id" },
+                { "data": "cate_name" },
+                { "data": "cate_img" },
+                { "data": "level" },
+                { "data": "is_show" },
+                { "data": null}
+            ],
+            "columnDefs": [
+                {
+                    "targets":-1,
+                    "render":function(data,type,row,meta) {
+                        var id = row.id;
+                        var html = '';
+                        html += "&nbsp;<a href='javascript:void(0);' onclick='editArticle("+ id + ")' class='up btn btn-default btn-xs'><i class='fa fa-arrow-up'></i>编辑</a>";
+                        html += "&nbsp;<a href='javascript:void(0);' onclick='delArticle("+ id + ")' class='down btn btn-default btn-xs'><i class='fa fa-arrow-down'></i>删除</a>";
+                        return html;
+                    }
+                },
+                {
+                    "targets":1,
+                    "render":function(data,type,row,meta) {
+                        var cate_name = row.cate_name;
+                        var html = '';
+                        if(row.level == 0 ){
+                            html = cate_name;
+                        }else if(row.level == 1 ){
+                            html = '&emsp;&emsp;|—'+cate_name;
+                        }else if(row.level == 2 ){
+                            html = '&emsp;&emsp;&emsp;——'+cate_name;
+                        }
+                        return html;
+                    }
+                },
+                {
+                    "targets":2,
+                    "render":function(data,type,row,meta) {
+                        var html = '';
+                        if(row.cate_img != null){
+                            html += '<img src="'+row.cate_img+'" style="max-width:100px;_width:expression(this.width > 150 ? "150px" : this.width);" class="J_preview" data-bimg="'+row.cate_img+'"/>';
+                        }
+                        return html;
+                    }
+                },
+                {
+                    "targets":3,
+                    "render":function(data,type,row,meta) {
+                        var html = '';
+                        if(row.level == 0 ){
+                            html = '顶级';
+                        }else if(row.level == 1 ){
+                            html = '二级';
+                        }else if(row.level == 2 ){
+                            html = '三级';
+                        }
+                        return html;
+                    }
+                },
+                {
+                    "targets":4,
+                    "render":function(data,type,row,meta) {
+                        var html = '';
+                        if(row.is_show == 0 ){
+                            html = '隐藏';
+                        }else if(row.is_show == 1 ){
+                            html = '显示';
+                        }
+                        return html;
+                    }
+                }
+            ]
+        });
+
+
+
+    });
+    //点击分类编辑
+    function editArticle(id) {
+        localStorage.img = '';
+        //获取单个分类的数据,并在弹窗中展示
+        $.ajax({
+            type : 'get',
+            url  : '__CONTROLLER__/edit/id/' + id,
+            dataType : 'json',
+            success  : function(data){
+                var cate_one = data.info.cate_one;
+                var html = '';
+                if(data.code == 0){
+                    layer.msg(data.msg, {icon: 5});
+                }else if(data.code == 10000){
+                    var html =
+                            '<div class="wrapper wrapper-content animated fadeInRight">'+
+                            '<form action="" method="post" class="form form-horizontal" id="demoform-1">'+
+                            '<div class="row cl">'+
+                            '<label class="form-label col-xs-4 col-sm-3">分类名称：</label>'+
+                            '<div class="formControls col-xs-4 col-sm-3">'+
+                            '<input type="text" class="input-text" autocomplete="off" placeholder="分类名称" name="cate_name" value="'+
+                            cate_one.cate_name
+                            +'">'+
+                            '</div>'+
+                            '</div>'+
+
+                            '<div class="row cl">'+
+                            '<label class="form-label col-xs-4 col-sm-3">是否在商城页面显示：</label>'+
+                            '<div class="mt-20 skin-minimal col-xs-8 col-sm-9">'+
+                            '<div class="radio-box">'+
+                            '<input type="radio" id="is_show-1" value="1" name="is_show" ';
+                    if(cate_one.is_show == 1){
+                        html += 'checked';
+                    }
+                    html +='>'+
+                            '<label for="radio-1" >YES</label>'+
+                            '</div>'+
+                            '<div class="radio-box">'+
+                            '<input type="radio" id="is_show-0" value="0" name="is_show"';
+                    if(cate_one.is_show == 0){
+                        html += 'checked';
+                    }
+                    html +='>'+
+                            '<label for="sex-0">NO</label>'+
+                            '</div>'+
+                            '</div>'+
+                            '</div>'+
+
+                            '<div class="row cl">'+
+                            '<label class="form-label col-xs-4 col-sm-3">分类图片：</label>'+
+                            '<div class="formControls col-xs-8 col-sm-9">';
+                    if(cate_one.cate_img != null && cate_one.cate_img != ''){
+                        localStorage.img = cate_one.cate_img;
+                        html += '<img id="imgHead" src="'+ cate_one.cate_img +'" alt="暂无图片" style="width: 150px;"/>';
+                    }
+
+                    html += '<a href="javascript:void(0);" class="btn btn-primary upload-btn">'+
+                            '<input type="file" multiple name="upload_img" id="upload_img" class="input-file"/>'+
+                            '<i class="fa fa-cloud-upload"></i> 浏览文件'+
+                            '</a>'+
+                            '<br/><span>注意：一天只能更换一次图片！</span>'+
+                            '</div>'+
+                            '</div>'+
+                            '<div class="row cl">'+
+                            '<label class="form-label col-xs-4 col-sm-3">上级分类：</label>'+
+                            '<div class="formControls col-xs-4 col-sm-3" id="pid">'+
+                            '<select class="dfinput select" size="1" name="cate_id">' +
+                            '<option value="0" selected>==顶级==</option>';
+                    for(var i = 0; i< data.info.catelist.length; i++){
+                        html += '<option value="' + data.info.catelist[i].id + '" ';
+                        if(cate_one.p1_id == data.info.catelist[i].id){
+                            html += 'selected';
+                        }
+                        if(cate_one.p2_id == data.info.catelist[i].id){
+                            html += 'selected';
+                        }
+                        html+='>' + data.info.catelist[i].cate_name + '</option>';
+                    }
+                    html += '</select>' +
+                            '<div style="height: 20px;"></div>';
+
+                    if (cate_one.p2_id != null) {
+                        html +=
+                                '<select class="dfinput select" size="1" name="cate_id">' +
+                                '<option value="' + cate_one.p1_id + '">' + cate_one.p1_name + '</option>' +
+                                '</select>';
+                    }
+                    html +=
+                            '</div>'+
+                            '<span>注意：顶级分类不能修改上级分类哦！</span>'+
+                            '</div>'+
+                            '</form>'+
+                            '</div>';
+
+
+
+                    //弹窗显示
+                    layer.open({
+                        type: 1
+                        ,skin: 'layui-layer-newadd' //自定义样式
+                        ,title: '分类编辑'
+                        ,closeBtn: false
+                        ,area: ['90%', '90%'] //宽高
+                        ,shade: 0.8
+                        ,id: 'LAY_layuipro' //设定一个id，防止重复弹出
+                        ,resize: false
+                        ,btn: ['提交', '取消']
+                        ,btnAlign: 'c'
+                        ,moveType: 1 //拖拽模式，0或者1
+                        ,content: html
+                        ,success: function(layero){
+
+                            var pid = 0;
+                            //当改变分类父级时，获取商品分类
+                            $(document).on('change','.dfinput',function(){
+
+                                pid = $(this).find('option:selected').val();
+
+                                var _this = this;
+                                $(_this).nextAll().remove();
+                                if(pid != 0 ){
+                                    $.ajax({
+                                        type : 'POST',
+                                        url  : '__MODULE__/Category/get_cate',
+                                        dataType : 'json',
+                                        data : {id:pid},
+                                        success : function(data){
+                                            var html = '';
+                                            if(data.code == 10000){
+                                                html = '<div style="height: 10px;"></div><select name="cate_id" class="dfinput select" size="1"><option value="0">--请选择--</option>';
+                                                for(var i = 0; i < data.info.length; i++){
+                                                    html +=  '<option value="' + data.info[i].id + '">' + data.info[i].cate_name + '</option>';
+                                                }
+                                                html += '</select>';
+                                            }
+                                            $(html).appendTo($(_this).closest('.col-xs-4'));
+                                            return false;
+                                        },
+                                        error  : function(){
+                                            layer.msg('获取三级分类出错啦！！！', {icon: 5});
+                                        }
+                                    });
+                                }
+                            });
+
+                            //上传图片
+                            $(document).on('change','#upload_img',function(){
+                                // 获取文件路径
+                                var filePath = $("input[name='upload_img']").val();
+                                // 获取“.”位置
+                                var extStart = filePath.lastIndexOf(".");
+                                // 获取文件格式后缀，并全部大写
+                                var ext = filePath.substring(extStart, filePath.length).toUpperCase();
+
+                                // 判断文件格式
+                                if (ext != ".BMP" && ext != ".PNG" && ext != ".JPG" && ext != ".JPEG") {
+                                    layer.msg('图片仅限于.gif .png .jpg .jpeg文件。', {time: 5000, icon:6});
+                                    return false;
+                                }
+                                else {
+                                    // 使用ajaxfileupload上传文件
+                                    $.ajaxFileUpload({
+                                        type:"POST",
+                                        url :"__MODULE__/Public/upload_img",
+                                        secureuri:false,
+                                        fileElementId:"upload_img",//文件选择框的id属性
+                                        dataType:'json',
+                                        success: function (data) {
+                                            if (data.code == 10000) {
+                                                layer.msg(data.msg, {icon: 6});
+                                                $("#imgHead").attr("src",data.info);
+                                                localStorage.img = data.info;
+                                            } else{
+                                                layer.msg(data.msg, {icon: 5});
+                                            }
+                                        },
+                                        error  : function(){
+                                            layer.msg('上传图片出错啦！！！', {icon: 5});
+                                        }
+                                    });
+                                }
+                            });
+
+
+
+                            //获取需要传递的数据
+                            var is_show = 0;
+                            $('input[type=radio][name=is_show]').on('change',function() {
+                                $(this).addClass('checked').siblings().removeClass('checked');
+                                is_show = $(this).val();
+
+                            });
+                            var cate_name = $("input[name='cate_name']").val();
+
+
+                            $(document).on('click','.layui-layer-btn0',function(){
+                                var cate_img  = localStorage.img;
+                                //console.log('分类id'+id+',分类名称'+cate_name+',是否显示',is_show + ',图片',cate_img + ',分类pid',pid);
+                                //将修改的数据保存
+                                $.ajax({
+                                    type : 'POST',
+                                    url  : '__CONTROLLER__/edit',
+                                    data : {id:id,cate_name:cate_name,is_show:is_show,pid:pid,cate_img:cate_img},
+                                    dataType : 'json',
+                                    success  : function(data){
+                                        layer.msg(data.msg, {icon: 6});
+                                        setTimeout( function(){
+                                            self.location.reload();
+                                        }, 3 * 1000 );
+                                    }
+                                });
+
+                            });
+                        },btn2: function(index, layero){
+                            layer.closeAll();
+                            self.location.reload();
+                        }
+                    });
+                }
+            },
+            error  : function(){
+                layer.msg('获取分类详情出错啦！！！', {icon: 5, time: 2000});
+            }
+        });
+    }
+    //删除
+    function delArticle(id) {
+        alert(id);
+    }
+
+
+
+</script>
+</body>
+</html>

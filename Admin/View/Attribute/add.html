@@ -1,0 +1,72 @@
+
+<include file="Common/header" />
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>商品 <small>属性新增 &emsp;<a href="__CONTROLLER__/index"><i class="fa fa-share" aria-hidden="true"></i> 商品列表页</a></small></h5>
+                </div>
+                <div class="ibox-content">
+                    <form id="tab" action="__SELF__" method="post" class="form form-horizontal">
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">属性名称</label>
+                            <div class="col-sm-9">
+                                <input type="text" name="attr_name" placeholder="请输入标题" class="form-control">
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">商品分类</label>
+                            <div class="col-sm-9">
+                                <select name="cate_id" class="dfinput" style="width: auto;">
+                                    <option value="0">--请选择--</option>
+                                    <volist name="cate" id="vol">
+                                        <option value="{$vol.id}">{$vol.cate_name}</option>
+                                    </volist>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">属性类型</label>
+                            <div class="col-sm-9">
+                                <input type="radio" name="attr_type" value="0" checked="checked">唯一属性&emsp;
+                                <input type="radio" name="attr_type" value="1">单选属性
+                                <input type="radio" name="attr_type" value="2">复选属性
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">录入方式</label>
+                            <div class="col-sm-9">
+                                <input type="radio" name="attr_input_type" value="0" checked="checked" >输入框&emsp;
+                                <input type="radio" name="attr_input_type" value="1" >下拉列表
+                                <input type="radio" name="attr_input_type" value="2" >多选框
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">可选值</label>
+                            <div class="col-sm-9">
+                                <textarea name="attr_values" cols="40" rows="5" placeholder="请输入可选值，多个值之间请使用英文“,”分隔开" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="hr-line-dashed"></div>
+                        <div class="form-group">
+                            <div class="col-sm-4">
+                                <button class="btn btn-primary" type="submit">保存内容</button>
+                                <button class="btn btn-white" type="reset">取消</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/Public/Admin/js/jquery.min.js?v=2.1.4"></script>
+<script>
+
+</script>
