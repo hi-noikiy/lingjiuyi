@@ -101,7 +101,7 @@ class PublicController extends Controller{
 
 			$hash = encrypt_pwd($data['password']);
 			//判断用户输入的密码是否正确
-			if($user['password'] == password_verify($data['password'],$hash))
+			if(password_verify($data['password'],$hash) === true)
 			{
 				session('userinfo',$user);
 				//调用cart模型 cookieTodb方法,迁移购物车数据

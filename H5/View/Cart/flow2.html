@@ -320,7 +320,10 @@ $(function(){
                                     layer.open({
                                         title:"微信扫码",
                                         content: html,
-                                        btn: ['取消']
+                                        btn: ['取消'],
+                                        yes: function(index){
+                                            location.href = '__MODULE__/User/order/type/0';
+                                        }
                                     });
                                 }
                             },

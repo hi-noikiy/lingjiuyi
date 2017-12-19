@@ -1,3 +1,4 @@
+
 <div class="container-fluid rel-div">
     <div class="col-lg-4 col-sm-8">
         <div class="main-logo">
@@ -10,12 +11,33 @@
         <div class="responsive-toggle fa fa-bars"> </div>
         <nav class="fix-navbar" id="primary-navigation">
             <ul class="primary-navbar">
-                <li><a href="__CONTROLLER__/index"> Home</a></li>
-                <li><a href="__CONTROLLER__/aboutUs">About Us</a></li>
-                <li><a href="__CONTROLLER__/shop"> shop</a></li>
-                <li><a href="__CONTROLLER__/shopSingle"> shop single </a></li>
-                <li><a href="__CONTROLLER__/myAccount"> my account </a></li>
-                <li><a href="__CONTROLLER__/contact">Contact Us</a></li>
+                <li>
+                    <a href="__CONTROLLER__/index"> 主页 </a>
+                </li>
+                <li><a href="__CONTROLLER__/aboutUs"> 关于我们 </a></li>
+                <li class="dropdown">
+                    <a href="__CONTROLLER__/shop" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"> 商品列表 </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="shop-1.html"> shop </a></li>
+                        <li><a href="shop-2.html"> shop 2 </a></li>
+                        <li><a href="__CONTROLLER__/shopSingle"> 商品详情 </a></li>
+                    </ul>
+                </li>
+                <li class="dropdown">
+                    <a href="javascript:void(0);"  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"> 博客 </a>
+                    <ul class="dropdown-menu">
+                        <li><a href="__CONTROLLER__/blog"> blog </a></li>
+                        <li><a href="__CONTROLLER__/blogSingle"> blog single </a></li>
+                    </ul>
+                </li>
+                <li><a href="__CONTROLLER__/myAccount"> 个人中心 </a></li>
+                <li><a href="__CONTROLLER__/contact"> 联系我们 </a></li>
+                <li>
+                    <div class="search-wrap" style="width: 150px;">
+                        <input class="form-control" placeholder="搜索商品名称" id="research">
+                        <button class="btn" type="button" id="search"> <i class="fa fa-search"></i> </button>
+                    </div>
+                </li>
             </ul>
         </nav>
     </div>
@@ -106,7 +128,7 @@
 
         <div class="sign-up" style="display: none;">
             <div class="holder">
-                <div class="with-line">用第三方帐号注册花瓣</div>
+                <div class="with-line">用第三方帐号注册零玖一</div>
                 <div class="buttons">
                     <a href="/oauth/weibo/instant_login/?_ref=frame" title="微博帐号登录" rel="nofollow" class="weibo"></a>
                     <a href="/oauth/qzone/instant_login/?_ref=frame" title="QQ帐号登录" rel="nofollow" class="qzone"></a>
@@ -115,7 +137,7 @@
                 </div>
                 <a class="switch-email-signup brown-link">使用手机号/邮箱注册</a>
             </div>
-            <div class="switch">已有帐号？<a class="brown-link botn-login">登录到花瓣</a></div>
+            <div class="switch">已有帐号？<a class="brown-link botn-login">登录到零玖一</a></div>
         </div>
         <div style="display: block;" class="login">
             <div class="holder">
@@ -135,7 +157,7 @@
                     <a href="javascript:void(0);" class="btn btn18 rbtn"><span class="text"> 登录</span></a>
                 </form>
                 <a class="reset-password red-link">忘记密码»</a>
-                <div class="switch-back">还没有花瓣帐号？
+                <div class="switch-back">还没有零玖一帐号？
                     <a class="red-link register">点击注册»</a>
                 </div>
             </div>

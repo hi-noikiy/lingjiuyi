@@ -2,6 +2,8 @@
 namespace Home\Controller;
 use Think\Controller;
 class IndexController extends Controller {
+
+    //主页
     public function index(){
 
         //首页右上角分类
@@ -52,12 +54,23 @@ ORDER BY a.click_num DESC");
         $this -> display();
     }
 
+    public function search(){
+        $key = I('get.keyword') ? I('get.keyword') : '';
+        $where = array(
+            'goods_name' => ['LIKE',"%$key%"],
+        );
+        $fields   = 'goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,is_act';
+        $list = D('Goods') -> field($fields) -> where($where) -> select();
+        dump($list);
+        $category = D('Category') -> field('id ci,cate_name cn') -> where('pid = 0') -> select();
+        $this -> assign('cate',$category);
+        $this -> display();
+    }
+
     public function aboutUs(){
         $this -> display();
     }
-    public function shop(){
-        $this -> display();
-    }
+
     public function shopSingle(){
         $this -> display();
     }
@@ -68,8 +81,12 @@ ORDER BY a.click_num DESC");
         $this -> display();
     }
 
+    //商品详情页弹窗
     public function goodsDetail(){
         $id      = I('get.id','','intval');
+        $goods   = D('Goods') -> where(" id = $id ") -> find();
+        $goods['click_num'] += 1;
+        D('Goods') -> save($goods);
         //获取商品相册
         $pic_img = D('Goodspics') -> field('pics_big pb,pics_sma ps') -> where("goods_id = $id") -> select();
         //获取商品属性
@@ -81,12 +98,7 @@ ORDER BY a.click_num DESC");
     }
 
 
-/*
-$goods=M('Goods')->where(" id = $id ")->find();
-            $goods['watch_num'] +=1;
-            M('Goods')->save($goods);
-            $goods=M('Goods')->where(" id = $id ")->find();
- */
+
     public function detail(){
     	//接收商品id参数
       $id = I('get.id',0,'intval');

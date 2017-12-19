@@ -141,7 +141,8 @@ class UserController extends CommonController {
                     $msg  = '账号不存在';
                 }else{
                     //如果传入的密码不等于数据库中密码
-                    if($password !== $userinfo['password']){
+                    $hash = encrypt_pwd($password);
+                    if(password_verify($password,$hash) !== true){
                         //则密码错误
                         $code = 10001;
                         $msg  = '密码错误';
