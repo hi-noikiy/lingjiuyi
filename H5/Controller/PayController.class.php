@@ -76,7 +76,7 @@ class PayController extends CommonController {
         $input->SetTime_expire(date("YmdHis", time() + 1800));//交易结束时间
         $input->SetGoods_tag("test");//订单优惠标记
         $input->SetNotify_url("http://paysdk.weixin.qq.com/example/notify.php");//通知地址（异步通知），必须线上可以访问
-        /*
+
         //如果是微信浏览器 则jsapi支付 暂时没有权限
         if(is_weixin_browser()){
 
@@ -127,26 +127,83 @@ class PayController extends CommonController {
 
         }elseif(isMobile()){
 
+            $config = C('WEIXIN_JSAPI_PAY');
+
+
+            $subject = "零玖一" . $order['order_sn']; //商品描述
+            $total_amount = $order['order_amount'] * 100; //金额
+            $order_id = $order['order_sn']; ////订单号
+            $nonce_str=MD5($order_id);    //随机字符串
+            $spbill_create_ip = get_ip(); //终端ip
+            $key = $config['KEY'];
+            //以上参数接收不必纠结，按照正常接收就行，相信大家都看得懂
+
+            //$spbill_create_ip = '118.144.37.98'; //终端ip测试
+            $trade_type = 'MWEB';//交易类型 具体看API 里面有详细介绍
+
+            $notify_url = 'http://jl.v-town.cc/'; //回调地址
+            $scene_info ='{"h5_info":{"type":"Wap","wap_url":"http://www.123.com","wap_name":"测试支付"}}'; //场景信息
+            //对参数按照key=value的格式，并按照参数名ASCII字典序排序生成字符串
+            $signA = "appid=".$config['APPID']."&body=$subject&mch_id=".$config['MCHID']."&nonce_str=$nonce_str&notify_url=$notify_url&out_trade_no=$order_id
+　　　　　　&scene_info=$scene_info&spbill_create_ip=$spbill_create_ip&total_fee=$total_amount&trade_type=$trade_type";
+
+            $strSignTmp = $signA."&key=$key"; //拼接字符串
+
+            $sign = strtoupper(MD5($strSignTmp)); // MD5 后转换成大写
+
+            $post_data = "<xml>
+                       <appid>".$config['APPID']."</appid>
+                       <body>$subject</body>
+                       <mch_id>".$config['MCHID']."</mch_id>
+                       <nonce_str>$nonce_str</nonce_str>
+                       <notify_url>$notify_url</notify_url>
+                       <out_trade_no>$order_id</out_trade_no>
+                       <scene_info>$scene_info</scene_info>
+                       <spbill_create_ip>$spbill_create_ip</spbill_create_ip>
+                       <total_fee>$total_amount</total_fee>
+                       <trade_type>$trade_type</trade_type>
+                       <sign>$sign</sign>
+                       </xml>";//拼接成XML 格式
+
+            $url = "https://api.mch.weixin.qq.com/pay/unifiedorder";//微信传参地址
+            $dataxml = http_post($url,$post_data); //后台POST微信传参地址  同时取得微信返回的参数，http_post方法请看下文
+            dump($dataxml);
+            $objectxml = (array)simplexml_load_string($dataxml, 'SimpleXMLElement', LIBXML_NOCDATA); //将微信返回的XML 转换成数组
+            dump($objectxml);
+            if($objectxml['return_code'] == 'SUCCESS')  {
+                if($objectxml['result_code'] == 'SUCCESS'){//如果这两个都为此状态则返回mweb_url，详情看‘统一下单’接口文档
+                    return $objectxml['mweb_url']; //mweb_url是微信返回的支付连接要把这个连接分配到前台
+                }
+                if($objectxml['result_code'] == 'FAIL'){
+                    $err_code_des = $objectxml['err_code_des'];
+                    return $err_code_des;
+                }
+            }
+
+
+
+
             //如果是移动端 ，但是非微信浏览器则h5支付 暂时没有权限
-            $input->SetTrade_type("MWEB");//交易类型（MWEB为h5支付）JSAPI | NATIVE | APP | WAP
-            $input->SetProduct_id("123456789");//商品ID
+            //$input->SetTrade_type("MWEB");//交易类型（MWEB为h5支付）JSAPI | NATIVE | APP | WAP
+            //$input->SetProduct_id("123456789");//商品ID
+            echo '1';
 
 
             //c，获取支付地址
-            $result = \WxPayApi::unifiedOrder($input);
-            if($result['mweb_url']){
-                $url = $result['mweb_url'].'&redirect_url=https%3A%2F%2Fwww.gujia.la';//希望用户支付完成后跳转至redirect_url
-                $this -> ajaxReturnSuccess($url);
-            }else{
-                $this -> ajaxReturnData(0,'目前只支持微信扫码支付，请在网页端进行扫码支付！<br/>'.$result['return_msg']);
-            }
+            //$result = \WxPayApi::unifiedOrder($input);
+            //if($result['mweb_url']){
+            //    $url = $result['mweb_url'].'&redirect_url=https%3A%2F%2Fwww.gujia.la';//希望用户支付完成后跳转至redirect_url
+            //    $this -> ajaxReturnSuccess($url);
+            //}else{
+            //    $this -> ajaxReturnData(0,'目前只支持微信扫码支付，请在网页端进行扫码支付！<br/>'.$result['return_msg']);
+            //}
             //$result = $wechatAppPay->unifiedOrder( $params );
             //$url = $result['mweb_url'].'&redirect_url=https%3A%2F%2Fwww.gujia.la';//希望用户支付完成后跳转至redirect_url
             //return $url;
 
 
         }else{
-        */
+
             //如果是web端 则扫码支付
             //交易类型（native为扫码支付）
             $input->SetTrade_type("NATIVE");
@@ -159,9 +216,9 @@ class PayController extends CommonController {
             //d，输出二维码图片
             $url = "http://paysdk.weixin.qq.com/example/qrcode.php?data=" . urlencode($url2);
             $this -> ajaxReturnData(10001,'支付二维码图片',$url);
-        /*
+
         }
-        */
+
 
     }
 

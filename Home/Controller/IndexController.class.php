@@ -1,7 +1,7 @@
 <?php
 namespace Home\Controller;
 use Think\Controller;
-class IndexController extends Controller {
+class IndexController extends CommonController {
 
     //主页
     public function index(){
@@ -54,17 +54,40 @@ ORDER BY a.click_num DESC");
         $this -> display();
     }
 
+    //搜索页面
     public function search(){
-        $key = I('get.keyword') ? I('get.keyword') : '';
-        $where = array(
-            'goods_name' => ['LIKE',"%$key%"],
-        );
-        $fields   = 'goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,is_act';
-        $list = D('Goods') -> field($fields) -> where($where) -> select();
-        dump($list);
-        $category = D('Category') -> field('id ci,cate_name cn') -> where('pid = 0') -> select();
-        $this -> assign('cate',$category);
-        $this -> display();
+        if(IS_AJAX){
+            $key      = I('post.keyword') ? I('post.keyword') : '';//搜索关键字
+            $p        = I('post.p') ? I('post.p','','intval') : 1;//页码
+            $pagesize = 20;//每页显示商品数量
+            $start    = ($p - 1) * $pagesize;//开始行数
+            $min      = I('post.min','','intval');
+            $max      = I('post.max','','intval');
+            $where = array(
+                'goods_name' => ['LIKE',"%$key%"],
+                'goods_price' => ['BETWEEN',$min.','.$max],
+            );//搜索条件
+
+            $order = I('post.sorts');
+            $price = I('post.prices');
+            if((!empty($order) || $order == '0') && empty($price)){
+                $order = ($order == 'a') ? 'sale_num desc' : ($order == 'b' ? 'click_num desc' : ($order == 'c' ? 'comment_num desc' : 'goods_id asc'));
+            }else{
+                $order = $price;
+                $order = $order == 'ltoh' ? 'goods_price asc' : 'goods_price desc' ;
+            }
+
+            $fields = 'goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,is_act';
+            $count  = D('Goods') -> where($where) -> count();
+            $list = D('Goods') -> field($fields) -> where($where) -> limit($start,$pagesize) -> order($order) -> select();
+            empty($list) && ($p === 1) ? $this -> ajaxReturnData(0,'到底了！',compact('count','p','pagesize')) : true;
+            empty($list) ? $this->ajaxReturnData(10001,'没有搜索到您想要的商品！',compact('list','count','p','pagesize')) : $this->ajaxReturnData(10000,'success',compact('list','count','p','pagesize','start'));
+
+        }else{
+            $category = D('Category') -> field('id ci,cate_name cn') -> where('pid = 0') -> select();
+            $this -> assign('cate',$category);
+            $this -> display();
+        }
     }
 
     public function aboutUs(){
@@ -84,7 +107,7 @@ ORDER BY a.click_num DESC");
     //商品详情页弹窗
     public function goodsDetail(){
         $id      = I('get.id','','intval');
-        $goods   = D('Goods') -> where(" id = $id ") -> find();
+        $goods   = D('Goods') -> where(" goods_id = $id ") -> find();
         $goods['click_num'] += 1;
         D('Goods') -> save($goods);
         //获取商品相册

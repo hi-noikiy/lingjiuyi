@@ -133,43 +133,27 @@ function sendmail($email,$id,$email_code){
 
 }
 
-function test(){
-    $mail->SetLanguage('zh_cn',VENDOR_PATH.'PHPMailer/language/phpmailer.lang-zh_cn.php');// 设置报错提示语言
 
-    $mail->SMTPDebug = 3;                                // 启用详细调试输出Enable verbose debug output 2:邮件调试模式
+function http_post($url, $data) {
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL,$url);
+    curl_setopt($ch, CURLOPT_HEADER,0);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    $res = curl_exec($ch);
+    curl_close($ch);
+    return $res;
+}
 
-    $mail->isSMTP();                                     //设置邮件使用SMTP协议服务
-    $mail->Host = 'smtp.mxhichina.com';                       //SMTP邮件服务器的地址
-//    $mail->Host = 'smtp.163.com';                       //SMTP邮件服务器的地址
-    $mail->SMTPAuth = true;                              //开启SMTP权限认证
-    $mail->Username = 'postmaster@lingjiuyi.cn';              // 邮箱地址
-//    $mail->Username = 'elisa_zhouyuting@163.com';              // 邮箱地址
-    $mail->Password = '1314Zyt520';                      //邮箱密码（授权码）
-//     $mail->SMTPSecure = 'ssl';                        //Enable TLS encryption,`ssl` also accepted加密方式TLS或ssl
-    $mail->Port = 25;                                    // TCP port to connect to TCP端口连接 根据smtp服务器商定
-
-    $mail->setFrom('postmaster@lingjiuyi.cn');                  //发件人
-    $mail->addAddress($email,'嗨！亲~~');               //收件人
-    // $mail->addAddress('ellen@example.com');               // Name is optional
-    $mail->addReplyTo('postmaster@lingjiuyi.cn', 'zhouyuting'); // 增加一个回复地址(别人回复时的地址).
-    // $mail->addCC('cc@example.com'); // 抄送地址
-    // $mail->addBCC('bcc@example.com'); // 密送地址
-
-    // $mail->addAttachment('/var/tmp/file.tar.gz');         // 添加附件
-    // $mail->addAttachment('/tmp/image.jpg', 'new.jpg');    // Optional name
-    $mail->isHTML(true);                                  //设置邮箱的内容格式为html
-
-    $mail->Subject = $subject;                 //邮件主题
-    $mail->Body    = $body;//邮件内容
-    // $mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
-
-    if(!$mail->send()) {
-        // return false;
-        // echo 'Mailer Error: ' . $mail->ErrorInfo;
-        return $mail->ErrorInfo;
-    } else {
-        return true;
+function get_ip(){
+    $cip = "unknown";
+    if($_SERVER['REMOTE_ADDR']){
+        $cip = $_SERVER['REMOTE_ADDR'];
+    }elseif(getenv("REMOTE_ADDR")){
+        $cip = getenv("REMOTE_ADDR");
     }
+    return $cip;
 }
 
 /**

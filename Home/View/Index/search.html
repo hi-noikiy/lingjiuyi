@@ -74,8 +74,9 @@
                             <div class="sort-dropdown left">
                                 <span>分类</span>
                                 <div class="search-selectpicker selectpicker-wrapper">
-                                    <select class="selectpicker input-price"  data-width="100%"
+                                    <select class="selectpicker input-price" id="cates"  data-width="100%"
                                             data-toggle="tooltip">
+                                        <option value="0">请选择</option>
                                         <volist name="cate" id="val">
                                         <option value="{$val.ci}">{$val.cn}</option>
                                         </volist>
@@ -85,11 +86,12 @@
                             <div class="sort-dropdown">
                                 <span>排序</span>
                                 <div class="search-selectpicker selectpicker-wrapper">
-                                    <select class="selectpicker input-price"  data-width="100%"
+                                    <select class="selectpicker input-price" id="sorts"  data-width="100%"
                                             data-toggle="tooltip">
-                                        <option>销量</option>
-                                        <option>浏览数</option>
-                                        <option>评论数</option>
+                                        <option value="0">请选择</option>
+                                        <option value="a">销量</option>
+                                        <option value="b">浏览数</option>
+                                        <option value="c">评论数</option>
                                     </select>
                                 </div>
                             </div>
@@ -98,10 +100,11 @@
                             <div class="sort-dropdown">
                                 <span>价格排序</span>
                                 <div class="search-selectpicker selectpicker-wrapper">
-                                    <select class="selectpicker input-price"  data-width="100%"
-                                            data-toggle="tooltip">                                   
-                                        <option> 由低到高 </option>
-                                        <option> 由高到低 </option>
+                                    <select class="selectpicker input-price" id="prices"  data-width="100%"
+                                            data-toggle="tooltip">
+                                        <option value="0">请选择</option>
+                                        <option value="ltoh"> 由低到高 </option>
+                                        <option value="htol"> 由高到低 </option>
                                     </select>
                                 </div>
                             </div>
@@ -114,46 +117,26 @@
                     <div class="divider-full-1"></div>
 
                     <div class="result-bar block-inline">
-                        <h4 class="result-txt">search result <b> 125 </b> </h4>
+                        <h4 class="result-txt">search result <b> 0 </b> </h4>
                         <ul class="view-tabs">
                             <li class="active">
                                 <a href="#grid-view" data-toggle="tab">                                                    
                                     <i class="fa fa-th"></i>
                                 </a>
                             </li>
+                            <!--
                             <li class="">
                                 <a href="#list-view" data-toggle="tab">
                                     <i class="fa fa-th-list"></i>
                                 </a>
                             </li>
+                            -->
                         </ul>
                     </div>
 
                     <div class="tab-content shop-content">
                         <div id="grid-view" class="tab-pane fade active in" role="tabpanel">
-                            <div class="row"> 
-                                <div class="col-lg-3 col-md-4 col-sm-6"> 
-                                    <div class="product-box"> 
-                                        <div class="product-media"> 
-                                            <img class="prod-img" alt="" src="__PUBLIC__/Home/img/products/7.png" />     
-                                            <img class="shape" alt="" src="__PUBLIC__/Home/img/icons/shap-small.png" />  
-                                            <div class="prod-icons"> 
-                                                <a href="#" class="fa fa-heart"></a>
-                                                <a href="#" class="fa fa-shopping-basket"></a>
-                                                <a  href="#product-preview" data-toggle="modal" class="fa fa-expand"></a>
-                                            </div>
-                                        </div>                                           
-                                        <div class="product-caption"> 
-                                            <h3 class="product-title">
-                                                <a href="#"> <span class="light-font"> organic </span>  <strong>mushroom</strong></a>
-                                            </h3>
-                                            <div class="price"> 
-                                                <strong class="clr-txt">$50.00 </strong> <del class="light-font">$65.00 </del>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
+                            <div class="row" id="listA">
                             </div>
 
                             <div class="rel-div pt-50">
@@ -165,18 +148,13 @@
                             </div>                            
 
                             <div class="pagination-wrap">
-                                <ul class="pagintn">                                  
-                                    <li><a href="#">01</a></li>
-                                    <li><a href="#">02</a></li>
-                                    <li><a href="#">03</a></li>
-                                    <li><a href="#">04</a></li>
-                                    <li><a href="#">05</a></li>
-                                    <li><a href="#">...</a></li>
-                                    <li><a href="#">15</a></li>                                    
+                                <ul class="pagintn">
                                 </ul>
                             </div>
                         </div>
 
+                        <!--暂时不需要这个-->
+                        <!--
                         <div id="list-view" class="tab-pane fade" role="tabpanel">
                             <div class="row"> 
                                 <div class="col-md-6 col-sm-12"> 
@@ -225,6 +203,8 @@
                                 </ul>
                             </div>
                         </div>
+                        -->
+                        <!--暂时不需要这个-->
                     </div>
                 </div>
             </section>
@@ -239,6 +219,7 @@
             <div id="to-top-mb" class="to-top mb"> <i class="fa fa-arrow-circle-o-up"></i> </div>
             
         </main>
+        <include file="Common/product"/>
         <!-- /WRAPPER -->
 
         <!-- JS Global -->
@@ -251,7 +232,9 @@
         <!-- Custom JS -->
         <script src="__PUBLIC__/Home/js/theme.js"></script>
         <!--自定义js-->
+        <script src="__PUBLIC__/Home/js/search.js"></script>
         <script src="__PUBLIC__/Home/js/index.js"></script>
+
         <script src="__PUBLIC__/Plugins/layer/layer.min.js"></script>
 
 
