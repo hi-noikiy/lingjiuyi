@@ -15,6 +15,7 @@ class PublicController extends Controller{
 		$this->ajaxReturn($data);
 	}
 
+	//注册
 	public function register(){		
 		if(IS_POST){
 			//接收数据
@@ -81,6 +82,7 @@ class PublicController extends Controller{
 		
 	}
 
+	//登录
 	public function login(){
 		if(IS_POST){
 			//接收数据
@@ -99,9 +101,8 @@ class PublicController extends Controller{
 				$this -> ajaxReturnData(10001,'账户未激活');
 			}
 
-			$hash = encrypt_pwd($data['password']);
 			//判断用户输入的密码是否正确
-			if(password_verify($data['password'],$hash) === true)
+			if(password_verify($data['password'],$user['password']) === true)
 			{
 				session('userinfo',$user);
 				//调用cart模型 cookieTodb方法,迁移购物车数据
@@ -167,11 +168,6 @@ class PublicController extends Controller{
 		}
 	}
 
-
-	//用户首页
-	public function index(){
-
-	}
 
 
 

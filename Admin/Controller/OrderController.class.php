@@ -1,10 +1,12 @@
 <?php
 namespace Admin\Controller;
 class OrderController extends BaseController{
+	//首页显示
 	public function index(){
 		$this -> display();
 	}
 
+	//首页ajax请求数据
 	public function lst(){
 		$order = D('Order')
 				->order('id desc')
@@ -52,6 +54,15 @@ class OrderController extends BaseController{
 		fclose($f2);
 		$res = rename($tmp,'Public/deliver.txt');
 		$res ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'清除消息失败！');
+	}
+
+	//订单详情
+	public function detail(){
+		$id = I('get.id','','intval');
+		empty($id) ? $this -> ajaxReturnData(0,'参数错误') : true;
+		$data = D('Order') -> alias('a') -> field('a.*'
+		) -> where(['id' => $id]) -> join('zhouyuting_order_goods b on a.id = b.order_id') -> select();
+		dump($data);
 	}
 
 	

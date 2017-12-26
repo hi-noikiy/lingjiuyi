@@ -2,6 +2,10 @@
     namespace Admin\Controller;
     use Think\Controller;
     use Think\Upload;
+    require_once './Application/Tools/Qiniu/autoload.php';
+    use Qiniu\Auth;
+    use Qiniu\Processing\PersistentFop;
+    use Qiniu\Storage\BucketManager;
 
     class PublicController extends Controller {
 
@@ -64,8 +68,29 @@
 
             echo json_encode($data);die;
 
-
-
         }
+
+        public function upload_video(){
+            $setting = C('UPLOAD_VIDEO_QINIU');
+            $upload = new Upload($setting);// 实例化上传类
+            $info = $upload->upload();
+            ob_end_clean();
+            if(empty($info)){
+                $data['msg']  = '上传视频失败！';
+                $data['code'] = 0;
+            }else{
+                $data['msg']  = '上传视频成功！';
+                $data['code'] = 10000;
+                $data['info'] = $info['upload_video']['url'];
+            }
+            echo json_encode($data);die;
+        }
+
+
+        public function notify(){
+            echo '转码成功！';
+        }
+
+
     }
 ?>

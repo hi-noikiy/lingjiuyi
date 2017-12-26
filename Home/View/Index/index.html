@@ -129,7 +129,7 @@
                                             </div>                                           
                                             <div class="product-caption"> 
                                                 <h3 class="product-title">
-                                                    <a href="/Index/shopSingle/id/{$val['i']}"> <span class="light-font">  </span>  <strong>{$val['n']}</strong></a>
+                                                    <a href="/Index/shopSingle/id/{$val['i']}"> <span class="light-font">  </span>  <strong title="{$val['n']}">{$val['n']}</strong></a>
                                                 </h3>
                                                 <div class="price"> 
                                                     <strong class="clr-txt">${$val['p']} </strong> <del class="light-font">${$val['bp']} </del>
@@ -215,7 +215,7 @@
                                         <img src="{$val.img}" alt="暂无图片" />
                                         <span class="divider"></span>
                                         <h3 class="title-1"> <a href="#/id/{$val.id}"> <span class="light-font">
-                                        </span> <strong> {$val.cn}</strong> </a> </h3>
+                                        </span> <strong title="{$val['cn']}"> {$val.cn}</strong> </a> </h3>
                                         <a class="clr-txt font-2" href="#/id/{$val.id}"> <i> {$val.sum} items </i> </a>
                                     </div>
                                 </div>
@@ -245,7 +245,7 @@
                                     <div class="organic-prod">
                                         <img src="{$val.img}" alt="" />
                                         <span class="divider"></span>
-                                        <h3 class="title-1"> <a href="#/id/{$val.id}"> <span class="light-font"> </span> <strong> {$val.cn}</strong> </a> </h3>
+                                        <h3 class="title-1"> <a href="#/id/{$val.id}"> <span class="light-font"> </span> <strong title="{$val['cn']}"> {$val.cn}</strong> </a> </h3>
                                         <a class="clr-txt font-2" href="#/id/{$val.id}"> <i> {$val.sum} items </i> </a>
                                     </div>
                                 </div>
@@ -300,7 +300,7 @@
                                             </div>
                                             <div class="product-caption">
                                                 <h3 class="product-title">
-                                                    <a href="/Index/shopSingle/id/{$val.i}"> <span class="light-font">  </span>  <strong>{$val.n}</strong></a>
+                                                    <a href="/Index/shopSingle/id/{$val.i}"> <span class="light-font">  </span>  <strong title="{$val['n']}">{$val.n}</strong></a>
                                                 </h3>
                                                 <div class="price">
                                                     <strong class="clr-txt">${$val.p} </strong> <del class="light-font">${$val.bp} </del>
@@ -357,7 +357,7 @@
                                     </div>
                                     <div class="deal-text">
                                         <h4 class="sub-title"> ORGANIC FRUITS </h4>
-                                        <h2 class="fsz-30 pb-15"> <a href="/Index/shopSingle/id/{$val.i}"> <span class="light-font">fresh </span> <strong>{$val.n} </strong> </a> </h2>
+                                        <h2 class="fsz-30 pb-15"> <a href="/Index/shopSingle/id/{$val.i}"> <span class="light-font">fresh </span> <strong  title="{$val['n']}">{$val.n} </strong> </a> </h2>
                                         <p>Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy...</p>
                                         <div class="price pt-15"> 
                                             <strong class="clr-txt">${$val.p} </strong> <del class="light-font">${$val.bp} </del>
@@ -402,7 +402,7 @@
                                             <img alt="" src="{$v.bi}" />
                                         </div>
                                         <div class="random-text"> 
-                                            <h3 class="title-1 no-margin"> <a href="#"> <span class="light-font">organic </span> <strong>{$v.n} </strong> </a> </h3>
+                                            <h3 class="title-1 no-margin"> <a href="#"> <span class="light-font">organic </span> <strong title='{$v.n}'>{$v.n} </strong> </a> </h3>
                                             <span class="divider"></span>
                                             <div class="price"> 
                                                 <strong class="clr-txt">${$v.p} </strong> <del class="light-font">${$v.bp} </del>
@@ -420,7 +420,7 @@
                                                 <img alt="" src="{$v.bi}" />
                                             </div>
                                             <div class="random-text">
-                                                <h3 class="title-1 no-margin"> <a href="/Index/shopSingle/id/{$v.i}"> <span class="light-font"> </span> <strong>{$v.n} </strong> </a> </h3>
+                                                <h3 class="title-1 no-margin"> <a href="/Index/shopSingle/id/{$v.i}"> <span class="light-font"> </span> <strong title="{$val['n']}">{$v.n} </strong> </a> </h3>
                                                 <span class="divider"></span>
                                                 <div class="price">
                                                     <strong class="clr-txt">${$v.p} </strong> <del class="light-font">${$v.bp} </del>
@@ -647,11 +647,6 @@
         <script src="__PUBLIC__/Home/js/theme.js"></script>
 
         <script src="__PUBLIC__/Plugins/layer/layer.min.js"></script>
-
-
-
-
-
 
     </body>
 </html>

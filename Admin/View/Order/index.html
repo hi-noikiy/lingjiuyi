@@ -29,9 +29,6 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr>
-
-                        </tr>
                         </tbody>
                     </table>
                 </div>
@@ -39,6 +36,7 @@
         </div>
     </div>
 </div>
+<!--发货内容-->
 <div id="modal-demo" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content radius">
@@ -96,6 +94,7 @@
         </div>
     </div>
 </div>
+<!--导出内容-->
 <div id="export-demo" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content radius">
@@ -173,6 +172,8 @@
         </div>
     </div>
 </div>
+
+
 <!-- 全局js -->
 <script src="/Public/Admin/js/jquery.min.js?v=2.1.4"></script>
 <script src="/Public/Admin/js/bootstrap.min.js?v=3.3.6"></script>
@@ -209,7 +210,7 @@
                         var id = row.id;
                         var os = row.os;
                         var html = '';
-                        html += "&nbsp;<a href='javascript:void(0);' onclick='editArticle("+ id + ")' class='up btn btn-default btn-xs'><i class='fa fa-arrow-up'></i>查看</a>";
+                        html += "&nbsp;<a href='javascript:void(0);' onclick='show_order(this,"+ id + ")' class='up btn btn-default btn-xs'><i class='fa fa-arrow-up'></i>查看</a>";
                         if(os == '待发货'){
                             html += "&nbsp;<a href='javascript:void(0);' id='modaldemo' class='up btn btn-default btn-xs'><i class='fa fa-arrow-up'></i>发货</a>";
                         }else if(os == '申请退货/退款中' || os == '申请退款中' || os == '退货成功'){
@@ -223,12 +224,80 @@
 
     });
 
-    function editArticle(id) {
-        alert(id);
+    //查看
+    function show_order(_this,id) {
+        var _this_tr = $(_this).closest('tr');
+        var tag      = $(_this_tr).next('tr').find('.col-sm-12').length;
+        if(sessionStorage.now == _this_tr && tag >= 1){
+            //如果当前点击对象 为 上一次点击对象 并且 页面中存在详情页面  ，则移除
+            $(_this_tr).next('tr').remove();
+        }else{
+            //否则添加
+            $.ajax({
+                type : 'get',
+                url  : '__CONTROLLER__/detail/id' + id,
+                dataType : 'json',
+                success  : function(data){
+
+                },
+                error : function(){
+
+                }
+            });
+            var _row_tr  =
+                    '<tr>'+ '<td colspan="10">'+
+                    '<div class="row"><div class="col-sm-12"><div class="ibox-content p-xl">'+
+
+                    '<div class="row">' +
+                    '<div class="col-sm-6">'+
+                    '<address>'+
+                    '<strong>北京百度在线网络技术有限公司</strong><br/> 北京市海淀区上地十街10号<br/> <abbr title="Phone">总机：</abbr> (+8610) 5992 8888'+
+                    '</address>'+
+                    '</div>'+
+
+                    '<div class="col-sm-6 text-right">'+
+                    '<h4>单据编号：</h4>'+
+                    '<h4 class="text-navy">H+-000567F7-00</h4>'+
+                    '<address>'+
+                    '<strong>阿里巴巴集团</strong><br> 中国杭州市华星路99号东部软件园创业大厦6层(310099)<br><abbr title="Phone">总机：</abbr>+ (86) 571-8502-2088'+
+                    '</address>'+
+                    '<p><span><strong>日期：</strong> 2014-11-11</span></p>'+
+                    '</div>'+
+                    '</div>'+
+
+                    '<div class="table-responsive m-t">'+
+                    '<table class="table invoice-table">'+
+                    '<thead>'+
+                    '<tr><th>清单</th><th>数量</th><th>单价</th><th>税率</th><th>总价</th></tr>'+
+                    '</thead>'+
+                    '<tbody>'+
+                    '<tr><td><div><strong>尚都比拉2013冬装新款女装</strong></div></td><td>1</td><td>¥26.00</td><td>¥1.20</td><td>¥31,98</td></tr>'+
+                    '</tbody>'+
+                    '</table>'+
+                    '</div>'+
+
+                    '<div class="col-sm-8"></div>'+
+                    '<div class="col-sm-4 text-right">'+
+                    '<strong>总价：</strong>+¥1026.00&emsp;&emsp;<strong>税：</strong>¥235.98&emsp;&emsp;<strong>总计</strong>¥1261.98&emsp;&emsp;'+
+                    '<div style="padding-bottom: 10px;">'+'</div>'+
+                    '</div>'+
+
+                    '<div class="text-right">'+
+                    '<button class="btn btn-primary"><i class="fa fa-dollar"></i> 发货</button>&emsp;&emsp;'+
+                    '<button class="btn btn-primary"><i class="fa fa-print" aria-hidden="true"></i> 打印</button>'+
+                    '</div>'+
+                    '</div></div></div>'+
+                    '</td>'+ '</tr>';
+            $(_this_tr).after(_row_tr);
+            sessionStorage.now = _this_tr;
+        }
+        //alert(id);
     }
+    //删除
     function delArticle(id) {
         alert(id);
     }
+    //发货
     $(document).on('click','#modaldemo',function(){
         var value = $(this).closest('tr').find('td:first').html();
         $('#order_id').attr('value',value);
@@ -255,6 +324,7 @@
 
 
 
+        //确定发货
         $('#info_btn').click(function(){
             var ei = $('option').attr('value');
             var oi = $('#order_id').val();

@@ -54,6 +54,14 @@ ORDER BY a.click_num DESC");
         $this -> display();
     }
 
+    public function cart(){
+        $this -> check_login();
+        $uid = session('userinfo.id');
+        $fields = 'a.id ci, a.goods_id gi,a.number num,b.goods_name gn,b.goods_price p,goods_bigprice bp,goods_small_img simg';
+        $cartlist = D('Cart') -> alias('a') -> field($fields) -> where("user_id = $uid") -> join('zhouyuting_goods b on a.goods_id = b.goods_id') -> select();
+        $cartlist ? $this -> ajaxReturnData(10000,'success',$cartlist) : $this -> ajaxReturnData(0,'购物车为空');
+    }
+
     //搜索页面
     public function search(){
         if(IS_AJAX){

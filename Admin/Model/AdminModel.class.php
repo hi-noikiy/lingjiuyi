@@ -22,6 +22,7 @@
                 if(md5(md5($password).$row['salt']) == $row['password']) {
                     session('username',$username);
                     session('userid',$row['userid']);
+                    session('header_img',$row['header_img']);
                     return true;
                 }
             }
