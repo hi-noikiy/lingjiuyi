@@ -13,7 +13,7 @@
                     </h5>
                 </div>
                 <div class="ibox-content">
-                    <table class="table table-striped table-bordered table-hover dataTables-example">
+                    <table class="table dataTables-example">
                         <thead>
                         <tr>
                             <th>编号</th>
@@ -232,64 +232,82 @@
             //如果当前点击对象 为 上一次点击对象 并且 页面中存在详情页面  ，则移除
             $(_this_tr).next('tr').remove();
         }else{
-            //否则添加
+            //否则移除原来的页面
+            $('#new_html').closest('tr').remove();
+            //添加新的页面
             $.ajax({
                 type : 'get',
-                url  : '__CONTROLLER__/detail/id' + id,
+                url  : '__CONTROLLER__/detail/id/' + id,
                 dataType : 'json',
                 success  : function(data){
+                    if(data.code == 10000){
+                        var arr= new Array(); //定义一数组
+                        arr=(data.info.order.address_info).split(" "); //字符分割
+                        var _row_tr  =
+                                '<tr>'+ '<td colspan="10" id="new_html"> '+
+                                '<div class="row"><div class="col-sm-12"><div class="ibox-content p-xl" style="border-color:#fff;">'+
 
+                                '<div class="row">' +
+                                '<div class="col-sm-6">'+
+                                '<h4>单据编号：<span class="text-navy">'+data.info.order.order_sn+'</span></h4>'+
+                                '<address>' +
+                                '<strong>收货人：</strong> '+arr[0]+'<br/>' +
+                                '<strong>联系电话：</strong> '+arr[1]+'<br/>' +
+                                '<strong>收货地址：</strong> '+arr[2]+'('+arr[3]+')</address>'+
+                                '<p><span><strong>最新变动日期：</strong> '+data.info.order.update_time+'</span></p>'+
+                                '</div>'+
+
+                                '<div class="col-sm-6 text-right">'+
+                                '</div>'+
+                                '</div>'+
+
+                                '<div class="table-responsive m-t">'+
+                                '<table class="table invoice-table">'+
+                                '<thead>'+
+                                '<tr><th>商品名称</th><th>数量</th><th>单价</th><th>属性</th><th>总价</th></tr>'+
+                                '</thead>'+
+                                '<tbody>';
+                        for(var i = 0; i < data.info.goods.length; i++){
+                            _row_tr += '<tr><td><div><strong>'+data.info.goods[i].goods_name+'</strong></div></td><td>'+data.info.goods[i].number+'</td><td>¥'+data.info.goods[i].goods_price+'</td><td>'+data.info.goods[i].goods_attr_ids+'</td><td>¥'+ Number(data.info.goods[i].number) * Number(data.info.goods[i].goods_price)+'</td></tr>';
+                        }
+                        _row_tr +=
+                                '</tbody>'+
+                                '</table>'+
+                                '</div>'+
+
+                                '<div class="col-sm-8"></div>'+
+                                '<div class="col-sm-4 text-right">'+
+                                '<strong>总计</strong>¥'+data.info.order.order_amount+'元'+
+                                '<div style="padding-bottom: 10px;">'+'</div>'+
+                                '</div>'+
+
+                                '<div class="text-right">';
+                        if(data.info.order.order_status == 6){
+                            _row_tr += '<button class="btn btn-primary"><i class="fa fa-dollar"></i> 同意退货</button>&emsp;&emsp;';
+                        }
+                        if(data.info.order.order_status == 7){
+                            _row_tr += '<button class="btn btn-primary"><i class="fa fa-dollar"></i> 确认收货</button>&emsp;&emsp;';
+                        }
+                        if(data.info.order.order_status == 8 || data.info.order.order_status == 10){
+                            _row_tr += '<button class="btn btn-primary"><i class="fa fa-dollar"></i> 同意退款</button>&emsp;&emsp;';
+                        }
+                        _row_tr +=
+                                '<button class="btn btn-primary" id="print"><i class="fa fa-print" aria-hidden="true"></i> 打印</button>'+
+                                '</div>'+
+                                '</div></div></div>'+
+                                '</td></tr>';
+                        $(_this_tr).after(_row_tr);
+                    }else{
+                        console.log(data.msg);
+                    }
+
+                    sessionStorage.now = _this_tr;
                 },
                 error : function(){
 
                 }
             });
-            var _row_tr  =
-                    '<tr>'+ '<td colspan="10">'+
-                    '<div class="row"><div class="col-sm-12"><div class="ibox-content p-xl">'+
 
-                    '<div class="row">' +
-                    '<div class="col-sm-6">'+
-                    '<address>'+
-                    '<strong>北京百度在线网络技术有限公司</strong><br/> 北京市海淀区上地十街10号<br/> <abbr title="Phone">总机：</abbr> (+8610) 5992 8888'+
-                    '</address>'+
-                    '</div>'+
-
-                    '<div class="col-sm-6 text-right">'+
-                    '<h4>单据编号：</h4>'+
-                    '<h4 class="text-navy">H+-000567F7-00</h4>'+
-                    '<address>'+
-                    '<strong>阿里巴巴集团</strong><br> 中国杭州市华星路99号东部软件园创业大厦6层(310099)<br><abbr title="Phone">总机：</abbr>+ (86) 571-8502-2088'+
-                    '</address>'+
-                    '<p><span><strong>日期：</strong> 2014-11-11</span></p>'+
-                    '</div>'+
-                    '</div>'+
-
-                    '<div class="table-responsive m-t">'+
-                    '<table class="table invoice-table">'+
-                    '<thead>'+
-                    '<tr><th>清单</th><th>数量</th><th>单价</th><th>税率</th><th>总价</th></tr>'+
-                    '</thead>'+
-                    '<tbody>'+
-                    '<tr><td><div><strong>尚都比拉2013冬装新款女装</strong></div></td><td>1</td><td>¥26.00</td><td>¥1.20</td><td>¥31,98</td></tr>'+
-                    '</tbody>'+
-                    '</table>'+
-                    '</div>'+
-
-                    '<div class="col-sm-8"></div>'+
-                    '<div class="col-sm-4 text-right">'+
-                    '<strong>总价：</strong>+¥1026.00&emsp;&emsp;<strong>税：</strong>¥235.98&emsp;&emsp;<strong>总计</strong>¥1261.98&emsp;&emsp;'+
-                    '<div style="padding-bottom: 10px;">'+'</div>'+
-                    '</div>'+
-
-                    '<div class="text-right">'+
-                    '<button class="btn btn-primary"><i class="fa fa-dollar"></i> 发货</button>&emsp;&emsp;'+
-                    '<button class="btn btn-primary"><i class="fa fa-print" aria-hidden="true"></i> 打印</button>'+
-                    '</div>'+
-                    '</div></div></div>'+
-                    '</td>'+ '</tr>';
-            $(_this_tr).after(_row_tr);
-            sessionStorage.now = _this_tr;
         }
         //alert(id);
     }
@@ -331,8 +349,7 @@
             var es = $('#express_sn').val();
 console.log(ei);
 console.log(oi);
-console.log(es);return false;
-
+console.log(es);
             $.ajax({
                 type :'post',
                 url : '__CONTROLLER__/add_express',
@@ -352,6 +369,19 @@ console.log(es);return false;
                 }
 
             });
+        });
+
+        //打印
+        $(document).on('click','#print',function(){
+            var head_str = "<html><head><title>打印</title><link href=‘/Public/Admin/css/style.css’ rel=‘stylesheet’></head><body>"; //先生成头部
+            var foot_str = "</body></html>"; //生成尾部
+            var older = document.body.innerHTML;
+            var new_str = document.getElementById('new_html').innerHTML; //获取指定打印区域
+            var old_str = document.body.innerHTML; //获得原本页面的代码
+            document.body.innerHTML = head_str + new_str + foot_str; //构建新网页
+            window.print(); //打印刚才新建的网页
+            document.body.innerHTML = older; //将网页还原
+            return false;
         });
     });
 

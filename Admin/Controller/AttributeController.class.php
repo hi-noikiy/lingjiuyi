@@ -2,10 +2,25 @@
 namespace Admin\Controller;
 class AttributeController extends BaseController{
 	public function index(){
+		$cate = M('Category') -> where("pid = 0") -> select();
+		$this->assign('cate',$cate);
 		$this->display();
 	}
 
 	public function lst(){
+
+		I('get.attr_id','','intval')    ? $where['attr_id'] = I('get.attr_id','','intval') : false;
+		I('get.cate_id','','intval')    ? $where['cate_id'] = I('get.cate_id','','intval') : false;
+		I('get.attr_input_type')        ||  (I('get.attr_input_type') === '0') ? $where['attr_input_type'] = I('get.attr_input_type','','intval') : false;
+		I('get.attr_type')              || (I('get.attr_type') === '0') ? $where['attr_type'] = I('get.attr_type','','intval') : false;
+		I('get.attr_name','','string')   ? $attr_name = I('get.attr_name','','string') : false;
+		I('get.attr_values','','string') ? $attr_values = I('get.attr_values','','string') : false;
+		if(isset($attr_name)){
+			$where['attr_name'] = ['LIKE',"%$attr_name%"];
+		}
+		if(isset($attr_values)){
+			$where['attr_values'] = ['LIKE',"%$attr_values%"];
+		}
 
 		$column = $_GET['order'][0]['column'];
 		switch($column){
@@ -32,8 +47,8 @@ class AttributeController extends BaseController{
 		$order  = $order.' '.$dir;
 		$start  = I('get.start','','intval');
 		$length = I('get.length','','intval');
-		$count  = D('Attribute') -> alias('t1') -> join("left join zhouyuting_category t2 on t1.cate_id=t2.id ") -> count();
-		$attr   = D('Attribute') -> alias('t1') -> join("left join zhouyuting_category t2 on t1.cate_id=t2.id ") -> limit($start,$length) -> order($order) -> select();
+		$count  = D('Attribute') -> alias('t1') -> where($where) -> join("left join zhouyuting_category t2 on t1.cate_id=t2.id ") -> count();
+		$attr   = D('Attribute') -> alias('t1') -> where($where) -> join("left join zhouyuting_category t2 on t1.cate_id=t2.id ") -> limit($start,$length) -> order($order) -> select();
 		$data   = array(
 			'data'            => $attr, //array 需要在表格中显示的数据
 			'draw'            => I('get.draw','','intval'),//integer 请求序号

@@ -112,7 +112,7 @@ function pay_status($status){
             return '未付款';
         case 1:
             return '已付款';
-        case 1:
+        case 2:
             return '已取消';
     }
 }
@@ -263,4 +263,25 @@ function base64_urlSafeDecode($str)
     $find = array('-', '_');
     $replace = array('+', '/');
     return base64_decode(str_replace($find, $replace, $str));
+}
+
+
+function request_by_curl($remote_server,$post_string,$upToken) {
+
+    $headers = array();
+    $headers[] = 'Content-Type:image/png';
+    $headers[] = 'Authorization:UpToken '.$upToken;
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL,$remote_server);
+    //curl_setopt($ch, CURLOPT_HEADER, 0);
+    curl_setopt($ch, CURLOPT_HTTPHEADER ,$headers);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    //curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $post_string);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+    $data = curl_exec($ch);
+    curl_close($ch);
+
+    return $data;
 }

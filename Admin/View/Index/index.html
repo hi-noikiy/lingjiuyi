@@ -17,7 +17,18 @@
 <link href="/Public/Admin/css/font-awesome.min.css?v=4.4.0" rel="stylesheet">
 <link href="/Public/Admin/css/animate.css" rel="stylesheet">
 <link href="/Public/Admin/css/style.css?v=4.1.0" rel="stylesheet">
+<link href="/Public/Plugins/layer/2.4/skin/layer.css" rel="stylesheet">
 </head>
+<style>
+  .fileInput{
+    height:50px;
+    width: 50px;
+    position:absolute;
+    opacity: 0;
+    filter:alpha(opacity=0);
+    cursor:pointer;
+  }
+</style>
 
 <body class="fixed-sidebar full-height-layout gray-bg" style="overflow:hidden">
 <div id="wrapper">
@@ -28,7 +39,11 @@
     <ul class="nav" id="side-menu">
       <li class="nav-header">
         <div class="dropdown profile-element">
-          <span><img alt="image" class="img-circle" src="<?php echo $_SESSION['header_img']; ?>" style="width: 50px;"/></span>
+          <span>
+            <input type="file" value="" class="fileInput" id="fileInput">
+            <img alt="image" class="img-circle" src="<?php echo $_SESSION['header_img']; ?>" style="width: 50px;"/>
+
+          </span>
           <a data-toggle="dropdown" class="dropdown-toggle" href="#">
             <span class="clear"> <span class="block m-t-xs"> <strong class="font-bold"><?php echo $_SESSION['username'].'管理员'; ?></strong> </span> </span>
           </a>
@@ -113,12 +128,73 @@
 <script src="/Public/Plugins/layer/2.4/layer.js"></script>
 <!-- 自定义js --> 
 <script src="/Public/Admin/js/hplus.js?v=4.1.0"></script> 
-<script type="text/javascript" src="/Public/Admin/js/contabs.js"></script> 
+<script type="text/javascript" src="/Public/Admin/js/contabs.js"></script>
+
+<script src="__PUBLIC__/Plugins/jcrop/imagecropper.js"></script>
 
 <!-- 第三方插件 --> 
 <script src="/Public/Plugins/pace/pace.min.js"></script>
 <script>
+  var cropper;
+  function init()
+  {
+    //绑定
+    cropper = new ImageCropper(200, 200, 100, 100);
+    cropper.setCanvas("cropper");
+    cropper.addPreview("preview180");
+    //检测用户浏览器是否支持imagecropper插件
+    if(!cropper.isAvaiable())
+    {
+      alert("Sorry, your browser doesn't support FileReader, please use Firefox3.6+ or Chrome10+ to run it.");
+    }
+  }
+  //旋转图片
+  function rotateImage(e)
+  {
+    switch(e.target.id)
+    {
+      case "rotateLeftBtn":
+        cropper.rotate(-90);
+        break;
+      case "rotateRightBtn":
+        cropper.rotate(90);
+        break;
+    }
+  }
+  //上传图片
+  function saveImage()
+  {
+    //选个你需要的大小
+    var imgData = cropper.getCroppedImageData(180, 180);
+    console.log("上传了："+imgData);
+    $.ajax({
+      type : 'post',
+      url  : '__MODULE__/Public/upload_img',
+      data : {type:'base64',data:imgData},
+      dataType : 'json',
+      success  : function(data){
+        if(data.code == 10000){
+          layer.closeAll();
+          $('.img-circle').attr('src',data.info);
+          layer.msg(data.msg);
+        }else{
+          layer.msg(data.msg);
+        }
+      },
+      error : function(){
+      }
+    })
+  }
   $(function(){
+    //计算json长度
+    function getJsonLength(jsonData){
+      var jsonLength = 0;
+      for(var item in jsonData){
+        jsonLength++;
+      }
+      return jsonLength;
+    }
+
     //ajax获取发货信息
     $.ajax({
       type : 'GET',
@@ -172,15 +248,35 @@
       });
     });
 
-    //计算json长度
-    function getJsonLength(jsonData){
-      var jsonLength = 0;
-      for(var item in jsonData){
-        jsonLength++;
-      }
-      return jsonLength;
-    }
-  })
+    //更换头像
+
+    $(document).on('change','.fileInput', function() {
+      var html =
+              '<div style="border:3px dashed #ccc;height: 250px;margin: 20px;padding: 10px;text-align: center;background-color: #f4f4f4;">' +
+              '<div class="container" style="width: 320px;padding-bottom: 10px;margin-right: 10px;float: left;"><canvas id="cropper"></canvas></div>'+
+              '<div style="float: left;border:1px dashed  #ccc;padding: 0;"><canvas id="preview180" width="180" height="180" class="preview"></canvas></div><br/>'+
+              '<button class="btn btn-primary" id="rotateLeftBtn"  onclick="rotateImage(event);"><i class="fa fa-rotate-left" aria-hidden="true"></i></button>&emsp;'+
+              '<button class="btn btn-primary" id="rotateRightBtn"  onclick="rotateImage(event);"><i class="fa fa-rotate-right" aria-hidden="true"></i></button>&emsp;'+
+              '<button class="btn btn-primary" onclick="saveImage();"><i class="fa fa-plus" aria-hidden="true"></i> 确认上传</button>'+
+              '</div>&emsp;提示：不建议上传png格式的图片，可能会是黑色背景哦！';
+
+      layer.open({
+        type: 1,
+        title: false, //不显示标题
+        skin: 'layui-layer-rim', //加上边框
+        area: ['60%', '60%'], //宽高
+        content: html
+      });
+      init();//初始化插件
+      var file = this.files[0];
+      cropper.loadImage(file);//打开本地图片
+
+    });
+
+  });
+
+
+
 </script>
 </body>
 </html>

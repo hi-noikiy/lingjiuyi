@@ -8,7 +8,7 @@
                     <h5>基本 <small>分类，查找</small></h5>
                 </div>
                 <div class="ibox-content">
-                    <table class="table table-striped table-bordered table-hover dataTables-example" style="text-align: center;">
+                    <table class="table dataTables-example" style="text-align: center;">
                         <thead>
                         <tr>
                             <th>编号</th>
@@ -80,7 +80,7 @@
                         var id = row.is_act;
                         var html = '';
                         if(id == 0){
-                            html += "<span data-color='red'>YES</span>";
+                            html += "<span style='color:#fb2424'><i class='fa fa-tag' aria-hidden='true'></i>YES</span>";
                         }else if(id == 1){
                             html += "<span>NO</span>";
                         }
@@ -92,7 +92,10 @@
                     "render":function(data,type,row,meta) {
                         var id = row.goods_id;
                         var goods_name = row.goods_name;
-                        goods_name = '<a href="__MODULE__/Goods/edit/id/' + id + '" style="color:#6c6c6c">' + goods_name+ '</a>';
+                        if(goods_name.length >= 10){
+                            goods_name = goods_name.slice(0,10) + '...';
+                        }
+                        goods_name = '<a href="__MODULE__/Goods/edit/id/' + id + '" style="color:#fb6464" title="'+row.goods_name+'">' + goods_name + '</a>';
                         return goods_name;
                     }
                 },

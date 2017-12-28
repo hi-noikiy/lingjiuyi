@@ -60,9 +60,25 @@ class OrderController extends BaseController{
 	public function detail(){
 		$id = I('get.id','','intval');
 		empty($id) ? $this -> ajaxReturnData(0,'参数错误') : true;
-		$data = D('Order') -> alias('a') -> field('a.*'
-		) -> where(['id' => $id]) -> join('zhouyuting_order_goods b on a.id = b.order_id') -> select();
-		dump($data);
+		//单据编号 订单状态 收货人姓名  收货人电话 收货地址 发货时间 总价 物流编号 备注  商品名称 商品价格 商品属性 购买数量
+		//order_sn order_status address_info
+		$data['order'] = D('Order')-> find($id);
+		$data['goods'] = D('Order') -> alias('a')
+				-> field('b.*,c.goods_name,c.goods_price')
+				-> where(['a.id' => $id])
+				-> join('zhouyuting_order_goods b on a.id = b.order_id')
+				-> join('zhouyuting_goods c on b.goods_id = c.goods_id')
+				-> select();
+		foreach($data['goods'] as $key => $value){
+			$data['goods'][$key]['goods_attr_ids'] = explode(',',$value['goods_attr_ids']);
+			foreach($data['goods'][$key]['goods_attr_ids'] as $k => $v){
+				$data['goods'][$key]['goods_attr_ids'][$k] = D('Goods_attr') -> where(['id' => $v ]) -> getField('attr_value');
+			}
+			$data['goods'][$key]['goods_attr_ids'] = implode(' X ',$data['goods'][$key]['goods_attr_ids']);
+		}
+		unset($key,$value);
+		unset($k,$v);
+		empty($data) ? $this -> ajaxReturnData(0,'没有数据') : $this -> ajaxReturnSuccess($data);
 	}
 
 	

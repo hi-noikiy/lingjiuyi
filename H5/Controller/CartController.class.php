@@ -331,6 +331,7 @@ class CartController extends CommonController {
 			$user['balance'] = $balance - $order_amount;//用户余额扣除订单金额
 			$resu = M('User') -> where("id = $uid") -> save($user);//保存扣除用户余额
 			$resu !== false ? $resu : $this -> ajaxReturnData(10001,'扣除用户余额失败！');
+			$order['pay_status'] = 1; //支付状态 0未付款 1已付款
 			$order['order_status'] = 1;//0待付款，1,待发货
 			$reso = D('Order') -> where("id = $res") -> save($order);
 			$url = '/User/order/type/'.$order_type;

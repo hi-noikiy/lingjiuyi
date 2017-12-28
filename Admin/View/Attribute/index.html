@@ -26,7 +26,60 @@
                     <h5>商品 <small>属性列表 &emsp;<a href='__CONTROLLER__/add' class="btn btn-default btn-xs">添加</a></small></h5>
                 </div>
                 <div class="ibox-content">
-                    <table class="table" style="text-align: center;border-collapse:collapse;">
+                    <div class="row">
+                        <div class="col-sm-3 m-b-xs">
+                            商品类型&emsp;
+                            <select class="input-sm  input-s-sm inline" name="cate_id">
+                                <option value=''>请选择</option>
+                                <volist name="cate" id="vol">
+                                    <option value="{$vol.id}">{$vol.cate_name}</option>
+                                </volist>
+                            </select>
+                        </div>
+                        <div class="col-sm-3 m-b-xs">
+                            属性类型&emsp;
+                            <select class="input-sm  input-s-sm inline" name="attr_type">
+                                <option value=''>请选择</option>
+                                <option value="0">唯一属性</option>
+                                <option value="1">单选属性</option>
+                                <option value="2">复选属性</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-3">
+                            录入方式&emsp;
+                            <select class="input-sm  input-s-sm inline" name="attr_input_type">
+                                <option value=''>请选择</option>
+                                <option value="0">输入框</option>
+                                <option value="2">多选框</option>
+                                <option value="1">下拉列表</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-3 m-b-xs">
+                            <div class="input-group">
+                                编号&emsp;<input type="text" name="attr_id" placeholder="请输入编号" class="input-sm">
+                            </div>
+                        </div>
+                        <div class="col-sm-3 m-b-xs">
+                            <div class="input-group">
+                                属性名称&emsp;<input type="text" name="attr_name" placeholder="请输入属性名称" class="input-sm">
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <div class="input-group">
+                                可选值&emsp;<input type="text" name="attr_values" placeholder="请输入可选值" class="input-sm">
+                            </div>
+                        </div>
+                        <div class="col-sm-3">
+                            <span class="input-group-btn">
+                                <button id="search" type="button" class="btn btn-sm btn-primary"> 搜索</button>
+                            </span>
+                        </div>
+                    </div>
+
+                    <div style="height: 20px;" id="biaoshi"></div>
+                    <table class="table dataTables-example" style="text-align: center;border-collapse:collapse;">
                         <thead>
                         <tr>
                             <th>编号</th>
@@ -58,9 +111,52 @@
 <script>
     $(document).ready(function () {
         //初始化表格数据
-        $('.table').dataTable({
+        init();
+    });
+
+    $('#search').click(function(){
+
+        var attr_id         = $('input[name=attr_id]').val();
+        var attr_name       = $('input[name=attr_name]').val();
+        var attr_values     = $('input[name=attr_values]').val();
+        var cate_id         = $("select[name=cate_id]").val();
+        var attr_input_type = $("select[name=attr_input_type]").val();
+        var attr_type       = $("select[name=attr_type]").val();
+
+        if(attr_id == '' && attr_name == '' && attr_values == '' && cate_id == '' && attr_input_type == '' && attr_type == ''){
+            return false;
+        }else{
+
+            var data = {attr_id:attr_id,attr_name:attr_name,attr_values:attr_values,cate_id:cate_id,attr_input_type:attr_input_type,attr_type:attr_type};
+            $('#DataTables_Table_1_wrapper').remove();
+            $('#DataTables_Table_0_wrapper').remove();
+            var html = '<table class="table dataTables-example" style="text-align: center;border-collapse:collapse;">'+
+                    '<thead>'+
+                    '<tr>'+
+                    '<th>编号</th>'+
+                    '<th>商品类型</th>'+
+                    '<th>属性名称</th>'+
+                    '<th>属性类型</th>'+
+                    '<th>录入方式</th>'+
+                    '<th>可选值</th>'+
+                    '<th>操作</th>'+
+                    '</tr>'+
+                    '</thead>'+
+                    '</table>';
+            $('#biaoshi').after(html);
+            init(data);
+
+        }
+
+    });
+
+    function init(data){
+        $('.dataTables-example').dataTable({
             "order": [[ 1, "asc" ]], //默认排序
-            "ajax": "{:U('Attribute/lst')}",
+            "ajax": {
+                "url" : '__CONTROLLER__/lst',
+                "data" : data
+            },
             "serverSide" : true,// 服务器端分页处理
             searching: false,//是否显示搜索框
             "columns": [
@@ -116,8 +212,8 @@
                 }
             ]
         });
+    }
 
-    });
     //修改
     function editAttribute(now,id){
         if($('#main').length >= 1){
@@ -131,6 +227,7 @@
         }
         localStorage.id = id;
 
+        $(now).closest('tr').attr('style','display:none');
         var html = '<tr class="odd" id="main">';
         $(now).closest('tr').each(function(i){                   // 遍历 tr
             $(this).children('td').each(function(j){  // 遍历 tr 的各个 td
@@ -180,7 +277,7 @@
                 }else if(j+1 == 6){
                     html += '<td class="sorting_1"><input type="text" id="attr_values" class="form-control" style="width: 300px;" value="'+$(this).text()+'"></td>';
                 }else if(j+1 == 7){
-                    html += '<td class="sorting_1"><button class="btn btn-white btn-xs" type="submit">保存</button></td>';
+                    html += '<td class="sorting_1"><button class="btn btn-white btn-xs" type="submit">保存</button>&emsp;<button class="btn bt-info btn-xs" type="submit">取消</button></td>';
                 }else{
                     html += '<td class="sorting_1">' + $(this).text() + '</td>';
                 }
@@ -192,6 +289,7 @@
         $(now).closest('tr').after(html);
         $(now).closest('tr').addClass('newone');
         $('#main').addClass('newtwo');
+        //保存
         $(document).on('click','.btn-white',function(){
             var id = $(this).closest('tr').children('td').eq(0).text();
             var attr_name  = $('#attr_name').val();
@@ -215,6 +313,11 @@
                 }
 
             });
+        });
+        $(document).on('click','.bt-info',function(){
+            $('tr').removeClass('newone');//移除所有的tr上的新样式
+            $(this).closest('tr').prev('tr').attr('style','display:show;');
+            $(this).closest('tr').remove();
         });
     }
     //删除
