@@ -8,6 +8,7 @@ use Qiniu\Storage\BucketManager;
 
 class GoodsController extends BaseController{
 
+	//初始化
 	public function __construct()
 	{
 		parent::__construct();
@@ -18,13 +19,15 @@ class GoodsController extends BaseController{
 		$this -> V_BUCK = $setting['bucket'];
 	}
 
+	//首页列表
 	public function index(){
 		if(IS_AJAX){
 			//查询商品数据
 			//实例化模型
 			$model = D('Goods');
+			$fields = 'a.goods_id,a.goods_name,a.goods_bigprice,a.goods_price,a.goods_number,a.goods_small_img,a.is_act,a.goods_big_img,b.shop_name,c.cate_name';
 			//使用select查询数据 加上limit条件
-			$goods = $model -> select();
+			$goods = $model -> alias('a') -> field($fields) -> join('zhouyuting_shop b on a.shop_id = b.id') -> join('zhouyuting_category c on a.cate_id = c.id') -> select();
 			$data  = ['data' => $goods];
 			//变量赋值
 			$this ->ajaxReturn($data);
@@ -34,6 +37,7 @@ class GoodsController extends BaseController{
 
 	}
 
+	//添加商品
 	public function add(){
 		if(IS_POST){
 			//添加数据
@@ -135,6 +139,7 @@ class GoodsController extends BaseController{
 
 	}
 
+	//修改商品
 	public function edit(){
 		$id = I('get.id','','intval') ? I('get.id','','intval') : I('post.id','','intval');//商品id
 		empty($id) ? $this -> ajaxReturnData(0,'参数错误') : true;
@@ -263,6 +268,23 @@ class GoodsController extends BaseController{
 			$this -> display();
 
 		}
+	}
+
+	//显示销售量
+	public function show_sales(){
+		$id = I('get.id','','intval') ? I('get.id','','intval') : $this -> ajaxReturnData(0,'参数错误');
+		$sales = D('Saleonline') -> alias('a') -> field('a.*,b.goods_smallprice') -> where(['a.goods_id' => $id]) -> join('zhouyuting_goods b on a.goods_id = b.goods_id') -> select();
+		$data = [];
+		foreach($sales as $key => $value){
+			$data['time'][]  = substr($value['add_time'],0,10);//时间
+			$data['num'][]   = $value['sale_num'];//销售量
+			$data['money'][] = $value['sale_money'];//销售金额
+			$data['price'][] = $value['sale_num'] * $value['goods_smallprice'];//进价
+			$data['pure'][]  = $value['sale_money'] - ($value['sale_num'] * $value['goods_smallprice']);//纯利润 = 销售金额 - (销售量 * 商品进价)
+		}
+		empty($sales) ? $this -> ajaxReturnData(0,'没有数据') : $this -> ajaxReturnSuccess($data);
+
+
 	}
 
 

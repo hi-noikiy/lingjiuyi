@@ -66,6 +66,7 @@
             "columnDefs": [
                 {
                     "targets":-1,
+                    "bSortable": false,
                     "render":function(data,type,row,meta) {
                         var id = row.id;
                         var html = '';
@@ -78,6 +79,7 @@
                 },
                 {
                     "targets":5,
+                    "bSortable": false,
                     "render":function(data,type,row,meta) {
                         var html = '';
                         if(row.header_img == null || row.header_img == ''){

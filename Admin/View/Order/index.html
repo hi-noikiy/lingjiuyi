@@ -206,6 +206,7 @@
             "columnDefs": [
                 {
                     "targets":-1,
+                    "bSortable": false,
                     "render":function(data,type,row,meta) {
                         var id = row.id;
                         var os = row.os;
@@ -244,7 +245,7 @@
                         var arr= new Array(); //定义一数组
                         arr=(data.info.order.address_info).split(" "); //字符分割
                         var _row_tr  =
-                                '<tr>'+ '<td colspan="10" id="new_html"> '+
+                                '<tr id="new_html">'+ '<td colspan="10" > '+
                                 '<div class="row"><div class="col-sm-12"><div class="ibox-content p-xl" style="border-color:#fff;">'+
 
                                 '<div class="row">' +

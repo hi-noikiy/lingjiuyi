@@ -60,7 +60,6 @@
     $(document).ready(function () {
         //初始化表格数据
         $('.dataTables-example').dataTable({
-            'ordering':false,
             "ajax": "{:U('Category/lst')}",
             "columns": [
                 { "data": "id" },
@@ -73,6 +72,7 @@
             "columnDefs": [
                 {
                     "targets":-1,
+                    "bSortable": false,
                     "render":function(data,type,row,meta) {
                         var id = row.id;
                         var html = '';
@@ -98,6 +98,7 @@
                 },
                 {
                     "targets":2,
+                    "bSortable": false,
                     "render":function(data,type,row,meta) {
                         var html = '';
                         if(row.cate_img != null){

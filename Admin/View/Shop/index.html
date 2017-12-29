@@ -41,7 +41,6 @@
 <script>
     $(document).ready(function () {
         $('.dataTables-example').dataTable({
-            'ordering':false,
             "ajax": "{:U('Shop/lst')}",
             "columns": [
                 { "data": "id" },
@@ -54,6 +53,7 @@
             "columnDefs": [
                 {
                     "targets":-1,
+                    "bSortable": false,
                     "render":function(data,type,row,meta) {
                         var id = row.id;
                         var html = '';
@@ -76,6 +76,7 @@
                 },
                 {
                     "targets":3,
+                    "bSortable": false,
                     "render":function(data,type,row,meta) {
                         var html = '';
                         if(row.shop_logo != null){

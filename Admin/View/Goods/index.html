@@ -21,6 +21,7 @@
                             <th>所属分类id</th>
                             <th>活动商品</th>
                             <th>操作</th>
+                            <th>大图</th>
                         </tr>
                         </thead>
                         <tbody>
@@ -47,11 +48,14 @@
 <script src="/Public/Admin/js/content.js?v=1.0.0"></script>
 <script src="/Public/Plugins/layer/layer.min.js"></script>
 
+<script type="text/javascript" src="http://echarts.baidu.com/gallery/vendors/echarts/echarts-all-3.js"></script>
+
 <!-- Page-Level Scripts -->
 <script>
     $(document).ready(function () {
         $('.dataTables-example').dataTable({
             "ajax": "{:U('Goods/index')}",
+
             "columns": [
                 { "data": "goods_id" },
                 { "data": "goods_name" },
@@ -59,23 +63,30 @@
                 { "data": "goods_price" },
                 { "data": "goods_number"},
                 { "data": "goods_small_img"},
-                { "data": "shop_id"},
-                { "data": "cate_id"},
+                { "data": "shop_name"},
+                { "data": "cate_name"},
                 { "data": "is_act"},
-                { "data": null}
+                { "data": null},
+                { "data": "goods_big_img"}
             ],
             "columnDefs": [
                 {
                     "targets":-1,
+                    "visible": false,
+                    "searchable": false
+                }, {
+                    "targets":-2,
+                    "bSortable": false,
                     "render":function(data,type,row,meta) {
                         var id = row.goods_id;
                         var html = '';
-                        html += "&nbsp;<a href='javascript:void(0);' onclick='editArticle("+ id + ")' class='up btn btn-default btn-xs'><i class='fa fa-arrow-up'></i>编辑</a>";
-                        html += "&nbsp;<a href='javascript:void(0);' onclick='delArticle("+ id + ")' class='down btn btn-default btn-xs'><i class='fa fa-arrow-down'></i>删除</a>";
+                        html += "&nbsp;<a href='javascript:void(0);' onclick='editGoods("+ id + ")' class='up btn btn-default btn-xs'><i class='fa fa-arrow-up'></i>编辑</a>";
+                        html += "&nbsp;<a href='javascript:void(0);' onclick='delGoods("+ id + ")' class='down btn btn-default btn-xs'><i class='fa fa-arrow-down'></i>删除</a>";
+                        html += "&nbsp;<a href='javascript:void(0);' onclick='show_sales(this,"+ id + ")' class='down btn btn-default btn-xs'><i class='fa fa-arrow-down'></i>查看销售量</a>";
                         return html;
                     }
                 },{
-                    "targets":-2,
+                    "targets":-3,
                     "render":function(data,type,row,meta) {
                         var id = row.is_act;
                         var html = '';
@@ -95,25 +106,60 @@
                         if(goods_name.length >= 10){
                             goods_name = goods_name.slice(0,10) + '...';
                         }
-                        goods_name = '<a href="__MODULE__/Goods/edit/id/' + id + '" style="color:#fb6464" title="'+row.goods_name+'">' + goods_name + '</a>';
+                        goods_name = '<a href="__MODULE__/Goods/edit/id/' + id + '" style="color:grey" title="'+row.goods_name+'">' + goods_name + '</a>';
                         return goods_name;
                     }
                 },
                 {
                     "targets":5,
+                    "bSortable": false,
                     "render":function(data,type,row,meta) {
-                        var html = '';
-                        html += '<img src="'+row.goods_small_img+'" style="width: 40px;"/>';
+                        var html = '<img class="show_img" src="'+row.goods_small_img+'" style="width: 40px;float: left;"/>';
+                        html += '<div style="display: none;"><img src="'+row.goods_big_img+'"  / ></div>';
                         return html;
                     }
                 }
             ]
         });
     });
-    function editArticle(id) {
+    $(function(){
+        //鼠标移到图片上显示大图
+        $(document).on('mouseover','.show_img',function(){
+            var _this = $(this);
+            var html = $(this).next('div').html();
+            layer.tips(html, _this, {
+                tips: [2, '#fff'],
+                maxWidth:400,
+                time: 4000
+            });
+        });
+        //鼠标移开关闭
+        $(document).on('mouseout','.show_img',function(){
+            layer.closeAll();
+        });
+        //点击搜索
+        $(document).on('click','#search',function(){
+            //获取值
+            var year       = $("select[name=year]").val();
+            var mon        = $("select[name=mon]").val();
+            var min_num    = $('input[name=min_num]').val();
+            var max_num    = $('input[name=max_num]').val();
+            var min_price  = $('input[name=min_price]').val();
+            var max_price  = $('input[name=max_price]').val();
+            console.log(year);
+            console.log(mon);
+            console.log(min_num);
+            console.log(max_num);
+            console.log(min_price);
+            console.log(max_price);
+        })
+    });
+    //修改
+    function editGoods(id) {
         location.href = '__MODULE__/Goods/edit/id/' + id;
     }
-    function delArticle(id) {
+    //删除
+    function delGoods(id) {
         layer.confirm('确定删除？', {
             btn: ['确定','取消'], //按钮
             shade: false //不显示遮罩
@@ -140,6 +186,242 @@
 
         });
     }
+    //查看
+    function show_sales(_this,id){
+        var _this_tr = $(_this).closest('tr');
+        var tag      = $(_this_tr).next('tr').find('#left_main').length;
+        if(sessionStorage.now == _this_tr && tag >= 1){
+            //如果当前点击对象 为 上一次点击对象 并且 页面中存在详情页面  ，则移除
+            $('#new_html').remove();
+        }else{
+            //否则移除原来的页面
+            $('#new_html').remove();
+
+            var _row_tr  = '<tr id="new_html"><td colspan="10">' +
+                    '<div class="row" style="padding-bottom: 10px;padding-top: 10px;">'+
+                    '<div class="col-sm-2 m-b-xs">'+
+                    '年&emsp;'+
+                    '<select class="input-sm  input-s-sm inline" name="year">'+
+                    '<option value="">请选择</option>';
+            for(var j = 1997; j <= 2018; j++){
+                _row_tr += '<option value="">'+j+'</option>';
+            }
+            _row_tr += '</select>'+
+                    '</div>'+
+                    '<div class="col-sm-2 m-b-xs">'+
+                    '月&emsp;'+
+                    '<select class="input-sm  input-s-sm inline" name="mon">'+
+                    '<option value="">请选择</option>';
+            for(var k = 1; k <= 12; k++){
+                _row_tr += '<option value="">'+k+'</option>';
+            }
+            _row_tr += '</select>'+
+                    '</div>'+
+                    '<div class="col-sm-3 m-b-xs">' +
+                    '销量&emsp;<input type="text" name="min_num" placeholder="0" class="input-sm" style="width: 60px;">' +
+                    '--<input type="text" name="max_num" placeholder="1000" class="input-sm" style="width: 60px;">' +
+                    '</div>' +
+                    '<div class="col-sm-3 m-b-xs">' +
+                    '进价&emsp;<input type="text" name="min_price" placeholder="0" class="input-sm" style="width: 60px;">' +
+                    '--<input type="text" name="max_price" placeholder="10000" class="input-sm" style="width: 60px;">' +
+                    '</div>' +
+                    '<div class="col-sm-2 m-b-xs"><span class="input-group-btn">'+
+                    '<button id="search" type="button" class="btn btn-sm btn-primary"> 搜索</button>'+
+                    '</span></div>'+
+                    '</div>'+
+                    '<div id="left_main"></div>' +
+                    '<div id="right_main"></div></td></tr>';
+            $(_this_tr).after(_row_tr);
+            show_data(_this_tr,id);//请求数据
+
+
+        }
+
+    }
+
+    //请求数据
+    function show_data(_this_tr,id){
+        //添加新的页面
+        $.ajax({
+            type : 'get',
+            url  : '__CONTROLLER__/show_sales/id/' + id,
+            dataType : 'json',
+            success  : function(data){
+                if(data.code == 10000){
+                    $('#left_main').attr('style','width:50%;float: left;height:300px;');
+                    $('#right_main').attr('style','width:50%;float: left;height:300px;');
+
+                    var Left_myChart  = echarts.init(document.getElementById('left_main'));
+                    var Right_myChart = echarts.init(document.getElementById('right_main'));
+                    var dateList = data.info.time;//时间
+                    var valueList = data.info.num;//销售量
+                    var priceList = data.info.price;//进价
+                    var moneyList = data.info.money;//销售金额
+                    var pureList  = data.info.pure;//纯利润
+
+                    Left_option = {
+                        title : {
+                            subtext: '商品销售额统计'
+                        },
+                        tooltip: {
+                            trigger: 'axis',
+                            formatter: '日期：{b0}<br/>销售量：{c0}件',
+                            axisPointer: {
+                                type: 'cross',
+                                animation: false,
+                                label: {
+                                    backgroundColor: '#505765'
+                                }
+                            },
+                            backgroundColor:'rgba(0,0,0,0.3)'
+                        },
+                        xAxis: [{
+                            name: '时间',
+                            data: dateList
+                        }],
+                        yAxis: [{
+                            name: '销售量(件)',
+                            splitLine: {show: false}
+                        }],
+                        grid: [{
+                            left: '5%',
+                            right: '5%',
+                            top: '20%',
+                            bottom: '20%',
+                            containLabel: true
+                        }],
+                        series: [{
+                            type: 'line',
+                            showSymbol: false,
+                            symbol:'pin',//拐点样式
+                            itemStyle:{
+                                normal:{
+                                    color: '#4de1f9'
+                                }
+                            },
+                            lineStyle:{
+                                normal:{
+                                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                        offset: 0,
+                                        color: '#05caea'
+                                    }, {
+                                        offset: 1,
+                                        color: '#fff'
+                                    }]),
+                                    width: 1
+                                }
+                            },
+                            areaStyle: {
+                                normal: {
+                                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{
+                                        offset: 0,
+                                        color: '#4de1f9'
+                                    }, {
+                                        offset: 1,
+                                        color: '#fff'
+                                    }])
+                                }
+                            },
+                            data: valueList
+                        }]
+                    };
+
+                    Right_option = {
+                        title : {
+                            subtext: '利润分析'
+                        },
+                        tooltip : {
+                            trigger: 'axis',
+                            axisPointer : {            // 坐标轴指示器，坐标轴触发有效
+                                type : 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                            }
+                        },
+                        legend: {
+                            data:['进价','售价','纯利润']
+                        },
+                        grid: {
+                            left: '5%',
+                            right: '5%',
+                            top: '20%',
+                            bottom: '20%',
+                            containLabel: true
+                        },
+                        xAxis : [
+                            {
+                                type : 'category',
+                                data : dateList
+                            }
+                        ],
+                        yAxis : [
+                            {
+                                name: '价格(元)',
+                                type : 'value'
+                            }
+                        ],
+                        series : [
+                            {
+                                name:'进价',
+                                type:'bar',
+                                itemStyle: {
+                                    //通常情况下：
+                                    normal:{
+                                        //每个柱子的颜色即为colorList数组里的每一项，如果柱子数目多于colorList的长度，则柱子颜色循环使用该数组
+                                        color: 'grey'
+                                    }
+                                },
+                                data:priceList
+                            },
+                            {
+                                name: '售价',
+                                type: 'bar',
+                                stack: '广告',
+                                itemStyle: {
+                                    normal:{
+                                        color: '#ccc'
+                                    }
+                                },
+                                data: moneyList
+                            },
+                            {
+                                name:'纯利润',
+                                type:'bar',
+                                data:pureList,
+                                itemStyle: {
+                                    normal:{
+                                        color: '#05caea'
+                                    }
+                                },
+                                markLine : {
+                                    lineStyle: {
+                                        normal: {
+                                            type: 'dashed'
+                                        }
+                                    },
+                                    data : [
+                                        [{type : 'min'}, {type : 'max'}]
+                                    ]
+                                }
+                            }
+                        ]
+                    };
+                    Left_myChart.setOption(Left_option);
+                    Right_myChart.setOption(Right_option);
+
+
+                }else{
+                    parent.layer.msg(data.msg, {shift: 6});
+                }
+
+                sessionStorage.now = _this_tr;
+            },
+            error : function(){
+
+            }
+        });
+    }
+
+
+
 </script>
 </body>
 </html>

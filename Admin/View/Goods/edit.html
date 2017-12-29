@@ -139,7 +139,8 @@
                                     <div class="row cl" id="goods_pics">
                                         <label class="form-label col-xs-4 col-sm-3"></label>
                                         <div class="formControls col-xs-6 col-sm-8">
-                                        <img src="{$val.pics_mid}" alt="暂无图片" style="width: 100px;padding-bottom: 10px;">
+                                        <img src="{$val.pics_mid}" class="show_img" alt="暂无图片" style="width: 100px;padding-bottom: 10px;">
+                                        <div style="display: none;"><img src="{$val.pics_big}" style="width: 400px;"/></div>
                                         <span class="btn-upload form-group">
                                         <a href="javascript:void(0);" id="del_pics" pic_id="{$val.id}" class="btn btn-primary upload-btn">
                                             <i class="fa fa-minus-square" aria-hidden="true"></i> 删除图片
@@ -654,6 +655,19 @@
                     layer.msg('视频处理出错了！！！', {icon: 5});
                 }
             });
+        });
+
+        $(document).on('mouseover','.show_img',function(){
+            var _this = $(this);
+            var html = $(this).next('div').html();
+            layer.tips(html, _this, {
+                tips: [2, '#fff'],
+                maxWidth:400,
+                time: 4000
+            });
+        });
+        $(document).on('mouseout','.show_img',function(){
+            layer.closeAll();
         });
 
     });
