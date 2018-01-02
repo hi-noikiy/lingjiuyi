@@ -147,9 +147,6 @@ class GoodsController extends BaseController{
 			//商品基本信息 goods
 			//商品属性管理 goods_attr
 			//商品相册 goodspics
-
-
-
 			//如果有商品id，则是修改商品信息
 
 			$data['pics_origin']     = I('post.pics')     ? I('post.pics')  : false;//如果上传的是商品相册，则保存相册相关参数
@@ -272,8 +269,33 @@ class GoodsController extends BaseController{
 
 	//显示销售量
 	public function show_sales(){
-		$id = I('get.id','','intval') ? I('get.id','','intval') : $this -> ajaxReturnData(0,'参数错误');
-		$sales = D('Saleonline') -> alias('a') -> field('a.*,b.goods_smallprice') -> where(['a.goods_id' => $id]) -> join('zhouyuting_goods b on a.goods_id = b.goods_id') -> select();
+		$id        =  I('get.id','','intval')     ? I('get.id','','intval')   : $this -> ajaxReturnData(0,'参数错误');
+		$year      =  I('get.year','','intval')   ? I('get.year','','intval') : '';
+		$mon       =  I('get.mon','','intval')    ? I('get.mon','','intval')  : '';
+		$min_num   = I('get.min_num','','intval') ? I('get.min_num','','intval') : '';
+		$max_num   = I('get.max_num','','intval') ? I('get.max_num','','intval') : '';
+		$min_price = I('get.min_price','','intval') ? I('get.min_price','','intval') : '';
+		$max_price = I('get.max_price','','intval') ? I('get.max_price','','intval') : '';
+		if(!empty($mon)){
+			$mon >= 10 ? $year = $year.'-'.$mon : $year = $year.'-0'.$mon;
+		}
+		if(empty($min_num) && !empty($max_num)){
+			$where['a.sale_num'] = ['LT',$max_num];
+		}elseif(!empty($min_num) && empty($max_num)){
+			$where['a.sale_num'] = ['GT',$min_num];
+		}elseif(!empty($min_num) && !empty($max_num)){
+			$where['a.sale_num'] = ['BETWEEN',[$min_num,$max_num]];
+		}
+		if(empty($min_price) && !empty($max_price)){
+			$where['a.sale_money'] = ['LT',$max_price];
+		}elseif(!empty($min_price) && empty($max_price)){
+			$where['a.sale_money'] = ['GT',$min_price];
+		}elseif(!empty($min_price) && !empty($max_price)){
+			$where['a.sale_money'] = ['BETWEEN',[$min_price,$max_price]];
+		}
+		$where['a.goods_id'] = $id;
+		$where['a.add_time'] = ['LIKE',"$year%"];
+		$sales = D('Saleonline') -> alias('a') -> field('a.*,b.goods_smallprice') -> where($where) -> join('zhouyuting_goods b on a.goods_id = b.goods_id') -> select();
 		$data = [];
 		foreach($sales as $key => $value){
 			$data['time'][]  = substr($value['add_time'],0,10);//时间

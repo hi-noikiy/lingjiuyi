@@ -36,13 +36,13 @@
 <script src="/Public/Plugins/dataTables/dataTables.bootstrap.js"></script> 
 
 <!-- 自定义js --> 
-<script src="/Public/Admin/js/content.js?v=1.0.0"></script> 
-
+<script src="/Public/Admin/js/content.js?v=1.0.0"></script>
+<script src="/Public/Plugins/layer/layer.min.js"></script>
 <!-- Page-Level Scripts --> 
 <script>
 	$(document).ready(function () {
 		$('.dataTables-example').dataTable({
-			"ajax": "{:U('Hot/lst')}",
+			"ajax": "__SELF__",
 			"columns": [
 				{ "data": "id" },
 				{ "data": "title" },
@@ -76,14 +76,25 @@
 			]
 		});
 	});
+
+    function editArticle(id) {
+        $.ajax({
+            type : 'post',
+            url  : '__CONTROLLER__/edit',
+            data : {id:id},
+            dataType : 'json',
+            success : function(data){
+                if(data.code == 10000){
+
+                }else{
+                    layer.msg(data.msg);
+                }
+            }
+        });
+    }
+    function delArticle(id) {
+        alert(id);
+    }
 </script>
-<script>
-        function editArticle(id) {
-            alert(id);
-        }
-        function delArticle(id) {
-            alert(id);
-        }
-    </script>
 </body>
 </html>

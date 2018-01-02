@@ -37,6 +37,20 @@ class IndexController extends BaseController {
     public function main() {
         $os = get_os();
         $software = $_SERVER['SERVER_SOFTWARE'];
+        $year = date('Y');
+        $mon  = date('Y-m');
+        $day  = date('Y-m-d');
+
+        $fields = 'SUM(sale_money) sum,SUM(goods_smallprice) price';
+        $join = 'zhouyuting_goods b on a.goods_id = b. goods_id';
+
+
+        $money[]  = D('Saleonline') -> alias('a') ->field($fields) -> join($join) -> find();//成本
+        $money[] = D('Saleonline') -> alias('a') ->field($fields) -> where(['a.add_time' => ['LIKE',"$year%"]]) -> join($join) -> find();//成本
+        $money[]  = D('Saleonline') -> alias('a') ->field($fields) -> where(['a.add_time' => ['LIKE',"$mon%"]])  -> join($join) -> find();//成本
+        $money[]  = D('Saleonline') -> alias('a') ->field($fields) -> where(['a.add_time' => ['LIKE',"$day%"]])  -> join($join) -> find();//成本
+
+        $this -> assign('money',$money);
         $this -> assign('os',$os);
         $this -> assign('software',$software);
         $this -> assign('version',PHP_VERSION);

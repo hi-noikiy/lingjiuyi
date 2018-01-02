@@ -17,14 +17,7 @@
                                     <th>最后登录时间</th>
                                 </tr>
                             </thead>
-
                             <tbody>
-                                <tr>
-                                    <th>用户名</th>
-                                    <th>所属角色</th>
-                                    <th>最后登录IP</th>
-                                    <th>最后登录时间</th>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -48,7 +41,7 @@
     <script>
         $(document).ready(function () {
             $('.dataTables-example').dataTable({
-                "ajax": "{:U('Admin/lst')}",
+                "ajax": "__SELF__",
                 "columns": [
                     { "data": "username" },
                     { "data": "role.rolename" },

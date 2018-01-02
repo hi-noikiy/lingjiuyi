@@ -12,24 +12,24 @@ namespace Admin\Controller;
 class UserController extends BaseController
 {
     public function index(){
-        $this -> display();
+        if(IS_AJAX){
+            $info = D('User') -> select();
+            foreach($info as $key => $value){
+                $info[$key]['birthday'] = substr($info[$key]['birthday'],0,10);
+                $info[$key]['weixin']   ? $wx = $info[$key]['weixin'] : $wx = '空';
+                $info[$key]['weibo']    ? $wb = $info[$key]['weibo']  : $wb = '空';
+                $info[$key]['qq']       ? $qq = $info[$key]['qq']     : $qq = '空';
+                $info[$key]['sanfang']  = $wx.'/<br/>'.$wb.'/<br/>'.$qq;
+            }
+            $data = ['data' => $info];
+            $this -> ajaxReturn($data);
+        }else{
+            $this -> display();
+        }
     }
 
     public function add(){
         $this ->display();
-    }
-
-    public function infolst(){
-        $info = D('User') -> select();
-        foreach($info as $key => $value){
-            $info[$key]['birthday'] = substr($info[$key]['birthday'],0,10);
-            $info[$key]['weixin']   ? $wx = $info[$key]['weixin'] : $wx = '空';
-            $info[$key]['weibo']    ? $wb = $info[$key]['weibo']  : $wb = '空';
-            $info[$key]['qq']       ? $qq = $info[$key]['qq']     : $qq = '空';
-            $info[$key]['sanfang']  = $wx.'/<br/>'.$wb.'/<br/>'.$qq;
-        }
-        $data = ['data' => $info];
-        $this -> ajaxReturn($data);
     }
 
     public function addrlst(){

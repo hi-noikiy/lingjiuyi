@@ -115,7 +115,7 @@
     <iframe class="J_iframe" name="iframe0" width="100%" height="100%" src="{:U('Index/main')}" frameborder="0" data-id="index_v1.html" seamless></iframe>
   </div>
   <div class="footer">
-    <div class="pull-right">&copy; 2016-2017 <a href="http://www.lingjiuyi.cn" target="_blank">www.lingjiuyi.cn</a> </div>
+    <div class="pull-right">&copy; 2016-2018 <a href="http://www.lingjiuyi.cn" target="_blank">www.lingjiuyi.cn</a> </div>
   </div>
 </div>
 <!--右侧部分结束-->
@@ -166,7 +166,6 @@
   {
     //选个你需要的大小
     var imgData = cropper.getCroppedImageData(180, 180);
-    console.log("上传了："+imgData);
     $.ajax({
       type : 'post',
       url  : '__MODULE__/Public/upload_img',

@@ -1,7 +1,7 @@
 <?php
 namespace Admin\Controller;
 
-class HotController extends \Think\Controller {
+class HotController extends BaseController {
     //定义uploadify方法
     public function uploadify() {
         if($_FILES['Filedata']['size'] > 0) {
@@ -39,20 +39,21 @@ class HotController extends \Think\Controller {
     }
 
     public function index() {
-        $this->display('Hot/index');
-    }
-
-    public function lst() {
-        $hot = D('Hot');
-        $list = array();
-        foreach($hot->select() as $row) {
-            $row['addtime'] = date('Y-m-d H:i:s',$row['addtime']);
-            $list[] = $row;
+        if(IS_AJAX){
+            $hot = D('Hot');
+            $list = array();
+            foreach($hot->select() as $row) {
+                $row['addtime'] = date('Y-m-d H:i:s',$row['addtime']);
+                $list[] = $row;
+            }
+            $data = array(
+                'data'=>$list
+            );
+            $this->ajaxReturn($data);
+        }else{
+            $this->display('Hot/index');
         }
-        $data = array(
-            'data'=>$list
-        );
-        $this->ajaxReturn($data);
+
     }
 
     public function add() {
@@ -71,5 +72,9 @@ class HotController extends \Think\Controller {
                 }
             }
         }
+    }
+
+    public function edit(){
+        echo 'aa';
     }
 }

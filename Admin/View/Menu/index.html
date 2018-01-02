@@ -1,5 +1,5 @@
 <include file="Common/header" />
-
+<link rel="stylesheet" href="/Public/Plugins/switchery/switchery.css" />
 <body class="gray-bg">
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
@@ -19,19 +19,10 @@
                                     <th>方法</th>
                                     <th>排序编号</th>
                                     <th>添加时间</th>
+                                    <th>左侧可见</th>
                                 </tr>
                             </thead>
-
                             <tbody>
-                                <tr>
-                                    <th>菜单名称</th>
-                                    <th>全路径</th>
-                                    <th>模块</th>
-                                    <th>控制器</th>
-                                    <th>方法</th>
-                                    <th>排序编号</th>
-                                    <th>添加时间</th>
-                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -47,6 +38,7 @@
     <!-- Data Tables -->
     <script src="/Public/Plugins/dataTables/jquery.dataTables.js"></script>
     <script src="/Public/Plugins/dataTables/dataTables.bootstrap.js"></script>
+    <script src="/Public/Plugins/switchery/switchery.js"></script>
 
     <!-- 自定义js -->
     <script src="/Public/Admin/js/content.js?v=1.0.0"></script>
@@ -55,7 +47,7 @@
     <script>
         $(document).ready(function () {
             $('.dataTables-example').dataTable({
-                "ajax": "{:U('Menu/lst')}",
+                "ajax": "__SELF__",
                 "bSort": false,
                 "aLengthMenu": [20, 30, 50, -1],
                 "columns": [
@@ -65,9 +57,59 @@
                     { "data": "c" },
                     { "data": "a" },
                     { "data": "listorder" },
-                    { "data": "addtime" }
+                    { "data": "addtime" },
+                    { "data": null },
+                    { "data": "is_show"},
+                    { "data": "menuid"}
+                ],
+                "columnDefs": [
+                    {
+                        "targets":-1,
+                        "visible": false,
+                        "searchable": false
+                    },
+                    {
+                        "targets":-2,
+                        "visible": false,
+                        "searchable": false
+                    },
+                    {
+                        "targets":-3,
+                        "bSortable": false,
+                        "render":function(data,type,row,meta) {
+                            var id = row.menuid;
+                            var is_show = row.is_show;
+                            var html = '<div class="switch">'+
+                                    '<div class="onoffswitch" onclick="editMenu('+id+')">'+
+                                    '<input type="checkbox"';
+                            if(is_show == 1){
+                                html += ' checked="" ';
+                            }
+                            html += 'class="onoffswitch-checkbox" id="" />'+
+                                    '<label class="onoffswitch-label" for="example1">'+
+                                    '<span class="onoffswitch-inner"></span> <span class="onoffswitch-switch"></span>'+
+                                    '</label>'+
+                                    '</div>'+
+                                    '</div>';
+                            return html;
+                        }
+                    }
                 ]
             });
+        });
+        function editMenu(id){
+            $.ajax({
+                type : 'post',
+                url  : '__CONTROLLER__/edit',
+                data : {id:id},
+                dataType : 'json',
+                success  : function(data){
+
+                },
+                error : function(){}
+            });
+        }
+        $(function(){
         });
     </script>
     <!--统计代码，可删除-->

@@ -45,7 +45,7 @@
 <script>
     $(document).ready(function () {
         $('.dataTables-example').dataTable({
-            "ajax": "{:U('News/lst')}",
+            "ajax": "__SELF__",
             "columns": [
                 { "data": "id" },
                 { "data": "title" },

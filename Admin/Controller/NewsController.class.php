@@ -39,20 +39,20 @@ class NewsController extends BaseController {
     }
 
     public function index() {
-        $this->display();
-    }
-
-    public function lst() {
-        $news = D('News');
-        $list = array();
-        foreach($news->select() as $row) {
-            $row['addtime'] = date('Y-m-d H:i:s',$row['addtime']);
-            $list[] = $row;
+        if(IS_AJAX){
+            $news = D('News');
+            $list = array();
+            foreach($news->select() as $row) {
+                $row['addtime'] = date('Y-m-d H:i:s',$row['addtime']);
+                $list[] = $row;
+            }
+            $data = array(
+                'data'=>$list
+            );
+            $this->ajaxReturn($data);
+        }else{
+            $this->display();
         }
-        $data = array(
-            'data'=>$list
-        );
-        $this->ajaxReturn($data);
     }
 
     public function add() {

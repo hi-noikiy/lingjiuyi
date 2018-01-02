@@ -1,4 +1,16 @@
 <include file="Common/header" />
+<style>
+    .newone{
+        border-top:2px solid rgba(204, 204, 204 ,0.5);
+        border-left:2px solid rgba(204, 204, 204 ,0.5);
+        border-right:2px solid rgba(204, 204, 204 ,0.5);
+    }
+    .newtwo{
+        border-bottom:2px solid rgba(204, 204, 204 ,0.5);
+        border-left:2px solid rgba(204, 204, 204 ,0.5);
+        border-right:2px solid rgba(204, 204, 204 ,0.5);
+    }
+</style>
 <body class="gray-bg">
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
@@ -8,7 +20,7 @@
                     <h5>基本 <small>分类，查找</small></h5>
                 </div>
                 <div class="ibox-content">
-                    <table class="table dataTables-example" style="text-align: center;">
+                    <table class="table dataTables-example" style="text-align: center;border-collapse:collapse;">
                         <thead>
                         <tr>
                             <th>编号</th>
@@ -139,20 +151,32 @@
         });
         //点击搜索
         $(document).on('click','#search',function(){
+            var _this_tr = $(this).closest('tr').prev('tr');
+            var id       = $(this).closest('tr').prev('tr').find('td').eq(0).html();
+            console.log(id);
             //获取值
-            var year       = $("select[name=year]").val();
-            var mon        = $("select[name=mon]").val();
+            var year       = $("select[name=year]").find("option:selected").val();
+            var mon        = $("select[name=mon]").find("option:selected").val();
             var min_num    = $('input[name=min_num]').val();
             var max_num    = $('input[name=max_num]').val();
             var min_price  = $('input[name=min_price]').val();
             var max_price  = $('input[name=max_price]').val();
-            console.log(year);
-            console.log(mon);
-            console.log(min_num);
-            console.log(max_num);
-            console.log(min_price);
-            console.log(max_price);
+            if(year == '' && mon == '' && min_num == '' && max_num == '' && min_price == '' && max_price == ''){
+                return false;
+            }else if(year == '' && mon != ''){
+                var _this = $("select[name=year]");
+                layer.tips('请选择年份', _this, {
+                    tips: [2, '#000'],
+                    maxWidth:400,
+                    time: 3000
+                });
+            }else{
+                var list = {year:year,mon:mon,min_num:min_num,max_num:max_num,min_price:min_price,max_price:max_price};
+                show_data(_this_tr,id,list);
+            }
+
         })
+
     });
     //修改
     function editGoods(id) {
@@ -192,19 +216,21 @@
         var tag      = $(_this_tr).next('tr').find('#left_main').length;
         if(sessionStorage.now == _this_tr && tag >= 1){
             //如果当前点击对象 为 上一次点击对象 并且 页面中存在详情页面  ，则移除
+            $(_this_tr).removeClass('newone');
             $('#new_html').remove();
         }else{
             //否则移除原来的页面
             $('#new_html').remove();
 
-            var _row_tr  = '<tr id="new_html"><td colspan="10">' +
+            $(_this_tr).addClass('newone');
+            var _row_tr  = '<tr id="new_html" class="newtwo"><td colspan="10">' +
                     '<div class="row" style="padding-bottom: 10px;padding-top: 10px;">'+
                     '<div class="col-sm-2 m-b-xs">'+
                     '年&emsp;'+
                     '<select class="input-sm  input-s-sm inline" name="year">'+
                     '<option value="">请选择</option>';
             for(var j = 1997; j <= 2018; j++){
-                _row_tr += '<option value="">'+j+'</option>';
+                _row_tr += '<option value="'+j+'">'+j+'</option>';
             }
             _row_tr += '</select>'+
                     '</div>'+
@@ -213,7 +239,7 @@
                     '<select class="input-sm  input-s-sm inline" name="mon">'+
                     '<option value="">请选择</option>';
             for(var k = 1; k <= 12; k++){
-                _row_tr += '<option value="">'+k+'</option>';
+                _row_tr += '<option value="'+k+'">'+k+'</option>';
             }
             _row_tr += '</select>'+
                     '</div>'+
@@ -226,7 +252,7 @@
                     '--<input type="text" name="max_price" placeholder="10000" class="input-sm" style="width: 60px;">' +
                     '</div>' +
                     '<div class="col-sm-2 m-b-xs"><span class="input-group-btn">'+
-                    '<button id="search" type="button" class="btn btn-sm btn-primary"> 搜索</button>'+
+                    '<button id="search" type="button" class="btn btn-default btn-xs"> 搜索</button>'+
                     '</span></div>'+
                     '</div>'+
                     '<div id="left_main"></div>' +
@@ -235,16 +261,18 @@
             show_data(_this_tr,id);//请求数据
 
 
+
         }
 
     }
 
     //请求数据
-    function show_data(_this_tr,id){
+    function show_data(_this_tr,id,list){
         //添加新的页面
         $.ajax({
             type : 'get',
             url  : '__CONTROLLER__/show_sales/id/' + id,
+            data : list,
             dataType : 'json',
             success  : function(data){
                 if(data.code == 10000){
@@ -409,6 +437,12 @@
 
 
                 }else{
+                    $('#left_main').empty();//清空内容
+                    $('#right_main').empty();
+                    $('#left_main').attr('style','');//清空样式
+                    $('#left_main').attr('_echarts_instance_','');//清空echarts
+                    $('#right_main').attr('style','');
+                    $('#right_main').attr('_echarts_instance_','');
                     parent.layer.msg(data.msg, {shift: 6});
                 }
 

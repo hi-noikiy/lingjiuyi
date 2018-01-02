@@ -10,6 +10,26 @@
 <body class="gray-bg">
 <div class="wrapper wrapper-content animated fadeInRight">
   <div class="row">
+    <volist name="money" id="val" key="key">
+    <div class="col-sm-3">
+      <div class="ibox">
+        <div class="ibox-content">
+          <h5><if condition=" $key == 1 " >总<elseif condition=" $key == 2 " />年<elseif condition=" $key == 3 " />月<elseif condition=" $key == 4 " />日</if>收入</h5>
+          <h1 class="no-margins">{$val['sum'] - $val['price']}</h1>
+          <div>
+            <div class="stat-percent font-bold text-navy">{$val['sum']} <i class="fa fa-bolt"></i></div>
+            <small>销售金额</small>
+          </div>
+          <div>
+            <div class="stat-percent font-bold text-navy">{$val['price']} <i class="fa fa-bolt"></i></div>
+            <small>成本</small>
+          </div>
+        </div>
+      </div>
+    </div>
+    </volist>
+  </div>
+  <div class="row">
     <div class="col-sm-12">
       <div class="ibox float-e-margins">
         <div class="ibox-title">
@@ -52,13 +72,6 @@
               </tr>
             </tbody>
           </table>
-        </div>
-        <div style="padding: 10px;"></div>
-        <div class="ibox-title">
-          <h5>图表可视化</h5>
-        </div>
-        <div class="ibox-content">
-
         </div>
       </div>
     </div>

@@ -1,4 +1,22 @@
 <include file="Common/header" />
+<style>
+    .newtwo{
+        -webkit-transition:border linear .2s,-webkit-box-shadow linear .5s;
+        border-color: rgb(58, 179, 160);
+        -webkit-box-shadow:0 0 18px rgb(24, 166, 137);
+    }
+    .fileInput{
+        opacity:0;
+        filter:alpha(opacity=0);
+        height: 70px;
+        width: 150px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 9;
+        cursor:pointer;
+    }
+</style>
 <body class="gray-bg">
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="row">
@@ -37,11 +55,13 @@
 <!-- 自定义js -->
 <script src="/Public/Admin/js/content.js"></script>
 
+<script src="/Public/Plugins/layer/layer.min.js"></script>
+<script src="/Public/Plugins/ajaxfileuploader/ajaxfileupload.js"></script>
 <!-- Page-Level Scripts -->
 <script>
     $(document).ready(function () {
         $('.dataTables-example').dataTable({
-            "ajax": "{:U('Shop/lst')}",
+            "ajax": "__SELF__",
             "columns": [
                 { "data": "id" },
                 { "data": "shop_name" },
@@ -57,8 +77,8 @@
                     "render":function(data,type,row,meta) {
                         var id = row.id;
                         var html = '';
-                        html += "&nbsp;<a href='javascript:void(0);' onclick='editArticle("+ id + ")' class='up btn btn-default btn-xs'><i class='fa fa-arrow-up'></i>编辑</a>";
-                        html += "&nbsp;<a href='javascript:void(0);' onclick='delArticle("+ id + ")' class='down btn btn-default btn-xs'><i class='fa fa-arrow-down'></i>删除</a>";
+                        html += "&nbsp;<a href='javascript:void(0);' onclick='editShop(this,"+ id + ")' class='up btn btn-default btn-xs'><i class='fa fa-arrow-up'></i>编辑</a>";
+                        html += "&nbsp;<a href='javascript:void(0);' onclick='delShop("+ id + ")' class='down btn btn-default btn-xs'><i class='fa fa-arrow-down'></i>删除</a>";
                         return html;
                     }
                 },
@@ -80,7 +100,7 @@
                     "render":function(data,type,row,meta) {
                         var html = '';
                         if(row.shop_logo != null){
-                            html += '<img src="'+row.shop_logo+'" style="width:150px;"/>';
+                            html += '<img class="show_img" src="'+row.shop_logo+'" style="width:150px;"/>';
                         }
                         return html;
                     }
@@ -88,13 +108,147 @@
             ]
         });
     });
-</script>
-<script>
-    function editArticle(id) {
-        alert(id);
+    $(function(){
+        //鼠标移到图片上显示大图
+        $(document).on('mouseover','.show_img',function(){
+            var _this = $(this);
+            var show_img = '<img src="'+_this[0].src+'" style="width:600px;"/>';
+            layer.tips(show_img, _this, {
+                tips: [1, '#fff'],
+                maxWidth:400,
+                time: 4000
+            });
+        });
+        //鼠标移开关闭
+        $(document).on('mouseout','.show_img',function(){
+            layer.closeAll();
+        });
+
+    });
+    function editShop(_this,id) {
+        var _this_tr = $(_this).closest('tr');
+
+        $('tr').attr('style','display:show');
+        $('#main').remove();
+        //隐藏旧行，添加新行s
+        $(_this_tr).attr('style','display:none');
+        var html = '<tr class="newtwo" id="main">';
+        $(_this_tr).children('td').each(function (j) {  // 遍历 tr 的各个 td
+            if(j == 1){
+                html += '<td><input type="text" name="shop_name" class="form-control" style="width: 120px;" value="'+$(this).text()+'"></td>';
+            }else if(j == 2){
+                html += '<td><select class="form-control" name="is_top"><option value="1"';
+                if($(this).text() == 'YES'){
+                    html += ' selected';
+                }
+                html += '>置顶商铺</option><option value="0" ';
+                if($(this).text() == 'NO'){
+                    html += ' selected';
+                }
+                html += '>非置顶商铺</option></select></td>';
+            }else if(j == 3){
+                html += '<td><div style="position: relative;"><input id="shop_logo" name="shop_logo" type="file" class="fileInput"">'+$(this).html()+'</div></td>'
+            }else if(j == 4){
+                html += '<td><input type="text" name="shop_desc" class="form-control" style="width: 200px;" value="'+$(this).text()+'"></td>';
+            }else if(j == 5){
+                html += '<td class="sorting_1"><button class="btn btn-white btn-xs" onclick="save_data('+id+')">保存</button>&emsp;<button class="btn bt-info btn-xs">取消</button></td>';
+            }else{
+                html += '<td>'+$(this).text()+'</td>';
+            }
+        });
+        html += '</tr>';
+        $(_this_tr).after(html);
+        //点击选择图片
+        $(document).on('change','.fileInput',function(){
+            var filePath = $("input[name='shop_logo']").val();
+            var extStart = filePath.lastIndexOf(".");
+            var ext = filePath.substring(extStart, filePath.length).toUpperCase();
+            if (ext != ".BMP" && ext != ".PNG" && ext != ".JPG" && ext != ".JPEG") {
+                layer.open({content: "图片仅限于.gif .png .jpg .jpeg文件。",skin: 'msg',time: 1});return false;
+            }
+            else {
+                $.ajaxFileUpload({
+                    type:"POST",
+                    url :"__MODULE__/Public/upload_img",
+                    secureuri:false,
+                    fileElementId:"shop_logo",//文件选择框的id属性
+                    dataType: 'json',   //json
+                    success: function (data) {
+                        if (data.code == 10000) {
+                            $('#shop_logo').closest('div').find('img').attr('src',data.info);
+                            $(_this_tr).find('img').attr('src',data.info);
+                            var type = 'img';
+                            var path = data.info;
+                            save_data(id,type,path);
+                        } else{
+                            layer.open({content: data.msg,skin: 'msg',time: 1});
+                        }
+                    },
+                    error: function(xhr, type){}
+                });
+            }
+        });
+        //点击取消
+        $(document).on('click','.bt-info',function(){
+            $(this).closest('tr').prev('tr').attr('style','display:show;');
+            $(this).closest('tr').remove();
+        });
+
+
     }
-    function delArticle(id) {
-        alert(id);
+    function save_data(id,type,val){
+        if(type == 'img'){
+            data = {id:id,shop_logo:val};
+        }else{
+            var shop_name = $('input[name="shop_name"]').val();
+            var is_top    = $('select[name="is_top"]').val();
+            var shop_desc = $('input[name="shop_desc"]').val();
+            data = {id:id,shop_name:shop_name,is_top:is_top,shop_desc:shop_desc};
+        }
+
+        $.ajax({
+            type : 'post',
+            url  : '__CONTROLLER__/edit',
+            data : data,
+            dataType : 'json',
+            success  : function(data){
+                if(data.code == 10000){
+                    layer.msg('修改成功');
+                    self.location.reload();
+                }else{
+                    layer.msg(data.msg);
+                }
+            },
+            error : function(){
+
+            }
+        });
+
+    }
+    function delShop(id) {
+        parent.layer.confirm('金钱诚可贵，数据价更高！确定要删除？', {
+            btn: ['删了你是2B','算了吧'], //按钮
+            shade: false //不显示遮罩
+        }, function(){
+            $.ajax({
+                type : 'post',
+                url  : '__CONTROLLER__/del',
+                data : {id:id},
+                dataType : 'json',
+                success  : function(data){
+                    if(data.code == 10000){
+                        parent.layer.msg('删除成功！你会后悔的！', {icon: 1});
+                        self.location.reload();
+                    }else{
+                        layer.msg(data.msg);
+                    }
+                },
+                error : function(){}
+            });
+        }, function(){
+            parent.layer.msg('哈哈哈哈，不删你也是2B', {shift: 6});
+        });
+
     }
 </script>
 </body>

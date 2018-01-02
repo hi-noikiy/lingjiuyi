@@ -17,7 +17,6 @@
               </tr>
             </thead>
             <tbody>
-
             </tbody>
           </table>
         </div>
@@ -41,7 +40,7 @@
 <script>
 	$(document).ready(function () {
 		$('.dataTables-example').dataTable({
-			"ajax": "{:U('Role/lst')}",
+			"ajax": "__SELF__",
 			"columns": [
 				{ "data": "rolename" },
 				{ "data": "privileges" }
@@ -50,12 +49,6 @@
 	});
 </script>
 <script>
-	function editPrivileges(id) {
-		location.href = '{:U("Admin/Privileges/index/roleid/'+id+'")}';
-	}
-	function delRole(id) {
-		alert(id);
-	}
 </script>
 </body>
 </html>
