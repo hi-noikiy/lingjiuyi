@@ -185,12 +185,13 @@
 
 <!-- 自定义js -->
 <script src="/Public/Admin/js/content.js?v=1.0.0"></script>
+<script src="/Public/Plugins/layer/2.4/layer.js"></script>
 
 <!-- Page-Level Scripts -->
 <script>
     $(document).ready(function () {
         $('.dataTables-example').dataTable({
-            "ajax": "{:U('Order/lst')}",
+            "ajax": "__SELF__",
             "columns": [
                 { "data": "id" },
                 { "data": "order_sn" },
@@ -299,7 +300,7 @@
                                 '</td></tr>';
                         $(_this_tr).after(_row_tr);
                     }else{
-                        console.log(data.msg);
+                        layer.msg(data.msg);
                     }
 
                     sessionStorage.now = _this_tr;

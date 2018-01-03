@@ -60,7 +60,7 @@
     $(document).ready(function () {
         //初始化表格数据
         $('.dataTables-example').dataTable({
-            "ajax": "{:U('Category/lst')}",
+            "ajax": "__SELF__",
             "columns": [
                 { "data": "id" },
                 { "data": "cate_name" },

@@ -3,15 +3,15 @@ namespace Admin\Controller;
 class CategoryController extends BaseController{
 	//首页
 	public function index(){
-		$this->display();
-	}
+		if(IS_AJAX){
+			$cate = D('Category') -> select();
+			$cate = getTree($cate);
+			$data = ['data' => $cate];
+			$this -> ajaxReturn($data);
+		}else{
+			$this->display();
+		}
 
-	//ajax获取列表页数据
-	public function lst(){
-		$cate = D('Category') -> select();
-		$cate = getTree($cate);
-		$data = ['data' => $cate];
-		$this -> ajaxReturn($data);
 	}
 
 	//ajax获取分类的三级联动

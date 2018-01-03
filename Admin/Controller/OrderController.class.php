@@ -3,24 +3,23 @@ namespace Admin\Controller;
 class OrderController extends BaseController{
 	//首页显示
 	public function index(){
-		$this -> display();
-	}
-
-	//首页ajax请求数据
-	public function lst(){
-		$order = D('Order')
-				->order('id desc')
-				->select();
-		foreach($order as $key => $value){
-			$order[$key]['ct'] = date('Y-m-d H:i:s',$order[$key]['create_time']);
-			$order[$key]['st'] = shipping_type($order[$key]['shipping_type']);
-			$order[$key]['ps']    = pay_status($order[$key]['pay_status']);
-			$order[$key]['pt']      = pay_type($order[$key]['pay_type']);
-			$order[$key]['os']  = order_status($order[$key]['order_status']);
-			$order[$key]['ot']    = order_type($order[$key]['order_type']);
+		if(IS_AJAX){
+			$order = D('Order')
+					->order('id desc')
+					->select();
+			foreach($order as $key => $value){
+				$order[$key]['ct'] = date('Y-m-d H:i:s',$order[$key]['create_time']);
+				$order[$key]['st'] = shipping_type($order[$key]['shipping_type']);
+				$order[$key]['ps']    = pay_status($order[$key]['pay_status']);
+				$order[$key]['pt']      = pay_type($order[$key]['pay_type']);
+				$order[$key]['os']  = order_status($order[$key]['order_status']);
+				$order[$key]['ot']    = order_type($order[$key]['order_type']);
+			}
+			$data = ['data' => $order];
+			$this -> ajaxReturn($data);
+		}else{
+			$this -> display();
 		}
-		$data = ['data' => $order];
-		$this -> ajaxReturn($data);
 	}
 
 	//后台发货

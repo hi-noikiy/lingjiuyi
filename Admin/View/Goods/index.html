@@ -66,7 +66,7 @@
 <script>
     $(document).ready(function () {
         $('.dataTables-example').dataTable({
-            "ajax": "{:U('Goods/index')}",
+            "ajax": "__SELF__",
 
             "columns": [
                 { "data": "goods_id" },
