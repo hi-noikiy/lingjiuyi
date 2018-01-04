@@ -6,7 +6,7 @@
             <div class="col-sm-12">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>基本 <small>分类，查找</small></h5>
+                        <h5>基本 <small><a onclick="show_add();" href="javascript:void(0);" class="btn btn-primary btn-xs">添加菜单</a></small></h5>
                     </div>
                     <div class="ibox-content">
                         <table class="table dataTables-example">
@@ -30,6 +30,85 @@
             </div>
         </div>
     </div>
+    <div class="layer_notice" style="display: none;">
+        <div class="ibox-content form-horizontal">
+            <form action="" method="post" id="form">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">菜单名称</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" name="name" value="">
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">icon图标</label>
+                    <div class="col-sm-8">
+                        <input type="text" class="form-control" name="icon" value="">
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">左侧是否可见</label>
+                    <div class="col-sm-3">
+                        <div class="radio i-checks">
+                            <label class="">
+                                <div class="iradio_square-green checked" style="position: relative;"><input type="radio" value="1" checked="" name="is_show" style="position: absolute; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins></div>
+                                <i></i> 可见
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="radio i-checks">
+                            <label class="">
+                                <div class="iradio_square-green" style="position: relative;"><input type="radio" value="0" name="is_show" style="position: absolute; opacity: 0;"><ins class="iCheck-helper" style="position: absolute; top: 0%; left: 0%; display: block; width: 100%; height: 100%; margin: 0px; padding: 0px; background: rgb(255, 255, 255); border: 0px; opacity: 0;"></ins></div>
+                                <i></i> 隐藏
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">上级菜单</label>
+                    <div class="col-sm-10">
+                        <div class="col-sm-6 m-l-n">
+                        <select class="form-control m-b" name="parentid">
+                            <option value="0">请选择</option>
+                        </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">模块</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" name="model" >
+                    </div>
+                    <label class="col-sm-2 control-label">控制器</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" name="controller" >
+                    </div>
+                    <label class="col-sm-2 control-label">方法</label>
+                    <div class="col-sm-2">
+                        <input type="text" class="form-control" name="action">
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">详细说明信息</label>
+                    <div class="col-sm-10">
+                        <input type="text" class="form-control" name="description" value="">
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div class="form-group">
+                    <div class="col-sm-4 col-sm-offset-2">
+                        <button class="btn btn-primary" onclick="add()" type="button">保存内容</button>
+                        <button class="btn btn-white" type="reset">重置</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
     <!-- 全局js -->
     <script src="/Public/Admin/js/jquery.min.js?v=2.1.4"></script>
     <script src="/Public/Admin/js/bootstrap.min.js?v=3.3.6"></script>
@@ -43,6 +122,7 @@
     <!-- 自定义js -->
     <script src="/Public/Admin/js/content.js?v=1.0.0"></script>
 
+    <script src="/Public/Plugins/layer/2.4/layer.js"></script>
     <!-- Page-Level Scripts -->
     <script>
         $(document).ready(function () {
@@ -109,10 +189,67 @@
                 error : function(){}
             });
         }
+        //显示添加菜单弹窗
+        function show_add(){
+            //获取菜单
+            $.ajax({
+                type : 'get',
+                url  : '__CONTROLLER__/ajax_get_menu',
+                dataType : 'json',
+                success  : function(data){
+                    if(data.code == 10000){
+                        var option = '',i;
+                        for(i = 0 ; i < data.info.length; i++){
+                            option += '<option value="'+data.info[i].menuid+'">'+data.info[i].name+'</option>';
+                        }
+                        $('select[name="parentid"]').append(option);
+                    }else{
+                        console.log(data.msg);
+                    }
+                },
+                error : function(){}
+            });
+            layer.open({
+                type: 1,
+                shade: false,
+                title: '添加菜单',
+                content: $('.layer_notice'),
+                area:['60%','70%'],
+                cancel: function(){
+                    layer.msg('O(∩_∩)O哈哈哈哈~', {time: 5000, icon:6});
+                }
+            });
+        }
+        //添加数据
+        function add(){
+            var params = $('#form').serialize(); // http request parameters.
+            params = decodeURIComponent(params,true);
+            $.ajax({
+                type: "POST",
+                url: "__CONTROLLER__/add" ,
+                data: params,
+                dataType: "json",
+                success: function (data) {
+                    if(data.code == 10000){
+                        layer.msg('添加成功O(∩_∩)O哈哈哈哈~', {time: 5000, icon:6});
+                        self.location.reload();
+                    }else{
+                        layer.msg(data.msg);
+                    }
+                },
+                error : function() {}
+            });
+        }
         $(function(){
+            $(document).on('click','input[name="is_show"]',function(){
+                $('input[name="is_show"]').closest('div').removeClass('checked');  // 删除其他兄弟元素的样式
+                $('input[name="is_show"]').removeAttr('checked');
+                $(this).closest('div').addClass('checked');
+                $(this).prop('checked',true);
+            });
         });
+
     </script>
-    <!--统计代码，可删除-->
 
 </body>
 

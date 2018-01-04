@@ -149,12 +149,28 @@
         setTimeout(function(){
             $('.listwrap').before(' <div class="col-xs-12 bgwhite"><h5 class=" fs-14 pr"><i class="cube">&nbsp;</i> <span class="bgwhite pr z1">&nbsp;特惠精品</span></h5></div>')//插入商品sbanner
 
-        },1500)
+        },1500);
 
 
         $(document).on('click','.goods a', function(){
             localStorage.goodid=$(this).attr('gid');
             location.href=hreflink+'/pages/goods_detial.html';
-        })
-    })
+        });
+    });
+
+    function a(){
+        var string = "wed445******家购买了玩具电动车一台！,giowi******家购买了美容仪！,阿哲******家购买了游戏机一台！,qwc******家购买了saw一台！,fff,ggg";   //原始数据
+        var array = string.split(",");           //转化为数组
+        var value = array[Math.round(Math.random()*(array.length-1))];  //随机抽取一个值
+        layer.open({
+            content: value
+            ,style: 'border:none; background-color:rgba(144,184,48,0.8); color:#fff;'
+            ,anim:false
+            ,skin: 'msg'
+            ,time: 3 //2秒后自动关闭
+        });
+    }
+
+    window.setInterval("a()",5000);
+
 </script>

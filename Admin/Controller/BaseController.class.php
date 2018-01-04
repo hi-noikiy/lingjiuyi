@@ -66,7 +66,7 @@ class BaseController extends Controller {
         }
 
         $menuid = D('Menu') -> where("c = '$c' AND a = '$a'") -> getField('menuid');
-
+//dump($menuid);dump($menuids);dump(!in_array($menuid,$menuids));die;
         //判断当前访问的页面对应的权限,是否在其拥有的权限中 $ac 是否在$role['role_author_ac']
         if(!in_array($menuid,$menuids)){
             //没有权限访问该页面
