@@ -44,10 +44,10 @@ class BaseController extends Controller {
         $user_id = session('userid');
         $role_id = D('Admin') -> where(['userid' => $user_id]) -> getField('roleid');
 
-//        if($role_id == 1){
-//            //超级管理员
-//            return;
-//        } 先不使用，等开发完成再使用
+        if($role_id == 1){
+            //超级管理员
+            return;
+        } //先不使用，等开发完成再使用
         $menuids = M('Privileges') -> where(['roleid' => $role_id]) -> getField('menuid',true);
         //获取当前访问的页面是哪个权限
         //偶去当前访问的控制器名称和方法 拼接"控制器-方法"

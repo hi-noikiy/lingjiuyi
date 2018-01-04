@@ -1,19 +1,34 @@
 <include file="Common/header" />
-
+<style>
+  .new_input{
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    display: block;
+    width: 100%;
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    background: rgb(255, 255, 255);
+    border: 0px; opacity: 0;
+  }
+</style>
 <body class="gray-bg">
 <div class="wrapper wrapper-content animated fadeInRight">
   <div class="row">
     <div class="col-sm-12">
       <div class="ibox float-e-margins">
         <div class="ibox-title">
-          <h5>基本 <small>分类，查找</small></h5>
+          <h5>基本 <small><a onclick="show_add();" href="javascript:void(0);" class="btn btn-primary btn-xs">添加菜单</a></small></h5>
         </div>
         <div class="ibox-content">
           <table class="table dataTables-example">
             <thead>
               <tr>
-                <th><div style="width: 80px;">角色</div></th>
+                <th><div style="width: 150px;">角色</div></th>
                 <th>拥有权限</th>
+                <th>编号</th>
+                <th>操作</th>
               </tr>
             </thead>
             <tbody>
@@ -22,6 +37,31 @@
         </div>
       </div>
     </div>
+  </div>
+</div>
+<div class="layer_notice" style="display: none;">
+  <div class="ibox-content form-horizontal">
+    <form action="" method="post" id="form">
+      <div class="form-group">
+        <label class="col-sm-2 control-label">管理员名称</label>
+        <div class="col-sm-8">
+          <input type="text" class="form-control" name="rolename" value="">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="col-sm-2 control-label">管理员权限说明</label>
+        <div class="col-sm-8">
+          <input type="text" class="form-control" name="roledesc" value="">
+        </div>
+      </div>
+      <div class="hr-line-dashed"></div>
+      <div class="form-group">
+        <div class="col-sm-4 col-sm-offset-2">
+          <button class="btn btn-primary" onclick="add()" type="button">保存内容</button>
+          <button class="btn btn-white" type="reset">重置</button>
+        </div>
+      </div>
+    </form>
   </div>
 </div>
 <!-- 全局js --> 
@@ -34,21 +74,271 @@
 <script src="/Public/Plugins/dataTables/dataTables.bootstrap.js"></script>
 
 <!-- 自定义js --> 
-<script src="/Public/Admin/js/content.js?v=1.0.0"></script> 
-
+<script src="/Public/Admin/js/content.js?v=1.0.0"></script>
+<script src="/Public/Plugins/layer/2.4/layer.js"></script>
 <!-- Page-Level Scripts --> 
 <script>
-	$(document).ready(function () {
-		$('.dataTables-example').dataTable({
-			"ajax": "__SELF__",
-			"columns": [
-				{ "data": "rolename" },
-				{ "data": "privileges" }
-			]
-		});
-	});
-</script>
-<script>
+  $(document).ready(function () {
+    $('.dataTables-example').dataTable({
+      "ajax": "__SELF__",
+      "columns": [
+        { "data": "rolename" },
+        { "data": "privileges" },
+        { "data": "roleid"},
+        { "data": null}
+      ],
+      "columnDefs": [
+        {
+          "targets":-1,
+          "bSortable": false,
+          "render":function(data,type,row,meta) {
+            var id = row.roleid;
+            var html = "&nbsp;<a href='javascript:void(0);' onclick='editRole(this,"+ id + ")' class='up btn btn-default btn-xs'><i class='fa fa-arrow-up'></i>编辑</a>";
+            return html;
+          }
+        },
+        {
+          "targets":-2,
+          "visible": false,
+          "searchable": false
+        }
+      ]
+    });
+  });
+  //显示添加弹窗
+  function show_add(){
+    //获取权限列表
+    $.ajax({
+      type : 'get',
+      url  : '__CONTROLLER__/get_role',
+      data : {type : 'add'},
+      dataType : 'json',
+      success  : function(data){
+        var html,i;
+        if(data.code == 10000){
+          html = '<div class="form-group">' +
+                 '<label class="col-sm-2 control-label">拥有权限 </label>'+
+                 '<div class="col-sm-10">';
+          for(i = 0; i < data.info.length; i++){
+            html += '<div class="col-sm-3">'+
+                    '<div class="checkbox i-checks">'+
+                    '<label class="">'+
+                    '<div class="icheckbox_square-green" style="position: relative;">' +
+                    '<input type="checkbox" value="'+data.info[i].menuid+'" style="position: absolute; opacity: 0;" name="menuname">' +
+                    '<ins class="iCheck-helper new_input"></ins></div>'+
+                    '<i></i> '+data.info[i].name+
+                    '</label>'+
+                    '</div>'+
+                    '</div>';
+          }
+          html += '</div>'+
+                  '</div>'+
+                  '<div class="hr-line-dashed"></div>';
+          $('.hr-line-dashed').after(html);
+        }else{
+          layer.msg(data.msg);
+        }
+      },
+      error : function(){}
+    });
+    layer.open({
+      type: 1,
+      shade: false,
+      title: '添加菜单',
+      content: $('.layer_notice'),
+      area:['80%','80%'],
+      cancel: function(){
+        layer.msg('O(∩_∩)O哈哈哈哈~', {time: 5000, icon:6});
+      }
+    });
+  }
+  //点击添加中的保存
+  function add(){
+    var name = $('input[name="rolename"]').val();
+    var desc = $('input[name="roledesc"]').val();
+    var menuids;
+    $('input:checkbox[name=menuname]:checked').each(function(i){
+      if(0==i){
+        menuids = $(this).val();
+      }else{
+        menuids += (","+$(this).val());
+      }
+    });
+    $.ajax({
+      type : 'post',
+      url  : '__CONTROLLER__/add',
+      data : {name : name,desc : desc,menuids : menuids},
+      dataType : 'json',
+      success  : function(data){
+        if(data.code == 10000){
+          layer.msg('添加成功O(∩_∩)~', {time: 5000, icon:6});
+          self.location.reload();
+        }else{
+          layer.msg(data.msg);
+        }
+      },
+      error : function () {}
+    });
+  }
+  //点击编辑
+  function editRole(_this,id){
+    //①获取信息
+    $.ajax({
+      type : 'get',
+      url  : '__CONTROLLER__/get_role',
+      data : {id : id},
+      dataType : 'json',
+      success  : function(data){
+        if(data.code == 10000){
+          var _this_tr = $(_this).closest('tr');
+          $('tr').attr('style','display:show');
+          $('#main').remove();
+          $(_this_tr).attr('style','display:none');
+          var html = '<tr class="newtwo" id="main" roleid="'+id+'">';
+          $(_this_tr).children('td').each(function (j) {
+            if(j == 0){ //第一列
+              html += '<td>' +
+                      '<div class="input-group">'+
+                      '<input type="text" class="form-control" value="'+$(this).text()+'" style="border: 1px solid #e5e6e7;" name="rname">'+
+                      '<span class="input-group-btn"> <button type="button" class="btn btn-primary" onclick="save_name(this,'+id+')">保存'+
+                      '</button> </span>'+
+                      '</div></td>';
+            }else if(j == 1){ //第二列
+              html += '<td>' ;
+              for(var i = 0; i < data.info.menu_all.length; i++){
+                html += '<div class="col-sm-3"><div class="checkbox i-checks">'+
+                        '<label class="">'+
+                        '<div class="icheckbox_square-green';
+                if(data.info.menus.length > 0){
+                  for(var k = 0; k < data.info.menus.length; k++){
+                    if(data.info.menu_all[i].menuid == data.info.menus[k].menuid){
+                      html += ' checked';
+                    }
+                  }
+                }
+                html += '" style="position: relative;">' +
+                        '<input type="checkbox"';
+                if(data.info.menus.length > 0){
+                  for(var k = 0; k < data.info.menus.length; k++){
+                    if(data.info.menu_all[i].menuid == data.info.menus[k].menuid){
+                      html += ' checked="" pri_id="'+data.info.menus[k].id+'"';
+                    }
+                  }
+                }
+                html += ' value="'+ data.info.menu_all[i].menuid+
+                        '" style="position: absolute; opacity: 0;"><ins class="iCheck-helper new_input ajax_edit"></ins></div>'+
+                        '<i></i> '+data.info.menu_all[i].name+
+                        '</label>'+
+                        '</div></div>';
+
+              }
+              html += '</td>';
+
+            }else if(j == 2){ //第三列
+              html += '<td>&emsp;<button class="btn bt-info btn-xs">取消</button></td>';
+            }
+          });
+          html += '</tr>';
+          $(_this_tr).after(html);
+
+
+        }else{
+          layer.msg(data.msg);
+        }
+      },
+      error : function (xhr) {
+
+      }
+    });
+  }
+  //点击保存
+  function save_name(_this,id){
+    var name = $(_this).closest('span').prev('input[name="rname"]').val();
+    $.ajax({
+      type : 'post',
+      url  : '__CONTROLLER__/edit',
+      data : {type:'save_name',id:id,name:name},
+      dataType : 'json',
+      success  : function(data){
+        if(data.code == 10000){
+          layer.msg('修改成功O(∩_∩)O哈哈哈哈~', {time: 5000, icon:6});
+          self.location.reload();
+        }else{
+          layer.msg(data.msg);
+        }
+      },
+      error : function(){}
+    });
+  }
+  $(function(){
+    //点击取消
+    $(document).on('click','.bt-info',function(){
+      $(this).closest('tr').prev('tr').attr('style','display:show;');
+      $(this).closest('tr').remove();
+    });
+    //点击添加中的多选框
+    $(document).on('click','input[name="menuname"]',function(){
+      var check_status = $(this).attr('checked');
+      if(check_status == undefined){
+        $(this).closest('div').addClass('checked');
+        $(this).attr('checked','');
+        $(this).prop('checked',true);
+      }else{
+        $(this).closest('div').removeClass('checked');
+        $(this).removeProp('checked',true);
+        $(this).removeAttr('checked');
+      }
+    });
+    //点击修改中的多选框
+    $(document).on('click','.ajax_edit',function(){
+      var _this = $(this);
+      //判断状态
+      var input_checked = $(this).prev('input').attr('checked');
+      if(input_checked == undefined){
+        //勾选权限
+        var roleid = $(this).closest('tr').attr('roleid');
+        var menuid = $(this).prev('input').val();
+        $.ajax({
+          type : 'post',
+          url  : '__CONTROLLER__/edit',
+          data : {type:'checked_pri',roleid:roleid,menuid:menuid},
+          dataType : 'json',
+          success  : function(data){
+            if(data.code == 10000){
+              var $x = $(_this).prev('input[type="checkbox"]');
+              $x.prop('checked',true);
+              $x.attr('checked','');
+              $x.attr('pri_id',data.info);
+              $(_this).closest('.icheckbox_square-green').addClass('checked');
+            }else{
+              layer.msg(data.msg);
+            }
+          },
+          error : function(){}
+        });
+
+      }else if(input_checked == 'checked'){
+        //取消权限
+        var pri_id = $(this).prev('input').attr('pri_id');
+        $.ajax({
+          type : 'post',
+          url  : '__CONTROLLER__/edit',
+          data : {type:'cancel_pri',pri_id:pri_id},
+          dataType : 'json',
+          success  : function(data){
+            if(data.code == 10000){
+              $(_this).prev('input').removeAttr('checked');
+              $(_this).closest('.icheckbox_square-green').removeClass('checked');
+            }else{
+              layer.msg(data.msg);
+            }
+          },
+          error : function(){}
+        });
+      }
+    });
+
+  });
 </script>
 </body>
 </html>
