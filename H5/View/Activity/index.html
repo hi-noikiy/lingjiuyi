@@ -41,7 +41,7 @@
                 type: 'GET',
                 url:'__CONTROLLER__/ajax_index',
                 dataType: 'json',
-//                data : {id:'45',p:gotpage,sort:sort,sort_order:sort_order},
+                data : {p:gotpage,sort:sort,rules:sort_order},
                 success: function(data){
                     gotpage++;
                     ajax(data,true);
@@ -65,11 +65,11 @@
                 type: 'GET',
                 url:'__CONTROLLER__/ajax_index',
                 dataType: 'json',
-//                data : {id:'45',p:'1',sort:sort,sort_order:sort_order},
+                data : {p:'1',sort:sort,rules:sort_order},
                 success: function(data){
                     gotpage++;
                     ajax(data,false);
-                    //$('.scroller').css('transform','translate(0px,5px)');
+                    $('.scroller').css('transform','translate(0px,5px)');
                 },
                 error: function(xhr, type){
                     // 即使加载出错，也得重置
@@ -130,7 +130,7 @@
                 if( $this.find('i').hasClass('asc')){
                     $this.find('i').removeClass('asc').addClass('desc');
                     sort='sales';
-                    sort_order='desc';
+                    sort_order='asc';
                     Refresh();
                 }else{
                     $this.find('i').removeClass('desc').addClass('asc');

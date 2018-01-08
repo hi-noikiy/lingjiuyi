@@ -25,7 +25,7 @@ class GoodsController extends CommonController {
     }
 
     //ajax获取特惠精品商品
-    public function ajaxindex(){
+    public function ajax_index(){
         $p = $_GET['p'] ? $_GET['p'] : 1;
         $fields = 'goods_id,goods_name,goods_price,goods_sn,goods_small_img';
         $where = 'is_act = 0';
@@ -35,11 +35,19 @@ class GoodsController extends CommonController {
         $totalPages = $pager -> totalPages;
         $firstRow   = $pager -> firstRow;
 
-        $goodslist = M('Goods') -> field($fields) -> where($where) -> limit($firstRow,$pagesize) -> select();
+        $sort     = $_GET['sort'] ? $_GET['sort'] : 'id';
+        $rules    = $_GET['rules'] ? $_GET['rules'] : 'desc';
+        $order    = "goods_".$sort." ".$rules;
+        $keywords = $_GET['keywords'] ? $_GET['keywords'] : '';
+        $where   .= " AND `goods_name` LIKE '%$keywords%'";
 
+        $goodslist = M('Goods') -> field($fields) -> where($where) -> limit($firstRow,$pagesize) -> order($order) -> select();
+
+        $pagesize = ($count < $pagesize) ? $count : $pagesize;
         $page = array(
-            'scalarPageNum' => (int)$p,//当前页
-            'scalarPageAll' => (int)$totalPages,//总页码
+            'nowPage' => (int)$p,//当前页
+            'pagesize'   => (int)$pagesize,
+            'totalPages' => $totalPages
         );
 
         //设置返回数据格式
@@ -84,24 +92,21 @@ class GoodsController extends CommonController {
                 $num++;
             }
             if(empty($good)){
-                $code = 10001;
-                $msg  = '没有商品';
-            }elseif(empty($goodsattrs)){
-                $code = 10001;
-                $msg  = '商品没有属性';
+                //设置返回数据格式
+                $data = array(
+                    'code' => 10001,
+                    'msg'  => '没有商品',
+                    'info' => compact('good','pics_big','attr_radio')
+                );
             }else{
-                $code = 10000;
-                $msg  = 'success';
+                //设置返回数据格式
+                $data = array(
+                    'code' => 10000,
+                    'msg'  => 'success',
+                    'info' => compact('good','pics_big','attr_radio')
+                );
             }
-
         }
-
-        //设置返回数据格式
-        $data = array(
-            'code' => $code,
-            'msg'  => $msg,
-            'info' => compact('good','pics_big','attr_radio')
-        );
         //返回数据
         $this->ajaxReturn($data);
 

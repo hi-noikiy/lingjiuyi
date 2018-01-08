@@ -86,13 +86,13 @@
         function Load(){
             $.ajax({
                 type: 'GET',
-                url:'__CONTROLLER__/ajax_index',
+                url:'__CONTROLLER__/ajax_index/p/' + gotpage,
                 dataType: 'json',
                 success: function(data){
                     gotpage++;
                     ajax(data,true);
                     $('.pullUp').css('margin-bottom','50px')
-                    if(Number(data.info.pager.nowPage)>=(Number(data.info.pager.totalPages))){
+                    if(data.info.userlikeinfo != undefined){
                         $('.pullUpLabel').html('到底了');
                         $('.checklast:last').attr('none',true);
                     }else{

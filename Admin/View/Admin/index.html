@@ -1,11 +1,24 @@
 <include file="Common/header" />
+<style>
+    .fileInput{
+        opacity:0;
+        filter:alpha(opacity=0);
+        height: 35px;
+        width: 80px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 199;
+        cursor:pointer;
+    }
+</style>
 <body class="gray-bg">
     <div class="wrapper wrapper-content animated fadeInRight">
         <div class="row">
             <div class="col-sm-12">
                 <div class="ibox float-e-margins">
                     <div class="ibox-title">
-                        <h5>基本 <small>分类，查找</small></h5>
+                        <h5>基本 <small><a onclick="show_add();" href="javascript:void(0);" class="btn btn-primary btn-xs">添加管理员</a></small></small></h5>
                     </div>
                     <div class="ibox-content">
                         <table class="table dataTables-example">
@@ -15,6 +28,8 @@
                                     <th>所属角色</th>
                                     <th>最后登录IP</th>
                                     <th>最后登录时间</th>
+                                    <th>操作</th>
+                                    <th></th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -23,6 +38,65 @@
                     </div>
                 </div>
             </div>
+        </div>
+    </div>
+    <div class="layer_notice" style="display: none;">
+        <div class="ibox-content form-horizontal">
+            <form action="__CONTROLLER__/add" method="post" id="form_add">
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">用户名</label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" name="username" value="">
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">昵称</label>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" name="nickname" value="">
+                    </div>
+                </div>
+                <!--<div class="hr-line-dashed"></div>-->
+                <!--<div class="form-group">-->
+                    <!--<label class="col-sm-2 control-label">头像</label>-->
+                    <!--<div class="col-sm-8">-->
+                        <!--<div style="position: relative;">-->
+                            <!--<input id="shop_logo" name="shop_logo" type="file" class="fileInput">-->
+                            <!--<button class="btn btn-primary" >上传图片</button>-->
+                        <!--</div>-->
+                    <!--</div>-->
+                <!--</div>-->
+                <div class="hr-line-dashed"></div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">初始密码</label>
+                    <div class="col-sm-6">
+                        <input type="password" class="form-control" name="password" value="">
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">邮箱</label>
+                    <div class="col-sm-6">
+                        <input type="email" class="form-control" name="email" value="">
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label">所属角色</label>
+                    <div class="col-sm-6">
+                        <select class="form-control m-b" name="roleid">
+                            <option value="0">请选择</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="hr-line-dashed"></div>
+                <div class="form-group">
+                    <div class="col-sm-6 col-sm-offset-2">
+                        <button class="btn btn-primary" onclick="add()" type="button">保存内容</button>
+                        <button class="btn btn-white" type="reset">重置</button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
     <!-- 全局js -->
@@ -36,6 +110,7 @@
 
     <!-- 自定义js -->
     <script src="/Public/Admin/js/content.js?v=1.0.0"></script>
+    <script src="/Public/Plugins/layer/layer.min.js"></script>
 
     <!-- Page-Level Scripts -->
     <script>
@@ -46,12 +121,202 @@
                     { "data": "username" },
                     { "data": "role.rolename" },
                     { "data": "lastloginip" },
-                    { "data": "lastlogintime" }
+                    { "data": "lastlogintime" },
+                    { "data": null },
+                    { "data": "userid" }
+                ],
+                "columnDefs": [
+                    {
+                        "targets":-1,
+                        "visible": false,
+                        "searchable": false
+                    },
+                    {
+                        "targets":-2,
+                        "bSortable": false,
+                        "render":function(data,type,row,meta) {
+                            var id = row.userid;
+                            var html = '&emsp;<a href="javascript:void(0);" style="color: #1ab394"><i class="fa fa-edit" aria-hidden="true" onclick="editAdmin(this,'+id+')"></i></a>&emsp;&emsp;<a href="javascript:void(0);" style="color: #1ab394"><i class="fa fa-close" aria-hidden="true" onclick="delAdmin('+id+')"></i></a>';
+                            return html;
+                        }
+                    }
                 ]
             });
         });
+        //显示添加弹窗
+        function show_add(){
+            //获取角色
+            $.ajax({
+                type : 'get',
+                url  : '__MODULE__/Role/ajax_get_role',
+                dataType : 'json',
+                success  : function(data){
+                    var html,i;
+                    if(data.code == 10000){
+                        for(i = 0; i < data.info.length; i++){
+                            html += '<option value="'+ data.info[i].roleid+'">'+ data.info[i].rolename +'</option>';
+                        }
+                        $('select[name=roleid]').append(html);
+                    }else{
+                        layer.msg(data.msg);
+                    }
+                },
+                error : function(){}
+            });
+            layer.open({
+                type: 1,
+                shade: false,
+                title: '添加角色',
+                content: $('.layer_notice'),
+                area:['60%','90%'],
+                cancel: function(){
+                    layer.msg('O(∩_∩)O哈哈哈哈~', {time: 5000, icon:6});
+                }
+            });
+        }
+        //保存添加内容
+        function add(){
+            var res = true;
+            $("input[type=text]").each(function(i){
+                if($(this).val() ==""){
+                    res = false;
+                    var _this = $(this);
+                    layer.tips('必填项不能为空', _this, {tips: [2, '#1ab394'], maxWidth:400, time: 3000});
+                    return false;
+                }
+            });
+            if(!res)return false;
+            $("input[type=password]").each(function(i){
+                if($(this).val() ==""){
+                    res = false;
+                    var _this = $(this);
+                    layer.tips('密码不能为空', _this, {tips: [2, '#1ab394'], maxWidth:400, time: 3000});
+                    return false;
+                }
+            });
+            if(!res)return false;
+            $("input[type=email]").each(function(i){
+                if($(this).val() ==""){
+                    res = false;
+                    var _this = $(this);
+                    layer.tips('邮箱不能为空', _this, {tips: [2, '#1ab394'], maxWidth:400, time: 3000});
+                    return false;
+                }
+            });
+            if(!res)return false;
+            $.ajax({
+                type : 'post',
+                url : '__CONTROLLER__/add',
+                data : $('#form_add').serialize(),
+                dataType : 'json',
+                success : function(data){
+                    if(data.code == 10000){
+                        layer.msg('添加成功O(∩_∩)O哈哈哈哈~', {time: 5000, icon:6});
+                        self.location.reload();
+                    }else{
+                        layer.msg(data.msg);
+                    }
+                },
+                error : function(){}
+            });
+        }
+        //编辑
+        function editAdmin(_this,id){
+            $.ajax({
+                type : 'get',
+                url  : '__MODULE__/Role/ajax_get_role',
+                data : {id : id},
+                dataType : 'json',
+                success  : function(data){
+                    if(data.code == 10000){
+                        var _this_tr = $(_this).closest('tr');
+                        $('tr').attr('style','display:show');
+                        $('#main').remove();
+                        $(_this_tr).attr('style','display:none');
+                        var html = '<tr class="newtwo" id="main" roleid="'+id+'">';
+                        $(_this_tr).children('td').each(function (j) {
+                            if(j == 0){ //第一列
+                                html += '<td>' +
+                                        '<div class="input-group">'+
+                                        '<input type="text" class="form-control" value="'+$(this).text()+'" style="border: 1px solid #e5e6e7;" name="rname">'+
+                                        '<span class="input-group-btn"> <button type="button" class="btn btn-primary" onclick="save_name(this,'+id+')">保存'+
+                                        '</button> </span>'+
+                                        '</div></td>';
+                            }else if(j == 1){ //第二列
+                                html += '<td>' ;
+                                for(var i = 0; i < data.info.menu_all.length; i++){
+                                    html += '<div class="col-sm-3"><div class="checkbox i-checks">'+
+                                            '<label class="">'+
+                                            '<div class="icheckbox_square-green';
+                                    if(data.info.menus.length > 0){
+                                        for(var k = 0; k < data.info.menus.length; k++){
+                                            if(data.info.menu_all[i].menuid == data.info.menus[k].menuid){
+                                                html += ' checked';
+                                            }
+                                        }
+                                    }
+                                    html += '" style="position: relative;">' +
+                                            '<input type="checkbox"';
+                                    if(data.info.menus.length > 0){
+                                        for(var k = 0; k < data.info.menus.length; k++){
+                                            if(data.info.menu_all[i].menuid == data.info.menus[k].menuid){
+                                                html += ' checked="" pri_id="'+data.info.menus[k].id+'"';
+                                            }
+                                        }
+                                    }
+                                    html += ' value="'+ data.info.menu_all[i].menuid+
+                                            '" style="position: absolute; opacity: 0;"><ins class="iCheck-helper new_input ajax_edit"></ins></div>'+
+                                            '<i></i> '+data.info.menu_all[i].name+
+                                            '</label>'+
+                                            '</div></div>';
+
+                                }
+                                html += '</td>';
+
+                            }else if(j == 2){ //第三列
+                                html += '<td>&emsp;<button class="btn bt-info btn-xs">取消</button></td>';
+                            }
+                        });
+                        html += '</tr>';
+                        $(_this_tr).after(html);
+
+
+                    }else{
+                        layer.msg(data.msg);
+                    }
+                },
+                error : function (xhr) {
+
+                }
+            });
+        }
+        function delAdmin(id){
+            parent.layer.confirm('确定要删除？', {
+                btn: ['没错','算了吧'], //按钮
+                shade: false //不显示遮罩
+            }, function(){
+                $.ajax({
+                    type : 'post',
+                    url  : '__CONTROLLER__/del',
+                    data : {id:id},
+                    dataType : 'json',
+                    success  : function(data){
+                        if(data.code == 10000){
+                            parent.layer.msg('删除成功！你会后悔的！', {icon: 1});
+                            self.location.reload();
+                        }else{
+                            parent.layer.msg(data.msg, {shift: 6});
+                        }
+                    },
+                    error : function(){
+                        parent.layer.msg('服务器出错了！', {shift: 6});
+                    }
+                });
+            }, function(){
+                parent.layer.msg('不删就不删', {shift: 6});
+            });
+        }
     </script>
-    <!--统计代码，可删除-->
 
 </body>
 

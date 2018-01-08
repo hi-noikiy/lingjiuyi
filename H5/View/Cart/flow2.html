@@ -340,6 +340,17 @@ $(function(){
                                 location.href = '__MODULE__' + data.info.url;
                             }
                         });
+                    }else if(data.code == 10000){
+                        //余额
+                        layer.open({
+                            content:'提交订单成功！'
+                            ,skin: 'msg'
+                            ,time: 2
+                            ,end : function(){
+                                //console.log('__MODULE__' + data.info.url);
+                                location.href = '__MODULE__' + data.info.url;
+                            }
+                        });
                     }
                 }
             });

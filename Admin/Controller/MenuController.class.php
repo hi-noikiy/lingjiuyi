@@ -52,7 +52,25 @@ class MenuController extends BaseController {
     }
 
     public function edit(){
+        if(IS_POST && IS_AJAX){
+            $data = I('post.');
+            $menu = D('Menu');
+            if(!$menu -> create()){
+                $msg = $menu -> getError();
+                $this -> ajaxReturnData(0,$msg);
+            }else{
+                if(isset($data['emodel'])) $data['m'] = $data['emodel'];unset($data['emodel']);
+                if(isset($data['econtroller'])) $data['c'] = $data['econtroller'];unset($data['econtroller']);
+                if(isset($data['eaction'])) $data['a'] = $data['eaction'];unset($data['eaction']);
+                unset($data['DataTables_Table_0_length']);
+                unset($data['edit_is_show']);
 
+                $res = M('Menu') -> save($data);
+                $res !== false ? $this -> ajaxReturnSuccess() : $this -> ajaxReturnData(0,'修改失败！');
+            }
+        }else{
+            $this -> ajaxReturnData(0,'访问方式错误');
+        }
     }
 
     public function ajax_get_menu(){

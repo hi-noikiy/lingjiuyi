@@ -346,7 +346,6 @@ class UserController extends CommonController {
 
             $where = ['id' => $uid];
             $user  = M('User') ->field('header_img,username') -> where($where) -> find();
-            $user['agent'] = M('Agent_log') -> where($where) -> getField('agent_status');
             //获取用户头像和用户名
             if($user){
                 $code = 10000;
@@ -485,7 +484,14 @@ class UserController extends CommonController {
 
     //ajax删除地址
     public function ajax_del_address(){
-
+        !IS_POST || !IS_AJAX ? $this -> ajaxReturnData(0,'访问错误') : true;
+        $oid = I('post.id','','intval');
+        $uid = $_SESSION['userinfo']['id'];//获取用户id
+        empty($uid) ? $this -> ajaxReturnData(10002,'请先登录') : $uid;//如果用户信息为空
+        $addr = D('Address') -> where(['user_id' => $uid, 'id' => $oid]) -> find();
+        empty($addr) ? $this -> ajaxReturnData(0,'订单号与用户不符') : true;
+        $res = D('Address') -> delete($oid);
+        $res !== false ? $this -> ajaxReturnSuccess() : $this -> ajaxReturnData(0,'删除失败');
     }
 
     //ajax订单
@@ -551,10 +557,6 @@ class UserController extends CommonController {
         $num = 0;
         foreach($neworder as $key => $value){
             $neworderlist[$num] = $value;
-            $neworderlist[$num]['id'] = $neworderlist[$num][0]['id'];
-            $neworderlist[$num]['sn'] = $neworderlist[$num][0]['order_sn'];
-            $neworderlist[$num]['amount'] = $neworderlist[$num][0]['order_amount'];
-            $neworderlist[$num]['status'] = $neworderlist[$num][0]['order_status'];
             $num ++;
         }
 

@@ -20,7 +20,7 @@ class ActivityController extends CommonController {
 
     //ajax限时活动
     public function ajax_index(){
-        $topicimg = M('Type') -> where(['type_id' => 5]) -> getField('banner_img');
+        //$topicimg = M('Type') -> where(['type_id' => 5]) -> getField('banner_img');
 
         $p = $_GET['p'] ? $_GET['p'] : 1;
         $fields = 'goods_id,goods_name,goods_price,goods_sn,goods_small_img';
@@ -30,20 +30,35 @@ class ActivityController extends CommonController {
         $totalPages = $pager -> totalPages;
         $firstRow   = $pager -> firstRow;
 
-        $topiclist = M('Goods') -> field($fields) -> where(['is_act' => 1]) -> limit($firstRow,$pagesize) -> select();
+        $sort = $_GET['sort'] ? $_GET['sort'] : 'id';
+        $rules = $_GET['rules'] ? $_GET['rules'] : 'desc';
+        $order = "goods_".$sort." ".$rules;
 
+        $topiclist = M('Goods') -> field($fields) -> where(['is_act' => 1]) -> limit($firstRow,$pagesize) -> order($order) -> select();
 
+        $pagesize = ($count < $pagesize) ? $count : $pagesize;
         $page = array(
-            'scalarPageNum' => (int)$p,//当前页
-            'scalarPageAll' => (int)$totalPages,//总页码
+            'nowPage' => (int)$p,//当前页
+            'pagesize'   => (int)$pagesize,
+            'totalPages' => $totalPages
         );
 
-        //设置返回数据格式
-        $data = array(
-            'code' => 10000,
-            'msg'  => 'success',
-            'info' => compact('topicimg','topiclist','page')
-        );
+        if(empty($topiclist)){
+            //设置返回数据格式
+            $data = array(
+                'code' => 0,
+                'msg'  => '无数据',
+                'info' => compact('topicimg')
+            );
+        }else{
+            //设置返回数据格式
+            $data = array(
+                'code' => 10000,
+                'msg'  => 'success',
+                'info' => compact('topicimg','topiclist','page')
+            );
+        }
+
         //返回数据
         $this->ajaxReturn($data);
 

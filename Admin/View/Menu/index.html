@@ -1,4 +1,11 @@
 <include file="Common/header" />
+<style>
+    .newtwo{
+        -webkit-transition:border linear .2s,-webkit-box-shadow linear .5s;
+        border-color: rgb(58, 179, 160);
+        -webkit-box-shadow:0 0 18px rgb(24, 166, 137);
+    }
+</style>
 <link rel="stylesheet" href="/Public/Plugins/switchery/switchery.css" />
 <body class="gray-bg">
     <div class="wrapper wrapper-content animated fadeInRight">
@@ -9,6 +16,7 @@
                         <h5>基本 <small><a onclick="show_add();" href="javascript:void(0);" class="btn btn-primary btn-xs">添加菜单</a></small></h5>
                     </div>
                     <div class="ibox-content">
+                        <form id="edit_form" method="post">
                         <table class="table dataTables-example">
                             <thead>
                                 <tr>
@@ -20,11 +28,13 @@
                                     <th>排序编号</th>
                                     <th>添加时间</th>
                                     <th>左侧可见</th>
+                                    <th>编辑</th>
                                 </tr>
                             </thead>
                             <tbody>
                             </tbody>
                         </table>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -139,8 +149,10 @@
                     { "data": "listorder" },
                     { "data": "addtime" },
                     { "data": null },
+                    { "data": null },
                     { "data": "is_show"},
-                    { "data": "menuid"}
+                    { "data": "menuid"},
+                    { "data": "parentid"}
                 ],
                 "columnDefs": [
                     {
@@ -155,17 +167,37 @@
                     },
                     {
                         "targets":-3,
+                        "visible": false,
+                        "searchable": false
+                    },
+                    {
+                        "targets":-4,
+                        "bSortable": false,
+                        "render":function(data,type,row,meta) {
+                            var id   = row.menuid;
+                            var pid  = row.parentid;
+                            var html = '';
+                            if(pid == 0){
+                                html = '<i class="fa fa-expeditedssl" aria-hidden="true"></i>';
+                            }else{
+                                html = '<i class="fa fa-edit" aria-hidden="true" onclick="editTrMenu(this,'+id+','+pid+')"></i>';
+                            }
+                            return html;
+                        }
+                    },
+                    {
+                        "targets":-5,
                         "bSortable": false,
                         "render":function(data,type,row,meta) {
                             var id = row.menuid;
                             var is_show = row.is_show;
                             var html = '<div class="switch">'+
-                                    '<div class="onoffswitch" onclick="editMenu('+id+')">'+
+                                    '<div class="onoffswitch" onclick="editMenu(this,'+id+')">'+
                                     '<input type="checkbox"';
                             if(is_show == 1){
                                 html += ' checked="" ';
                             }
-                            html += 'class="onoffswitch-checkbox" id="" />'+
+                            html += 'class="onoffswitch-checkbox" name="edit_is_show" />'+
                                     '<label class="onoffswitch-label" for="example1">'+
                                     '<span class="onoffswitch-inner"></span> <span class="onoffswitch-switch"></span>'+
                                     '</label>'+
@@ -177,14 +209,90 @@
                 ]
             });
         });
-        function editMenu(id){
+        //编辑一行数据
+        function editTrMenu(_this,id,pid){
+            $.ajax({
+                type : 'post',
+                url  : '__CONTROLLER__/ajax_get_menu',
+                dataType : 'json',
+                success  : function(data){
+                    console.log(data)
+                    var _this_tr = $(_this).closest('tr'),html,i;
+                    $('tr').attr('style','display:show');
+                    $('#main').remove();
+                    $(_this_tr).attr('style','display:none');
+                    html = '<tr class="newtwo" id="main">';
+                    $(_this_tr).children('td').each(function (j) {
+                        if(j == 0){
+                            var str = $(this).text();
+                            var string = str.replace(/\s+/g,"");
+                            html += '<td><input type="text" class="input-sm" name="name" value="' +string+ '"></td>';
+                        }else if(j == 1){
+                            html += '<td>' +$(this).text()+ '</td>';
+                        }else if(j == 2){
+                            html += '<td><input type="text" class="input-sm" name="emodel" value="' +$(this).text()+ '"></td>';
+                        }else if(j ==3){
+                            html += '<td><input type="text" class="input-sm" name="econtroller" value="' +$(this).text()+ '"></td>';
+                        }else if(j == 4){
+                            html += '<td><input type="text" class="input-sm" name="eaction" value="' +$(this).text()+ '"></td>';
+                        }else if(j == 8){
+                            html += '<td colspan="2">' +
+                                    '<select class="input-sm  input-s inline" name="parentid">'+
+                                    '<option value="0">请选择父级菜单</option>';
+                            if(data.code == 10000){
+                                for(i = 0; i < data.info.length ; i++){
+                                    html += '<option value="'+data.info[i].menuid+'"';
+                                    if(pid == data.info[i].menuid){
+                                        html += ' selected ';
+                                    }
+                                    html += '>'+data.info[i].name+'</option>';
+                                }
+                            }else{
+                                html += '';
+                            }
+                            html += '</select>'+
+                                    '<input type="hidden" class="input-sm" name="menuid" value="' +id+ '">'+
+                                    '</td>';
+                            html += '<td colspan="2"><button class="btn btn-white btn-xs" type="button">保存</button>&emsp;<button class="btn bt-info btn-xs">取消</button></td>';
+                        }
+                    });
+                    html += '</tr>';
+                    $(_this_tr).after(html);
+
+                },
+                error : function(){}
+            });
+
+
+        }
+        //编辑菜单可见性
+        function editMenu(_this,id){
+            var status = $(_this).find('input[name=edit_is_show]').attr('checked'),is_show;
+            console.log(status);
+            if(status == 'checked'){
+                is_show = 0;
+            }else if(status == undefined){
+                is_show = 1;
+            }
             $.ajax({
                 type : 'post',
                 url  : '__CONTROLLER__/edit',
-                data : {id:id},
+                data : {menuid:id,is_show:is_show},
                 dataType : 'json',
                 success  : function(data){
+                    if(data.code == 10000){
+                        layer.msg('修改成功,刷新之后才会生效哦！', {time: 5000, icon:6});
+                        if(status == 'checked'){
+                            $(_this).find('input[name=edit_is_show]').removeAttr('checked');
+                            $(_this).find('input[name=edit_is_show]').removeProp('checked',false);
+                        }else if(status == undefined){
+                            $(_this).find('input[name=edit_is_show]').prop('checked',true);
+                            $(_this).find('input[name=edit_is_show]').attr('checked','');
+                        }
 
+                    }else{
+                        layer.msg(data.msg);
+                    }
                 },
                 error : function(){}
             });
@@ -241,12 +349,38 @@
             });
         }
         $(function(){
+            //改变单选颜色
             $(document).on('click','input[name="is_show"]',function(){
                 $('input[name="is_show"]').closest('div').removeClass('checked');  // 删除其他兄弟元素的样式
                 $('input[name="is_show"]').removeAttr('checked');
                 $(this).closest('div').addClass('checked');
                 $(this).prop('checked',true);
             });
+            //点击取消
+            $(document).on('click','.bt-info',function(){
+                $(this).closest('tr').prev('tr').attr('style','display:show;');
+                $(this).closest('tr').remove();
+            });
+            //点击保存修改
+            $(document).on('click','.btn-white',function(){
+                var params = $('#edit_form').serialize();
+                console.log(params)
+                $.ajax({
+                    type: "POST",
+                    url: "__CONTROLLER__/edit" ,
+                    data: params,
+                    dataType: "json",
+                    success: function (data) {
+                        if(data.code == 10000){
+                            layer.msg('修改成功O(∩_∩)O哈哈哈哈~', {time: 5000, icon:6});
+                            self.location.reload();
+                        }else{
+                            layer.msg(data.msg);
+                        }
+                    },
+                    error : function() {}
+                });
+            })
         });
 
     </script>

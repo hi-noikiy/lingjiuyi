@@ -20,8 +20,6 @@ class IndexController extends CommonController {
             -> field('id,shop_logo')
             -> where(array('is_top' => 1))
             -> select();
-        //首页中部小图标类型信息
-        $typelist = M('Type') -> select();
         //首页中部分类大图标信息
         $catelist = M('Category')
             -> field('id,cate_img')
@@ -31,9 +29,9 @@ class IndexController extends CommonController {
         //判断用户是否登录
         $uid = session('userinfo.uid') ? session('userinfo.uid') : 1;//测试数据，暂时使用，后期修改
         //如果存在用户，获取用户喜欢表中的关键字
-        $keywords = M('Userlike')
+        $keywords = M('User')
             -> where(array('user_id' => $uid))
-            -> getField('keywords');
+            -> getField('search_keywords');
         //表中用户喜欢关键字为一整个字符串，拆分成数组
         $keywords = explode(',',$keywords);
         //定义查询条件
@@ -78,7 +76,7 @@ class IndexController extends CommonController {
         $data = array(
             'code' => 10000,
             'msg'  => 'success',
-            'info' => compact('shoplist','typelist','catelist','userlikelist','pager','userlikeinfo')
+            'info' => compact('shoplist','catelist','userlikelist','pager','userlikeinfo')
         );
         //返回数据
         $this->ajaxReturn($data);

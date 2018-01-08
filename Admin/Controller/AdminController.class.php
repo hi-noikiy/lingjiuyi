@@ -20,4 +20,23 @@ class AdminController extends BaseController {
         }
     }
 
+    public function add(){
+        $admin = D('Admin');
+        if (!$admin -> create()){
+            $msg = $admin -> getError();
+            $this -> ajaxReturnData(0,$msg);
+        }else{
+            $data = I('post.');
+            $data['password'] = encrypt_pwd($data['password']);
+            $res = $admin -> add($data);
+            empty($res) ? $this -> ajaxReturnData(0,'添加失败') : $this -> ajaxReturnSuccess();
+        }
+    }
+
+    public function del(){
+        I('post.id','','intval') ? $id = I('post.id','','intval') : $this -> ajaxReturnData(0,'参数错误');
+        $res = D('Admin') -> delete($id);
+        $res ? $this -> ajaxReturnSuccess() : $this -> ajaxReturnData(0,'删除失败');
+    }
+
 }

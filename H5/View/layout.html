@@ -42,32 +42,35 @@
 <div class="container-fluid oh footer pf b0 l0 r0" style="z-index: 10;">
     <div class="row">
         <div class="col-xs-2 bnav">
-            <a <if condition=" '__CONTROLLER__' == '/H5/Index' ">class='ac'</if>>
+            <a <if condition=" '__CONTROLLER__' == '/Index' ">class='ac'</if>>
                 <i class="home"></i>
                 <span>首页</span>
             </a>
         </div>
 
         <div class="col-xs-2 bnav">
-            <a <if condition=" '__CONTROLLER__' == '/H5/Goods' ">class='ac'</if>>
+            <a <if condition=" '__CONTROLLER__' == '/Activity' ">class='ac'</if>>
+            <i class="category"></i>
+            <span>限时秒杀</span>
+            </a>
+        </div>
+
+        <div class="col-xs-2 bnav">
+            <a <if condition=" '__CONTROLLER__' == '/Goods' ">class='ac'</if>>
                 <i class="promotion"></i>
                 <span>特惠精品</span>
             </a>
         </div>
+
         <div class="col-xs-2 bnav">
-            <a <if condition=" '__CONTROLLER__' == '/H5/Activity' ">class='ac'</if>>
-                <i class="category"></i>
-                <span>限时活动</span>
-            </a>
-        </div>
-        <div class="col-xs-2 bnav">
-            <a id="order" <if condition=" '__CONTROLLER__' == '/H5/Cart' ">class='ac'</if>>
+            <a id="order" <if condition=" '__CONTROLLER__' == '/Cart' ">class='ac'</if>>
                 <i class="news"></i>
                 <span>购物车</span>
             </a>
         </div>
+
         <div class="col-xs-2">
-            <a id='wode' userinfo="{$Think.session.userinfo}" <if condition=" '__CONTROLLER__' == '/H5/User' ">class='ac'</if>>
+            <a id='wode' userinfo="{$Think.session.userinfo}" <if condition=" '__CONTROLLER__' == '/User' ">class='ac'</if>>
                 <i class="user"></i>
                 <span>账户</span>
             </a>
@@ -77,13 +80,13 @@
 <script>
     $(function(){
         $('.home').click(function(){
-            location.href= '/H5/Index/index';
+            location.href= '/Index/index';
         });
         $('.promotion').click(function(){
-            location.href= '/H5/Goods/index';
+            location.href= '/Goods/index';
         });
         $('.category').click(function(){
-            location.href= '/H5/Activity/index';
+            location.href= '/Activity/index';
         });
 
         //点击购物车

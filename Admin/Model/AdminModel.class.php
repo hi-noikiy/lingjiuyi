@@ -16,10 +16,18 @@
             )
         );
 
+        protected $_validate = array(
+            array('username','require','用户名称为必填！'),
+            array('nickname','require','昵称为必填！'),
+            array('password','require','初始密码为必填！'),
+            array('email','require','邮箱为必填！'),
+            array('roleid','require','所属角色为必填！'),
+        );
+
         public function login($username,$password) {
             $row = $this->where("username='$username'")->find();
             if($row) {
-                if(md5(md5($password).$row['salt']) == $row['password']) {
+                if(password_verify($password,$row['password']) === true) {
                     session('username',$username);
                     session('userid',$row['userid']);
                     session('header_img',$row['header_img']);

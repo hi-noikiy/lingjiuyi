@@ -1,12 +1,15 @@
 <?php
-namespace App\Controller;
+namespace Tv\Controller;
 use Think\Controller;
 
-class CommonController extends Controller {
-
-	protected function ajaxReturnData($code = 10000, $msg = 'success',$info = [])
+class BaseController extends Controller{
+    public function __construct()
     {
-    	$info = edit_img($info);
+        parent::__construct();
+    }
+
+    protected function ajaxReturnData($code = 10000, $msg = 'success',$info = [])
+    {
         //设置返回数据格式
         $data = array(
             'code' => $code,
@@ -19,7 +22,7 @@ class CommonController extends Controller {
 
     protected function ajaxReturnSuccess($info = [] , $code = 10000 , $msg = 'success')
     {
-//    	$info = edit_img($info);//如果是本地图片需要函数
+
         //设置返回数据格式
         $data = array(
             'code' => $code,

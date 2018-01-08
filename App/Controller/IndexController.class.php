@@ -12,8 +12,7 @@ class IndexController extends CommonController{
 
         empty($cate) ? $this -> ajaxReturnData(0,'没有分类数据') : true;
         empty($goods_list) ? $this -> ajaxReturnData(0,'没有热卖商品数据') : true;
-        
-      
+
         $this -> ajaxReturnSuccess(compact('cate','goods_list'));
     }
 

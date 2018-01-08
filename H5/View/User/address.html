@@ -132,11 +132,11 @@ $(function(){
 
                 $.ajax({
                     type:"POST",
-                    data:{id:del_id,apiTocken:localStorage.apiTocken},
+                    data:{id:del_id},
                     url:'__CONTROLLER__/ajax_del_address', //后台提供的删除接口
                     dataType:'json',
                     success:function(data){
-                        if(data.status=='200'){
+                        if(data.code == 10000){
                             self.parent().parent().parent().parent().remove();
                         } else {
                             layer.open({

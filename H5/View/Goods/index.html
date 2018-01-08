@@ -14,19 +14,19 @@ $(function(){
     var sort='sales';
     var sort_order='desc';
     var keywords='';
-    var url='__CONTROLLER__/ajaxindex';
+    var url='__CONTROLLER__/ajax_index';
     var tehui='';
     var header='<div class="container-fluid oh">'+
             '<div class="row cate-search pl0 pr0 pb0 bm mb10">'+
-            '<div class="col-xs-2"><a href="Javascript:history.go(-1)" class="back"></a> </div>'+
-            '<div class="input-box col-xs-8"><input type="text" name="keywords" placeholder="关键词搜索" value=""/></div>'+
+            '<div class="col-xs-1"></div>'+
+            '<div class="input-box col-xs-9"><input type="text" name="keywords" placeholder="关键词搜索" value=""/></div>'+
             '<div class="input-btn txt col-xs-2 tc"><input type="button" value="搜索"></div>'+
             '<div class="col-xs-3 order-btn"><a  class="ac">综合</a></div>'+
             '<div class="col-xs-3 order-btn"><a>销量<i class="sort"></i></a></div>'+
             '<div class="col-xs-3 order-btn"><a>价格<i class="sort"></i></a></div>'+
             '<div class="col-xs-3 order-btn"><a>最新 <i class="sort"></i></a></div>'+
-            '</div>'
-    '</div>'
+            '</div>'+
+            '</div>';
     Refresh();
     refresher.init({
         id: "wrapper",
@@ -38,7 +38,7 @@ $(function(){
             type: 'GET',
             url:url,
             dataType: 'json',
-            data : {p:gotpage,sort:sort,sort_order:sort_order},
+            data : {p:gotpage,sort:sort,rules:sort_order},
             success: function(data){
                 gotpage++;
                 ajax(data,true);
@@ -61,7 +61,7 @@ $(function(){
             type: 'GET',
             url:url,
             dataType: 'json',
-            data : {p:'1',sort:sort,sort_order:sort_order},
+            data : {p:'1',sort:sort,rules:sort_order},
             success: function(data){
                 gotpage++;
                 ajax(data,false);
@@ -107,7 +107,7 @@ $(function(){
         keywords=$('input[name="keywords"]').val();
         if(keywords==''){
         }else{
-            url='__CONTROLLER__/ajaxindex?keywords='+keywords;
+            url='__CONTROLLER__/ajax_index?keywords='+keywords;
             Refresh();
         }
     });
@@ -126,7 +126,7 @@ $(function(){
             if( $this.find('i').hasClass('asc')){
                 $this.find('i').removeClass('asc').addClass('desc');
                 sort='sales';
-                sort_order='desc';
+                sort_order='asc';
                 Refresh();
             }else{
                 $this.find('i').removeClass('desc').addClass('asc');
@@ -149,12 +149,12 @@ $(function(){
         }else{
             if( $this.find('i').hasClass('asc')){
                 $this.find('i').removeClass('asc').addClass('desc');
-                sort='add_time';
+                sort='create_time';
                 sort_order='asc';
                 Refresh();
             }else{
                 $this.find('i').removeClass('desc').addClass('asc');
-                sort='add_time';
+                sort='create_time';
                 sort_order='desc';
                 Refresh();
             }

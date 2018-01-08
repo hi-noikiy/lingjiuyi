@@ -19,7 +19,7 @@
     <div class="col-sm-12">
       <div class="ibox float-e-margins">
         <div class="ibox-title">
-          <h5>基本 <small><a onclick="show_add();" href="javascript:void(0);" class="btn btn-primary btn-xs">添加菜单</a></small></h5>
+          <h5>基本 <small><a onclick="show_add();" href="javascript:void(0);" class="btn btn-primary btn-xs">添加角色</a></small></h5>
         </div>
         <div class="ibox-content">
           <table class="table dataTables-example">
@@ -28,7 +28,7 @@
                 <th><div style="width: 150px;">角色</div></th>
                 <th>拥有权限</th>
                 <th>编号</th>
-                <th>操作</th>
+                <th><div style="width: 100px;">操作</div></th>
               </tr>
             </thead>
             <tbody>
@@ -93,7 +93,7 @@
           "bSortable": false,
           "render":function(data,type,row,meta) {
             var id = row.roleid;
-            var html = "&nbsp;<a href='javascript:void(0);' onclick='editRole(this,"+ id + ")' class='up btn btn-default btn-xs'><i class='fa fa-arrow-up'></i>编辑</a>";
+            var html ='&emsp;<a href="javascript:void(0);" style="color: #1ab394"><i class="fa fa-edit" aria-hidden="true" onclick="editRole(this,'+id+')"></i></a>&emsp;&emsp;<a href="javascript:void(0);" style="color: #1ab394"><i class="fa fa-close" aria-hidden="true" onclick="delRole('+id+')"></i></a>';
             return html;
           }
         },
@@ -110,7 +110,7 @@
     //获取权限列表
     $.ajax({
       type : 'get',
-      url  : '__CONTROLLER__/get_role',
+      url  : '__CONTROLLER__/ajax_get_menu',
       data : {type : 'add'},
       dataType : 'json',
       success  : function(data){
@@ -144,7 +144,7 @@
     layer.open({
       type: 1,
       shade: false,
-      title: '添加菜单',
+      title: '添加角色',
       content: $('.layer_notice'),
       area:['80%','80%'],
       cancel: function(){
@@ -185,7 +185,7 @@
     //①获取信息
     $.ajax({
       type : 'get',
-      url  : '__CONTROLLER__/get_role',
+      url  : '__CONTROLLER__/ajax_get_menu',
       data : {id : id},
       dataType : 'json',
       success  : function(data){
@@ -251,7 +251,7 @@
       }
     });
   }
-  //点击保存
+  //点击编辑保存
   function save_name(_this,id){
     var name = $(_this).closest('span').prev('input[name="rname"]').val();
     $.ajax({
@@ -268,6 +268,33 @@
         }
       },
       error : function(){}
+    });
+  }
+  //删除
+  function delRole(id){
+    parent.layer.confirm('确定要删除？', {
+      btn: ['没错','算了吧'], //按钮
+      shade: false //不显示遮罩
+    }, function(){
+      $.ajax({
+        type : 'post',
+        url  : '__CONTROLLER__/del',
+        data : {id:id},
+        dataType : 'json',
+        success  : function(data){
+          if(data.code == 10000){
+            parent.layer.msg('删除成功！你会后悔的！', {icon: 1});
+            self.location.reload();
+          }else{
+            parent.layer.msg(data.msg, {shift: 6});
+          }
+        },
+        error : function(){
+          parent.layer.msg('服务器出错了！', {shift: 6});
+        }
+      });
+    }, function(){
+      parent.layer.msg('不删就不删', {shift: 6});
     });
   }
   $(function(){

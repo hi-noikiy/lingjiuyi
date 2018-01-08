@@ -69,9 +69,14 @@
             }
         }
 
-        public function del(){}
+        public function del(){
+            I('post.id','','intval') ? $id = I('post.id','','intval') : $this -> ajaxReturnData(0,'参数错误');
+            $res = D('Role') -> delete($id);
+            $res ? $this -> ajaxReturnSuccess() : $this -> ajaxReturnData(0,'删除失败');
+        }
 
-        public function get_role(){
+        //获取菜单名称
+        public function ajax_get_menu(){
             !IS_AJAX && !IS_GET ? $this -> ajaxReturnData(0,'访问方式错误！') : true;
             $type = I('get.type','','string') ? I('get.type','','string') : false;
             if($type === 'add'){
@@ -86,6 +91,13 @@
                 $menus = D('Privileges') -> where("roleid = $id") -> select();//获取当前管理员拥有的菜单
                 empty($menu_all) && empty($menus) ? $this -> ajaxReturnData(0,'无数据') : $this -> ajaxReturnSuccess(compact('menu_all','menus'));
             }
+        }
+
+        //获取角色名称
+        public function ajax_get_role(){
+            !IS_AJAX && !IS_GET ? $this -> ajaxReturnData(0,'访问方式错误！') : true;
+            $roles = D('Role') -> field('roleid,rolename') -> select();
+            empty($roles) ? $this -> ajaxReturnData(0,'无数据') : $this -> ajaxReturnSuccess($roles);
         }
 
 
