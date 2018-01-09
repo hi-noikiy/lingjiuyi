@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<!--[if IE 7]><html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]><html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>myAccount</title>
+
+    <!-- Font Icon -->
+    <link href="__PUBLIC__/Home/css/plugin/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- CSS Global -->
+    <link href="__PUBLIC__/Home/css/plugin/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="__PUBLIC__/Home/css/plugin/bootstrap-select.min.css" rel="stylesheet" type="text/css">
+    <link href="__PUBLIC__/Home/css/plugin/owl.carousel.css" rel="stylesheet" type="text/css">
+    <link href="__PUBLIC__/Home/css/plugin/animate.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom CSS -->
+    <link href="__PUBLIC__/Home/css/style.css" rel="stylesheet" type="text/css">
+
+    <!-- Color CSS -->
+
+    <!--[if lt IE 9]>
+    <script src="__PUBLIC__/Home/js/plugin/html5shiv.js"></script>
+    <script src="__PUBLIC__/Home/js/plugin/respond.js"></script>
+    <![endif]-->
+</head>
+
+<body id="home" class="wide">
+
+<!-- WRAPPER -->
+<main class="wrapper">
+    <!-- CONTENT AREA -->
+
+    <!-- Main Header Start -->
+    <header class="main-header white-bg">
+        <include file="Common/header" />
+    </header>
+    <!-- / Main Header Ends -->
+
+    <!--Breadcrumb Section Start-->
+    <section class="breadcrumb-bg">
+        <div class="theme-container container ">
+            <div class="site-breadcumb">
+                <h2 class="section-title"> <span class="light-font">我的 </span> <strong class="clr-txt">账户 </strong> </h2>
+                <ol class="breadcrumb breadcrumb-menubar">
+                    <li> <a href="/Index/index"> 主页 </a> 我的 账户  </li>
+                </ol>
+            </div>
+        </div>
+    </section>
+    <!--Breadcrumb Section End-->
+
+    <!-- My Account Starts-->
+    <section class="account-page ptb-50">
+        <div class="container">
+            <div class="row">
+                <aside class="col-md-9 col-sm-8 ptb-15">
+                    <!--我的账户start-->
+                    <div class="panel-group chk-panel" id="accordion">
+                        <div class="panel">
+                            <div class="accordion-heading">
+                                <a class="title-2" data-toggle="collapse" data-parent="#accordion" href="#accordion-1" aria-expanded="true"> <span class="light-font">01. 我的 </span> <strong> 账户 </strong> </a>
+                            </div>
+                            <div id="accordion-1" class="panel-collapse collapse in">
+                                <div class="account-body">
+                                    <ul class="acnt-list">
+                                        <li>
+                                            <i class="fa fa-arrow-circle-o-right clr-txt"></i>
+                                            <a href="javascript:void(0);" > 修改 你的 账户 信息</a>
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-arrow-circle-o-right clr-txt"></i>
+                                            <a href="cng-pw.html"> 修改 你的 登录密码</a>
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-arrow-circle-o-right clr-txt"></i>
+                                            <a href="address-book.html"> 修改 你的 电子邮箱 地址</a>
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-arrow-circle-o-right clr-txt"></i>
+                                            <a href="address-book.html"> 修改 你的 收货 地址</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel">
+                            <div class="accordion-heading">
+                                <a class="title-2" data-toggle="collapse" data-parent="#accordion" href="#accordion-2"> <span class="light-font">02. 订单 与 </span> <strong>  评论 </strong>  </a>
+                            </div>
+                            <div id="accordion-2" class="panel-collapse collapse">
+                                <div class="account-body">
+                                    <ul class="acnt-list">
+                                        <li>
+                                            <i class="fa fa-arrow-circle-o-right clr-txt"></i>
+                                            <a href="order-history.html"> 查看 你的 历史 订单</a>
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-arrow-circle-o-right clr-txt"></i>
+                                            <a href="review-rating.html"> 你的 评论 与 等级</a>
+                                        </li>
+                                        <li>
+                                            <i class="fa fa-arrow-circle-o-right clr-txt"></i>
+                                            <a href="return.html"> View your retun requests</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="panel">
+                            <div class="accordion-heading">
+                                <a class="title-2" data-toggle="collapse" data-parent="#accordion" href="#accordion-3">  <span class="light-font">03.订阅 </span> <strong> 时事通讯 </strong> </a>
+                            </div>
+                            <div id="accordion-3" class="panel-collapse collapse">
+                                <div class="account-body">
+                                    <ul class="acnt-list">
+                                        <li>
+                                            <a href="newsletter.html"> 订阅 / 取消订阅 时事通讯</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!--我的账户end-->
+
+                    <!--账户信息start-->
+                    <div class="account-wrap cart-box" id="info" style="display: none;">
+                        <form class="gray-control">
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label> * 昵称 </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <!--后期改为span标签显示-->
+                                <div class="form-group col-sm-6">
+                                    <label> * 用户余额 </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label> * 用户积分 </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <!--后期改为span标签显示-->
+                                <div class="form-group col-sm-6">
+                                    <label> * 头像 </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label> * 真实姓名 </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label> * 性别 </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label> * 生日 </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <!--如果有电子邮箱，需要在后面添加是否激活的说明-->
+                                <div class="form-group col-sm-6">
+                                    <label> * 电子邮箱 </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label> 手机号码 </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label> 微信</label>
+                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label> QQ</label>
+                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label> 微博</label>
+                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="pt-15 col-sm-12">
+                                    <button type="submit" class="theme-btn btn-black"> <b> 更新 </b> </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!--账户信息end-->
+
+                    <!--登录密码start-->
+                    <div class="account-wrap cart-box" id="pass" style="display: none;">
+                        <form class="gray-control">
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label> * 新密码 </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <!--后期改为span标签显示-->
+                                <div class="form-group col-sm-6">
+                                    <label> * 发送邮件 </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <div class="pt-15 col-sm-12">
+                                    <button type="submit" class="theme-btn btn-black"> <b> 更新 </b> </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!--登录密码end-->
+
+                    <!--收货地址start-->
+                    <div class="account-wrap" id="addr" style="display: none;">
+                        <form class="">
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label> Address-1 </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label> Address-2 </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label> Country </label>
+                                    <div class="search-selectpicker selectpicker-wrapper">
+                                        <select class="selectpicker" data-width="100%" data-toggle="tooltip" tabindex="-98">
+                                            <option> English </option>
+                                            <option> English </option>
+                                            <option> English </option>
+                                            <option> English </option>
+                                            <option> English </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label>  State/Province  </label>
+                                    <div class="search-selectpicker selectpicker-wrapper">
+                                        <select class="selectpicker" data-width="100%" data-toggle="tooltip" tabindex="-98">
+                                            <option> English </option>
+                                            <option> English </option>
+                                            <option> English </option>
+                                            <option> English </option>
+                                            <option> English </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label>  City  </label>
+                                    <div class="search-selectpicker selectpicker-wrapper">
+                                        <div class="btn-group bootstrap-select" style="width: 100%;">
+                                            <select class="selectpicker" data-width="100%" data-toggle="tooltip" tabindex="-98">
+                                                <option> English </option>
+                                                <option> English </option>
+                                                <option> English </option>
+                                                <option> English </option>
+                                                <option> English </option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label> Zip/Postal Code </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label> Email </label>
+                                    <input type="email" class="form-control" required="">
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label> Phone Number </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <div class="pt-15 col-sm-12">
+                                    <button type="submit" class="theme-btn btn-black"> <b> Update </b> </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!--收货地址end-->
+
+                    <!--历史订单start-->
+                    <div class="cart-table" id="order" style="display: none;">
+                        <form class="cart-form">
+                            <table class="product-table">
+                                <thead class="">
+                                <tr>
+                                    <th>商品详情</th>
+                                    <th></th>
+                                    <th>价格</th>
+                                    <th>购买日期</th>
+                                    <th>订单状态</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr>
+                                    <td class="image">
+                                        <div class="white-bg">
+                                            <a class="media-link" href="#"><img src="__PUBLIC__/Home/img/extra/cart-1.png" alt=""></a>
+                                        </div>
+                                    </td>
+                                    <td class="description">
+                                        <div class="rating">
+                                            <span class="star active"></span>
+                                            <span class="star active"></span>
+                                            <span class="star active"></span>
+                                            <span class="star active"></span>
+                                            <span class="star active"></span>
+                                        </div>
+                                        <h6 class="fsz-12 gray-color"> Overall Rating : 5/5 </h6>
+                                        <div class="divider-2"></div>
+                                        <h3 class="product-title no-margin"> <a href="#"> <span class="light-font">organic </span> <strong>almonds </strong> </a> </h3>
+                                        <h6>DRY FRUITS</h6>
+                                    </td>
+                                    <td>
+                                        <div class="price fontbold-2">
+                                            <strong class="fsz-14">$50.00 </strong>X<b class="fsz-14"> 1 </b>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="text-center pt-20"> <b class="fsz-16"> 12th Dec'15 </b> </div>
+                                    </td>
+                                    <td>
+                                        <div class="order-status pt-15">
+                                            <a href="#" class="theme-btn-sm-2 btn">付款</a>
+                                            <br/>
+                                            <a href="#" class="theme-btn-sm-3 btn"> Re Order </a>
+                                        </div>
+                                    </td>
+                                </tr>
+
+                                </tbody>
+                            </table>
+
+                            <div class="continue-shopping text-center">
+                                <a href="my-account.html" class="theme-btn btn"> Back to account </a>
+                            </div>
+
+                        </form>
+                    </div>
+                    <!--历史订单end-->
+
+                    <div class="account-wrap" id="subscribe" style="display: none;">
+                        <form class="">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <div class="form-group subscribe-group">
+                                        <label class="upper-text"> Subscribe: </label>
+                                        <label class="radio-inline"><input type="radio" value="" name="subscribe"> <span class="square-box"></span> <span>Yes</span> </label>
+                                        <label class="radio-inline"><input type="radio" value="" name="subscribe"> <span class="square-box"></span> <span>No</span> </label>
+                                    </div>
+                                </div>
+                                <div class="pt-15 col-sm-12">
+                                    <button type="submit" class="theme-btn btn-black"> <b> Update </b> </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                </aside>
+
+                <!-- Sidebar Starts -->
+                <aside class="col-md-3 col-sm-4">
+                    <div class="widget-wrap">
+                        <h2 class="widget-title"> <span class="light-font">我的</span> <strong>账户</strong> </h2>
+                        <div class="divider-full-1"></div>
+                        <ul class="cate-widget">
+                            <li> <i class="fa fa-arrow-circle-o-right clr-txt"></i> <a href="javascript:void(0);" id="editinfo"> 账户信息 </a></li>
+                            <li> <i class="fa fa-arrow-circle-o-right clr-txt"></i> <a href="javascript:void(0);" id="editpass"> 修改密码</a></li>
+                            <li> <i class="fa fa-arrow-circle-o-right clr-txt"></i> <a href="javascript:void(0);" id="editaddr"> 收货地址</a></li>
+                            <li> <i class="fa fa-arrow-circle-o-right clr-txt"></i> <a href="javascript:void(0);" id="showorder"> 历史订单 </a></li>
+                            <li> <i class="fa fa-arrow-circle-o-right clr-txt"></i> <a href="javascript:void(0);" id="showheart"> 我的收藏 </a></li>
+                            <li> <i class="fa fa-arrow-circle-o-right clr-txt"></i> <a href="javascript:void(0);" id="showsub"> 时事通讯</a></li>
+                        </ul>
+                    </div>
+                </aside>
+                <!-- Sidebar Ends -->
+
+            </div>
+        </div>
+    </section>
+    <!-- / My Account Ends -->
+
+    <!-- / CONTENT AREA -->
+
+    <!-- FOOTER -->
+    <include file="Common/footer" />
+    <!-- /FOOTER -->
+
+    <div id="to-top-mb" class="to-top mb"> <i class="fa fa-arrow-circle-o-up"></i> </div>
+
+</main>
+<!-- /WRAPPER -->
+
+<!-- JS Global -->
+<script src="__PUBLIC__/Home/js/plugin/jquery-2.2.4.min.js"></script>
+<script src="__PUBLIC__/Home/js/plugin/bootstrap.min.js"></script>
+<script src="__PUBLIC__/Home/js/plugin/bootstrap-select.min.js"></script>
+<script src="__PUBLIC__/Home/js/plugin/owl.carousel.min.js"></script>
+
+
+<!-- Custom JS -->
+<script src="__PUBLIC__/Home/js/theme.js"></script>
+<!--自定义js-->
+<script src="__PUBLIC__/Home/js/index.js"></script>
+<script src="__PUBLIC__/Home/js/myAccount.js"></script>
+
+
+</body>
+</html>
+

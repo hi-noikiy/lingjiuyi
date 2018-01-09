@@ -85,6 +85,7 @@ ORDER BY a.click_num DESC");
                 $order = $order == 'ltoh' ? 'goods_price asc' : 'goods_price desc' ;
             }
 
+
             $fields = 'goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,is_act';
             $count  = D('Goods') -> where($where) -> count();
             $list = D('Goods') -> field($fields) -> where($where) -> limit($start,$pagesize) -> order($order) -> select();
@@ -105,9 +106,7 @@ ORDER BY a.click_num DESC");
     public function shopSingle(){
         $this -> display();
     }
-    public function myAccount(){
-        $this -> display();
-    }
+
     public function contact(){
         $this -> display();
     }
@@ -129,144 +128,4 @@ ORDER BY a.click_num DESC");
     }
 
 
-
-    public function detail(){
-    	//接收商品id参数
-      $id = I('get.id',0,'intval');
-
-      if($id <= 0){
-        $this->error('参数不合法',0,'intval');
-      }
-
-      /*
-      //把动态的页面转化为一个真静态页面
-      //判断    
-      $file = "./Static/detail_{$id}.html";//如果存在纯静态文件,直接访问纯静态文件
-      //如果文件存在,需要判断有效期
-      if(file_exists($file) && (filemtime($file) + 3600 > time()) ){
-        // echo 'i an old';die;
-        //直接使用Common/function.PHP中的redirect函数直接跳转
-        redirect("/Static/detail_{$id}.html");
-      }*/
-      //如果是第一次请求,纯静态文件不存在,需要正常访问
-    	//查询商品基本信息
-      $goods=M('Goods')->where(" goods_id = $id ")->find();
-      $goods['click_num'] += 1;  //商品点击量加1
-      M('Goods')->save($goods); //保存商品点击量
-      $goods = M('Goods')->find($id);
-      $this->assign('goods',$goods);
-
-    	//获取商品的单选属性
-      $attr_radio = M('Goods_attr')->alias('t1')->join("left join zhouyuting_attribute t2 on t1.attr_id=t2.attr_id")->where("t1.goods_id = $id and attr_type = 1")->select();
-    	 //dump($attr_radio);die;
-    	// $data =array('口味'=>array('原味','炭烧'),);
-    	foreach($attr_radio as $k => $v){
-        $new_attr_radio[$v['attr_id']][] = $v;
-      }
-    	// dump($new_attr_radio);die;
-      /*
-      array(2) {
-        ["口味"] => array(6) {
-          [0] => array(9) {
-            ["id"] => string(3) "103"
-            ["goods_id"] => string(2) "42"
-            ["attr_id"] => string(1) "9"
-            ["attr_value"] => string(6) "麻辣"
-          }
-        }
-        ["包装"] => array(2) {
-          [0] => array(9) {
-            ["id"] => string(3) "107"
-            ["goods_id"] => string(2) "42"
-            ["attr_id"] => string(2) "13"
-            ["attr_value"] => string(6) "盒装"
-          }
-        }
-      }
-      */
-        //获取商品的唯一属性
-      $attr_only = M('Goods_attr')->alias('t1')->join("left join zhouyuting_attribute t2 on t1.attr_id=t2.attr_id")->where("t1.goods_id = $id and t2
-        .attr_type = 0")->select();
-
-    	//获取商品的 所有相册图片
-    	$goodspics = M('Goodspics')->where("goods_id = $id")->select();
-
-    	$this->assign('attr_radio',$attr_radio);
-    	$this->assign('new_attr_radio',$new_attr_radio);
-    	$this->assign('attr_only',$attr_only);
-    	$this->assign('goodspics',$goodspics);
-
-      // ob_start();    //开启ob缓存
-    	$this->display('detail'); //输出一些内容
-      //①使用fetch方法获取原始页面所输出的内容 
-      //$str = $this->fetch();
-      
-      /*
-      $str = ob_get_contents();    //从ob缓存获取其中的内容
-      $str = ob_get_clean();
-      dump($str);die;
-      */
-     /*
-      //②生成一个纯静态html页面把获取的内容放到一个文件
-      $file = "./Static/detail_{$id}.html";
-      file_put_contents($file,$str);
-      //③以后访问原始的页面,直接替换成访问静态页面,跳转
-      redirect("/Static/detail_{$id}.html");
-      */
-    }
-
-//    //搜索框
-//    public function search(){
-//      //遍历属性表中的分类
-//      $attribute = D('Attribute')->select('1,2,3');
-//      foreach($attribute as $k => $v){
-//        $attribute[$k]['attr_values'] = explode(',',$v['attr_values']);
-//      }
-//      // dump($attribute);
-//      $this->assign('attribute',$attribute);
-//
-//      if(IS_POST){
-//        $data = I('post.keyword');
-//      }else{
-//        $data = I('get.keyword');
-//        $cate_id = I('get.id');
-//      }
-//      $keyword = $data;
-//      //实例化模型
-//      $model = D('Goods');
-//      //使用分页类实现分页功能
-//      //获取总记录数
-//      if($cate_id){
-//        $total = $model->where("category_id = {$cate_id}")->count();
-//      }else{
-//        $total = $model->where("goods_name LIKE '%{$keyword}%'")->count();
-//      }
-//
-//      $pagesize = 8;
-//      //实例化page类
-//      $page = new \Think\Page($total,$pagesize);
-//      //定制分页栏显示
-//      $page->setConfig('prev','上一页');
-//      $page->setConfig('next','下一页');
-//      $page->setConfig('first','首页');
-//      $page->setConfig('last','尾页');
-//      $page->setConfig('theme',' %FIRST% %UP_PAGE% %LINK_PAGE% %DOWN_PAGE% %END% %HEADER%');
-//      //修改page类的属性rollPage lastSuffix
-//      $page->rollPage = 4;
-//      $page->lastSuffix = false;
-//      //获取分页栏代码
-//      $page_html = $page->show();
-//      $this->assign('page_html',$page_html);
-//      //使用select查询数据 加上limit条件
-//      if($cate_id){
-//        $goods = $model->limit($page->firstRow,$page->listRows)->where("category_id = $cate_id")->select();
-//      }else{
-//        $goods = $model->limit($page->firstRow,$page->listRows)->where("goods_name LIKE '%{$keyword}%'")->select();
-//      }
-//
-//      //变量赋值
-//      $this->assign('goods',$goods);
-//
-//      $this->display();
-//    }
 }

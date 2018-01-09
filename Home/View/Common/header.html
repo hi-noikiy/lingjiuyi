@@ -1,9 +1,9 @@
 
 <div class="container-fluid rel-div">
     <div class="col-lg-4 col-sm-8">
-        <div class="main-logo">
-            <a href="index.html"> <strong>naturix <img src="__PUBLIC__/Home/img/icons/logo-icon.png" alt="" /> </strong> <span class="light-font">farmfood</span>  </a>
-            <span class="medium-font">ORGANIC STORE</span>
+        <div class="main-logo" >
+            <a href="index.html"> <strong>零玖一 <img src="__PUBLIC__/Home/img/icons/logo-icon.png" alt="" /> </strong> <span class="light-font">手工作坊</span>  </a>
+            <span class="medium-font">Manual workshop</span>
         </div>
     </div>
 
@@ -11,26 +11,20 @@
         <div class="responsive-toggle fa fa-bars"> </div>
         <nav class="fix-navbar" id="primary-navigation">
             <ul class="primary-navbar">
-                <li>
-                    <a href="__CONTROLLER__/index"> 主页 </a>
+                <li <if condition=" '__CONTROLLER__' == '/Index' ">class="dropdown active"</if>>
+                    <a href="__MODULE__/Index/index"> 主页 </a>
                 </li>
-                <li><a href="__CONTROLLER__/aboutUs"> 关于我们 </a></li>
-                <li class="dropdown">
-                    <a href="__CONTROLLER__/search" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"> 商品列表 </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="__CONTROLLER__/search"> 商品列表 </a></li>
-                        <li><a href="__CONTROLLER__/shopSingle"> 商品详情 </a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="javascript:void(0);"  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"> 博客 </a>
-                    <ul class="dropdown-menu">
-                        <li><a href="__CONTROLLER__/blog"> blog </a></li>
-                        <li><a href="__CONTROLLER__/blogSingle"> blog single </a></li>
-                    </ul>
-                </li>
-                <li><a href="__CONTROLLER__/myAccount"> 个人中心 </a></li>
-                <li><a href="__CONTROLLER__/contact"> 联系我们 </a></li>
+                <li><a href="__MODULE__/Index/blog" > 博客 </a></li>
+                <li><a href="__MODULE__/Index/contact"> 加入我们 </a></li>
+                <if condition=" $Think.session.userinfo " >
+                    <li <if condition=" '__CONTROLLER__' == '/User' ">class="dropdown active"<else/>class="dropdown"</if> >
+                        <a href="javascript:void(0);"  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"> 个人中心 </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="__MODULE__/User/index" id="my_mine"> 我的零玖一 </a></li>
+                            <li><a href="__MODULE__/User/sign_out" id="my_sign_out"> 退出 </a></li>
+                        </ul>
+                    </li>
+                </if>
                 <li>
                     <div class="search-wrap" style="width: 150px;">
                         <input class="form-control" placeholder="搜索商品名称" id="research">
