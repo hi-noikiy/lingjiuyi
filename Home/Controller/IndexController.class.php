@@ -14,20 +14,21 @@ class IndexController extends CommonController {
 
         //四个分类对应的20个商品展示
         $gmodel   = D('Goods');
-        $fields   = 'goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,is_act';
+        $fields   = 'goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,goods_small_img si,is_act';
         $addA     = ',b.id cid,b.cate_name cn';
         $g = $fields.$addA;
         $three_goods    = $gmodel -> query("SELECT $g FROM zhouyuting_goods AS a LEFT JOIN zhouyuting_category AS b ON a.cate_id=b.id
-WHERE 20 > ( SELECT COUNT(*) FROM zhouyuting_goods WHERE cate_id=a.cate_id AND goods_id > a.goods_id ) AND cate_id in (246,311,213,186)
+WHERE 20 > ( SELECT COUNT(*) FROM zhouyuting_goods WHERE cate_id=a.cate_id AND goods_id > a.goods_id ) AND cate_id in (321,242,213,186)
 ORDER BY a.click_num DESC");
         $cate_goods       = change_array($three_goods,'cid');
 
         //六个分类介绍
         $six_cates = D('Category') -> alias('a')
-            -> field('a.id,cate_name cn,cate_img img,count(cate_id) sum')
-            -> join('join zhouyuting_goods b  on a.id = b.cate_id')
-            -> limit(0,6) -> group('cate_id') -> select();
-        //后期添加条件 where(pid=2)
+            -> field('d.id,d.cate_name cn,d.cate_small_img img,count(cate_id) sum')
+            -> join('join zhouyuting_goods b on a.id = b.cate_id')
+            -> join('join zhouyuting_category c on a.pid = c.id')
+            -> join('join zhouyuting_category d on c.pid = d.id')
+            -> limit(0,12) -> group('d.id') -> select();
 
         //六个店铺对应的16个商品展示
         $joinB      = 'left join zhouyuting_shop b on zhouyuting_goods.shop_id = b.id';
@@ -65,23 +66,40 @@ ORDER BY a.click_num DESC");
     //搜索页面
     public function search(){
         if(IS_AJAX){
-            $key      = I('post.keyword') ? I('post.keyword') : '';//搜索关键字
-            $p        = I('post.p') ? I('post.p','','intval') : 1;//页码
+            $key      = I('post.keyword','','string') ? I('post.keyword','','string') : '';//搜索关键字
+            $p        = I('post.p','','intval') ? I('post.p','','intval') : 1;//页码
+
             $pagesize = 20;//每页显示商品数量
             $start    = ($p - 1) * $pagesize;//开始行数
-            $min      = I('post.min','','intval');
-            $max      = I('post.max','','intval');
+
+            $min      = I('post.min','','intval');//最低价格
+            $max      = I('post.max','','intval');//最高价格
+            $cate     = I('post.cates','','intval');//分类
+            if(!empty($cate)){
+                $cates    = D('Category') -> alias('a') -> field('c.id') -> where("a.id = $cate") -> join('zhouyuting_category b on a.id = b.pid') -> join('zhouyuting_category c on b.id = c.pid') -> select();
+                foreach($cates as $k => $v){
+                    $cates[$k] = $cates[$k]['id'];
+                }
+                $ids = implode(',',$cates);
+            }
+            unset($k,$v);
+
+
             $where = array(
-                'goods_name' => ['LIKE',"%$key%"],
-                'goods_price' => ['BETWEEN',$min.','.$max],
+                'goods_name' => ['LIKE',"%$key%"], //查询商品名称
+                'goods_price' => ['BETWEEN',$min.','.$max], //查询商品价格区间
             );//搜索条件
 
-            $order = I('post.sorts');
-            $price = I('post.prices');
+            if(isset($ids)){
+                $where['cate_id'] = ['IN',$ids];
+            }
+
+            $order = I('post.sorts');//排序
+            $price = I('post.prices');//价格排序
             if((!empty($order) || $order == '0') && empty($price)){
-                $order = ($order == 'a') ? 'sale_num desc' : ($order == 'b' ? 'click_num desc' : ($order == 'c' ? 'comment_num desc' : 'goods_id asc'));
+                $order = ($order == 'a') ? 'sale_num desc' : ($order == 'b' ? 'click_num desc' : ($order == 'c' ? 'comment_num desc' : 'goods_id asc'));//根据参数拼接排序规则
             }else{
-                $order = $price;
+                $order = $price; //按照价格排序
                 $order = $order == 'ltoh' ? 'goods_price asc' : 'goods_price desc' ;
             }
 
@@ -123,7 +141,14 @@ ORDER BY a.click_num DESC");
         $attrs   = D('goods_attr') -> alias('a') -> field('a.id gaid,a.attr_id ai,a.attr_value value,b.attr_name name,b.attr_type type') -> where("goods_id = $id") -> join('zhouyuting_attribute b on a.attr_id = b.attr_id') -> select();
         $new_attrs = change_array($attrs,'ai');
 
-        $this -> ajaxReturn(compact('pic_img','new_attrs'));
+        $number = array(
+            'sales_num' => $goods['goods_sales'], //购买数
+            'click_num' => $goods['click_num'],//查看数
+            'heart_num' => D('User_goods') -> where(" goods_id = $id ") -> count('goods_id'), //收藏数
+            'comme_num' => D('Comment') -> where(" goods_id = $id ") -> count('goods_id')  //评论数
+        );
+
+        $this -> ajaxReturn(compact('pic_img','new_attrs','number'));
 
     }
 

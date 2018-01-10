@@ -21,9 +21,11 @@
                         <a href="javascript:void(0);"  class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"> 个人中心 </a>
                         <ul class="dropdown-menu">
                             <li><a href="__MODULE__/User/index" id="my_mine"> 我的零玖一 </a></li>
-                            <li><a href="__MODULE__/User/sign_out" id="my_sign_out"> 退出 </a></li>
+                            <li><a href="__MODULE__/Public/logout" > 退出 </a></li>
                         </ul>
                     </li>
+                <else/>
+                    <li><a href="javascript:void(0);" onclick="show_login()"> 登录 </a></li>
                 </if>
                 <li>
                     <div class="search-wrap" style="width: 150px;">

@@ -138,7 +138,7 @@ class PublicController extends Controller{
 	public function logout(){
 		//清除session
 		session(null);
-		$this->redirect('Home/User/login');
+		$this->redirect('Index/index');
 	}
 
 	//邮箱账号激活地址
@@ -157,15 +157,15 @@ class PublicController extends Controller{
 					//激活用户,修改数据库中的激活状态
 					$user['is_check'] = 1;
 					D('User')->save($user);
-					$this->success('激活成功',U('Home/User/login'));
+					$this->success('激活成功',U('User/login'));
 				}else{
-					$this->error('验证码不正确',U('Home/User/register'));					
+					$this->error('验证码不正确',U('User/register'));
 				}
 			}else{
-				$this->error('用户不存在',U('Home/User/register'));
+				$this->error('用户不存在',U('User/register'));
 			}
 		}else{
-			$this->error('参数不合法',U('Home/User/register'));
+			$this->error('参数不合法',U('User/register'));
 		}
 	}
 
