@@ -99,7 +99,7 @@
     <nav class="page-tabs J_menuTabs">
       <div class="page-tabs-content"> <a href="javascript:;" class="active J_menuTab" data-id="index_v1.html">首页</a> </div>
     </nav>
-    <button class="roll-nav roll-right J_tabRight"><i class="fa fa-forward"></i> </button>
+    <button class="roll-nav roll-right J_tabRight" style="width:70px;" id="setting">全局设置 </button>
     <div class="btn-group roll-nav roll-right">
       <button class="dropdown J_tabClose" data-toggle="dropdown">关闭操作<span class="caret"></span> </button>
       <ul role="menu" class="dropdown-menu dropdown-menu-right">
@@ -119,6 +119,70 @@
   </div>
 </div>
 <!--右侧部分结束-->
+
+  <!--弹出框开始-->
+  <div class="layer_notice" style="display: none;">
+    <div class="ibox-content form-horizontal">
+      <div class="form-group">
+        <div class="col-sm-4">
+          <button class="btn btn-primary" onclick="show_add_setting()" type="button">添加设置</button>
+        </div>
+      </div>
+      <form action="" method="post" id="form">
+        <volist name="setting" id="val">
+          <div class="form-group">
+            <label class="col-sm-2 control-label">{$val.desc}</label>
+            <div class="col-sm-8">
+              <input type="text" class="form-control" name="{$val.name}" value="{$val.content}">
+            </div>
+            <if condition=" $val['type'] == 2 ">
+              <div class="col-sm-2">
+                <button class="btn btn-primary" type="button" onclick="upload_img()">上传图片</button>
+              </div>
+            </if>
+          </div>
+          <div class="hr-line-dashed"></div>
+        </volist>
+        <div class="form-group">
+          <div class="col-sm-4 col-sm-offset-2">
+            <button class="btn btn-primary" onclick="save_setting()" type="button">保存内容</button>
+            <button class="btn btn-white" type="reset">重置</button>
+          </div>
+        </div>
+      </form>
+      <form action="" method="post" id="add_form" style="display: none;">
+        <div class="form-group">
+          <label class="col-sm-2 control-label">设置名称</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" name="name" value="">
+          </div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">中文注释</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" name="desc" value="">
+          </div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group">
+          <label class="col-sm-2 control-label">存放内容</label>
+          <div class="col-sm-8">
+            <input type="text" class="form-control" name="content" value="">
+          </div>
+        </div>
+        <div class="hr-line-dashed"></div>
+        <div class="form-group">
+          <div class="col-sm-4 col-sm-offset-2">
+            <button class="btn btn-primary" type="button" onclick="add_setting()">确定新增</button>
+            <button class="btn btn-white back" type="button">返回查看</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!--弹出框结束-->
+
 
 <!-- 全局js --> 
 <script src="/Public/Admin/js/jquery.min.js?v=2.1.4"></script> 
@@ -184,6 +248,58 @@
       }
     })
   }
+
+  //显示添加设置弹窗
+  function show_add_setting(){
+    $('#form').attr('style','display:none');
+    $('#add_form').attr('style','display:show');
+  }
+
+  //添加设置
+  function add_setting(){
+    $.ajax({
+      type : 'post',
+      url : '__MODULE__/Setting/add',
+      data : $('#add_form').serialize(),
+      dataType : 'json',
+      success : function(data){
+        if(data.code == 10000){
+          self.location.reload();
+          layer.msg('添加成功', {time: 5000, icon:6});
+
+        }else{
+          layer.msg(data.msg);
+        }
+      },
+      error : function(){}
+    });
+  }
+
+  //保存修改
+  function save_setting(){
+    $.ajax({
+      type : 'post',
+      url : '__MODULE__/Setting/edit',
+      data : $('#form').serialize(),
+      dataType : 'json',
+      success : function(data){
+        if(data.code == 10000){
+          self.location.reload();
+          layer.msg('修改成功', {time: 5000, icon:6});
+
+        }else{
+          layer.msg(data.msg);
+        }
+      },
+      error : function(){}
+    });
+  }
+
+  //上传图片
+  function upload_img(){
+    alert('此功能暂时未完成，请直接复制链接修改哦！')
+  }
+
   $(function(){
     //计算json长度
     function getJsonLength(jsonData){
@@ -270,6 +386,26 @@
       var file = this.files[0];
       cropper.loadImage(file);//打开本地图片
 
+    });
+
+    //设置
+    $('#setting').click(function(){
+      layer.open({
+        type: 1,
+        shade: false,
+        title: '全局设置',
+        content: $('.layer_notice'),
+        area:['80%','80%'],
+        cancel: function(){
+          layer.msg('O(∩_∩)O哈哈哈哈~', {time: 5000, icon:6});
+        }
+      });
+    });
+
+    //返回查看
+    $('.back').click(function(){
+      $('#form').attr('style','display:show');
+      $('#add_form').attr('style','display:none');
     });
 
   });

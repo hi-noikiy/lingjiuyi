@@ -2,8 +2,10 @@
 namespace Admin\Controller;
 
 class IndexController extends BaseController {
+    //主页
     public function index() {
         if(!IS_AJAX){
+            //展示页面
             $menu   = D('Menu');
             $row    = M('Admin') -> where("username='".session('username')."'")->find();
             $roleid = $row['roleid'];//角色id
@@ -11,8 +13,11 @@ class IndexController extends BaseController {
 
             $menuB  = $menu->query('select * from zhouyuting_menu where menuid in (select menuid from zhouyuting_privileges where roleid='.$roleid.') and is_show = 1  order by listorder asc');//二级显示菜单
 
+            $setting = D('Setting') -> select();
+
             $this -> assign('menuA',$menuA);
             $this -> assign('menuB',$menuB);
+            $this -> assign('setting',$setting);
             $this -> display('Index/index');
         }else{
             //发货信息
@@ -34,6 +39,7 @@ class IndexController extends BaseController {
 
     }
 
+    //主页框架
     public function main() {
         $os = get_os();
         $software = $_SERVER['SERVER_SOFTWARE'];
@@ -61,6 +67,7 @@ class IndexController extends BaseController {
         $this -> display('Index/main');
     }
 
+    //图表功能
     public function charts(){
         //订单汇总
         //title:'商品销售汇总'  num:num+num mintitle:'销售总数量' name:name:price元 y:num
@@ -96,4 +103,5 @@ class IndexController extends BaseController {
         }
         $list ? $this -> ajaxReturnSuccess($list) : $this -> ajaxReturnData(0,'没有数据');
     }
+
 }

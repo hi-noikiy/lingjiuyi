@@ -105,6 +105,7 @@ class PublicController extends Controller{
 			if(password_verify($data['password'],$user['password']) === true)
 			{
 				session('userinfo',$user);
+				cookie('userinfo_id',$user['id']);
 				//调用cart模型 cookieTodb方法,迁移购物车数据
 				D('cart')->cookieTodb();
 
