@@ -12,17 +12,19 @@ class CartController extends CommonController{
         $model = D('Cart');
 
         $data = array(
-            'user_id'  => session('userinfo.id'),
-            'goods_id' => I('post.id','','intval'),
-            'number'   => I('post.num','','intval'),
-            'add_time' => time()
+            'user_id'        => session('userinfo.id'),
+            'goods_id'       => I('post.id','','intval'),
+            'goods_attr_ids' => I('post.ids','','string'),
+            'number'         => I('post.num','','intval'),
+            'update_time'    => date('Y-m-d'),
+            'add_time'       => time()
         );
         $where = array(
             'user_id'  => $data['user_id'],
             'goods_id' => $data['goods_id']
         );
 
-        $num = $model -> where($where) -> getField('number');
+        $num = $model -> where($where) -> getField('number');//查询购物车中是否存在相同商品
         if($num !== null){
             $add['number'] = $data['number'] + $num;
             $res = $model -> where($where) -> save($add);

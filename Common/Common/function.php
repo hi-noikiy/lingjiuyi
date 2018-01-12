@@ -79,6 +79,21 @@ function curl_request($url, $post = true, $data = array(), $https = false){
     return $result;//返回结果给调用方
 }
 
+/**
+ * @return mixed
+ * 作者:周雨婷
+ * 时间:2018-01-12
+ * 描述：微信公众号中获取 access_token
+ */
+function getToken(){
+    $appid     = C('TEST_WEIXIN_PUBLIC_CONFIG.appID');
+    $appsecret = C('TEST_WEIXIN_PUBLIC_CONFIG.appsecret');
+    $url       = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={$appid}&secret={$appsecret}";
+    $res      = curl_request($url,false);
+    $info     = json_decode($res);
+    return $info -> access_token;
+}
+
 
 /**
  * @param $email String 收件人

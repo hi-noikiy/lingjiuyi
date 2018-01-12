@@ -55,6 +55,7 @@ ORDER BY a.click_num DESC");
         $this -> display();
     }
 
+    //购物车列表
     public function cart(){
         $this -> check_login();
         $uid = session('userinfo.id');
@@ -118,10 +119,6 @@ ORDER BY a.click_num DESC");
     }
 
     public function aboutUs(){
-        $this -> display();
-    }
-
-    public function shopSingle(){
         $this -> display();
     }
 

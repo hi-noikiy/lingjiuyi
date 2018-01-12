@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<!--[if IE 7]><html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]><html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>naturix</title>
+
+    <!-- Font Icon -->
+    <link href="__PUBLIC__/Home/css/plugin/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+    <!-- CSS Global -->
+    <link href="__PUBLIC__/Home/css/plugin/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="__PUBLIC__/Home/css/plugin/bootstrap-select.min.css" rel="stylesheet" type="text/css">
+    <link href="__PUBLIC__/Home/css/plugin/owl.carousel.css" rel="stylesheet" type="text/css">
+    <link href="__PUBLIC__/Home/css/plugin/animate.css" rel="stylesheet" type="text/css">
+    <link href="__PUBLIC__/Home/css/plugin/jquery-ui.min.css" rel="stylesheet" type="text/css">
+
+    <!-- Custom CSS -->
+    <link href="__PUBLIC__/Home/css/style.css" rel="stylesheet" type="text/css">
+    <link href="__PUBLIC__/Plugins/layer/skin/layer.css" rel="stylesheet" type="text/css">
+
+    <!-- Color CSS -->
+
+    <!--[if lt IE 9]>
+    <script src="__PUBLIC__/Home/js/plugin/html5shiv.js"></script>
+    <script src="__PUBLIC__/Home/js/plugin/respond.js"></script>
+    <![endif]-->
+</head>
+
+<body id="home" class="wide">
+
+<!-- WRAPPER -->
+<main class="wrapper">
+    <!-- CONTENT AREA -->
+
+    <!-- Main Header Start -->
+    <if condition=" $Think.session.userinfo == '' ">
+    <include file="Common/top" />
+    </if>
+    <header class="main-header white-bg">
+        <include file="Common/header" />
+    </header>
+    <!-- / Main Header Ends -->
+
+    <!--Breadcrumb Section Start-->
+    <section class="breadcrumb-bg"
+    <if condition=" $goods['Shop']['shop_logo_web'] != '' ">
+
+        style="background-image: url({$goods['Shop']['shop_logo_web']});"
+    <else/>
+        style="background-image: url(http://hbfile.b0.upaiyun.com/img/home/banner/9fdda0e1c006b95a6bb59bb79511c002273d6143bd4a9);"
+    </if>>
+        <div class="theme-container container ">
+            <div class="site-breadcumb white-clr">
+                <h2 class="section-title"> <strong class="clr-txt">lingjiuyi </strong> <span class="light-font">{$goods['Shop']['shop_name']} </span> </h2>
+                <ol class="breadcrumb breadcrumb-menubar">
+                    <li> <a href="/Shop/index/shop_id/{$goods['Shop']['id']}"> 进入店铺 </a> {$goods['Shop']['shop_name']}  </li>
+                </ol>
+            </div>
+        </div>
+    </section>
+    <!--Breadcrumb Section End-->
+
+
+    <!-- Shop Starts-->
+    <section class="shop-wrap sec-space-bottom">
+        <div class="container rel-div pt-50">
+            <div class="row">
+                <!--左侧开始-->
+                <div class="col-md-3 pt-15">
+                    <div class="widget-wrap">
+                        <h2 class="widget-title"> <span class="light-font">店铺分类</span> <strong>{$goods['Shop']['shop_name']}</strong> </h2>
+                        <div class="divider-full-1"></div>
+                        <ul class="cate-widget">
+                            <volist name="shop_cate" id="val">
+                            <li> <i class="fa fa-arrow-circle-o-right clr-txt"></i> <a href="javascript:void(0);">{$val['shop_cate_name']}</a>
+                                <!--<ul class="cate-widget">-->
+                                    <!--<li> <i class="fa fa-arrow-circle-o-right clr-txt"></i> <a href="javascript:void(0);">Apple</a> </li>-->
+                                <!--</ul>-->
+                            </li>
+                            </volist>
+                        </ul>
+                    </div>
+
+                    <!--
+                    <div class="widget-wrap">
+                        <h2 class="widget-title"> <span class="light-font">Natrix</span> <strong>Highlights</strong> </h2>
+                        <div class="divider-full-1"></div>
+                        <ul class="checkbox-widget">
+                            <li class="form-group"><label class="checkbox-inline"><input value="" type="checkbox" checked=""> <span>Deals of the day</span></label> </li>
+                            <li class="form-group"><label class="checkbox-inline"><input value="" type="checkbox"> <span>Fresh shipping</span></label> </li>
+                        </ul>
+                    </div>
+
+                    <div class="widget-wrap">
+                        <h2 class="widget-title"> <span class="light-font">Sort by</span> <strong>Price Range</strong> </h2>
+                        <div class="divider-full-1"></div>
+                        <div class="sort-range pt-15">
+                            <span>PRICE</span> <div id="price-range"></div>
+                        </div>
+                    </div>
+                    -->
+
+                    <div class="widget-wrap">
+                        <h2 class="widget-title"> <span class="light-font">店铺热销</span> <strong></strong> </h2>
+                        <div class="divider-full-1"></div>
+                        <div class="widget-post pt-15">
+                            <volist name="hot_goods" id="val">
+                            <div class="random-prod">
+                                <div class="random-img">
+                                    <img alt="" src="{$val['si']}">
+                                </div>
+                                <div class="random-text">
+                                    <h3 class="title-1 no-margin product-title"> <a href="javascript:void(0);"> <span class="light-font" title="{$val['an']}" >{$val['an']} </span> <strong > </strong> </a> </h3>
+                                    <span class="divider"></span>
+                                    <div class="price">
+                                        <strong class="clr-txt">${$val['gp']} </strong> <del class="light-font">${$val['gb']} </del>
+                                    </div>
+                                </div>
+                            </div>
+                            </volist>
+                        </div>
+                    </div>
+
+                    <div class="widget-wrap">
+                        <h2 class="widget-title"> <span class="light-font">Sort by</span> <strong>Tags</strong> </h2>
+                        <div class="divider-full-1"></div>
+                        <ul class="tags-widget">
+                            <li> <a href="javascript:void(0);">fruits</a> </li>
+                        </ul>
+                    </div>
+                </div>
+                <!--左侧结束-->
+
+                <!--右侧开始-->
+                <div class="col-md-9 pt-15">
+                    <div class="product-single sec-space-bottom  clearfix" id="product-preview">
+                        <!-- Single Products Slider Starts -->
+                        <div class="col-lg-6 pb-50 col-sm-8 col-sm-offset-2 col-lg-offset-0">
+                            <div class="prod-slider sync1">
+                                <volist name="goods['Goodspics']" id="val" key="key">
+                                <div class="item">
+                                    <img src="{$val['pics_big']}" alt="">
+                                </div>
+                                </volist>
+                            </div>
+                            <div style="height: 10px;"></div>
+
+                            <div  class="sync2">
+                                <volist name="goods['Goodspics']" id="val" key="key">
+                                <div class="item"> <a href="javascript:void(0);"> <img src="{$val['pics_sma']}" alt="" style="width:100px;"> </a> </div>
+                                </volist>
+                            </div>
+                        </div>
+                        <!-- Single Products Slider Ends -->
+
+                        <div class="col-lg-6" >
+                            <div class="product-content block-inline">
+
+                                <div class="tag-rate">
+                                    <span class="prod-tag tag-1">新品</span> <span class="prod-tag tag-2">促销</span>
+                                    <div class="rating">
+                                        <span class="star active"></span>
+                                        <span class="star active"></span>
+                                        <span class="star active"></span>
+                                        <span class="star active"></span>
+                                        <span class="star active"></span>
+                                        <span class="fsz-12 gray-color ml-10"> {$goods['Comment_num']} 条评论</span>
+                                    </div>
+                                </div>
+
+                                <div class="single-caption">
+                                    <h3 class="section-title">
+                                        <a href="javascript:void(0);"> <span class="light-font"> 【零玖一】 </span>  <strong>{$goods['goods_name']}</strong></a>
+                                    </h3>
+                                    <span class="divider-2"></span>
+                                    <p class="price">
+                                        <strong class="clr-txt fsz-20">${$goods['goods_price']} </strong> <del class="light-font">${$goods['goods_bigprice']} </del>
+                                    </p>
+
+                                    <div class="fsz-16">
+                                        <p>Creativity change life and shape life by hand. </p>
+                                    </div>
+
+                                    <div class="prod-btns item" style="text-align: left;" gid="{$goods['goods_id']}">
+                                        <div class="quantity">
+                                            <button class="btn minus"><i class="fa fa-minus-circle"></i></button>
+                                            <input title="Qty" value="1" class="form-control qty" type="text" name="number">
+                                            <button class="btn plus"><i class="fa fa-plus-circle"></i></button>
+                                        </div>
+                                        <div style="color:#92d2a7;font-size:22px;padding-left: 10px;">
+                                            <i class="fa fa-heartbeat" aria-hidden="true"></i><span style="font-size: 8px;">0</span>
+                                        </div>
+                                        <div style="color:#79d1d6;font-size:22px;padding-left: 10px;">
+                                            <i class="fa fa-shopping-basket" aria-hidden="true"></i><span style="font-size: 8px;">0</span>
+                                        </div>
+                                        <div style="color:#92d2a7;font-size:22px;padding-left: 10px;">
+                                            <i class="fa fa-eye" aria-hidden="true"></i><span style="font-size: 8px;">0</span>
+                                        </div>
+                                    </div>
+                                    <volist name="attrs" id="val">
+                                        <if condition=" $val[0]['type'] == 1 ">
+                                            <div class="sort-dropdown">
+                                                <strong>{$val[0]['name']}</strong>
+                                                <div class="search-selectpicker selectpicker-wrapper">
+                                                    <select class="selectpicker input-price"  data-width="100%"
+                                                            data-toggle="tooltip">
+                                                        <volist name="val" id="v">
+                                                            <option value="{$v['gaid']}">{$v['value']}</option>
+                                                        </volist>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </if>
+                                    </volist>
+                                    <ul class="meta">
+                                        <volist name="attrs" id="val">
+                                            <if condition=" $val[0]['type'] == 0 ">
+                                                <li> <strong> {$val[0]['name']} </strong> <span>: &nbsp;  {$val[0]['value']}</span> </li>
+                                            </if>
+                                        </volist>
+                                        <li class="tags-widget"> <strong> 标签 </strong> <span>:  <a href="javascript:void(0);">热销</a> <a href="javascript:void(0);">必备</a></span> </li>
+                                    </ul>
+                                    <div class="divider-full-1"></div>
+                                    <div class="add-cart pt-15">
+                                        <a href="javascript:void(0);" class="theme-btn btn" onclick="before_add_cart(this)"> <strong> 加入购物车 </strong> </a>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="prod-tabs pb-50">
+                        <ul class="tabs fsz-20">
+                            <li class="active"><a href="#prod-tab-1" data-toggle="tab"> <span class="light-font">商品 </span> <strong>详情 </strong> </a></li>
+                            <li class=""><a href="#prod-tab-2" data-toggle="tab"> <span class="light-font">additional </span> <strong>info </strong> </a></li>
+                            <li class="" onclick="show_comment()"><a href="#prod-tab-3" data-toggle="tab"> <span class="light-font">商品 </span> <strong>评论 ({$goods['Comment_num']})</strong> </a></li>
+                        </ul>
+                        <div class="divider-full-1"></div>
+
+                        <div class="tab-content prod-tab-content">
+                            <div id="prod-tab-1" class="tab-pane fade in active">
+                                <h3 class="fsz-16"><span class="light-font">商品 </span> <strong>详情 </strong>  </h3>
+                                <span class="divider-2 crl-bg"></span>
+
+                                <div class="block-inline pera">
+                                    <p>{$goods['goods_introduce']} </p>
+                                </div>
+
+                            </div>
+                            <div id="prod-tab-2" class="tab-pane fade">
+                                <h3 class="fsz-16"><span class="light-font">additional </span> <strong>info </strong> </h3>
+                                <span class="divider-2 crl-bg"></span>
+
+                                <div class="block-inline pera">
+                                    <p>Lorem ipsum dolor sit amet, consectetuer adiping elit food sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat adiping elit food sed diam nonummy nibh euismod tincidunt ut laoreet dolore. </p>
+                                </div>
+                            </div>
+                            <div id="prod-tab-3" class="tab-pane fade">
+                                <h3 class="fsz-16"><span class="light-font">商品 </span> <strong>评论 </strong> <span class="clr-txt">({$goods['Comment_num']})</span> </h3>
+                                <span class="divider-2 crl-bg"></span>
+
+                                <!--评论-->
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--
+                    <div class="you-like organic-content pb-50">
+                        <h3 class="fsz-20 pb-15 text-center"><span class="light-font">Related  </span> <strong>Products </strong>  </h3>
+                        <div class="divider-full-1"></div>
+                        <div id="rel-prod-slider" class="rel-prod-slider nav-1">
+                            <div class="item">
+                                <div class="product-box">
+                                    <div class="product-media">
+                                        <img class="prod-img" alt="" src="__PUBLIC__/Home/img/products/1.png" />
+                                        <img class="shape" alt="" src="__PUBLIC__/Home/img/icons/shap-small.png" />
+                                        <div class="prod-icons">
+                                            <a href="javascript:void(0);" class="fa fa-heart"></a>
+                                            <a href="javascript:void(0);" class="fa fa-shopping-basket"></a>
+                                            <a  href="#product-preview" data-toggle="modal" class="fa fa-expand"></a>
+                                        </div>
+                                    </div>
+                                    <div class="product-caption">
+                                        <h3 class="product-title">
+                                            <a href="javascript:void(0);"> <span class="light-font"> organic </span>  <strong>tomato</strong></a>
+                                        </h3>
+                                        <div class="price">
+                                            <strong class="clr-txt">$50.00 </strong>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    -->
+
+
+                    <div class="your-review">
+                        <h3 class="fsz-20 pb-15 text-center"><span class="light-font">Your item </span> <strong>review </strong>  </h3>
+                        <div class="divider-full-1"></div>
+                        <div class="your-review">
+                            <div class="block-inline your-rating">
+                                <div class="left">
+                                    <div class="rating">
+                                        <span class="fsz-12 gray-color"> Your Rating :  </span>
+                                        <span class="star"></span>
+                                        <span class="star"></span>
+                                        <span class="star"></span>
+                                        <span class="star"></span>
+                                        <span class="star"></span>
+                                    </div>
+                                </div>
+                                <div class="right">
+                                    <div class="rating">
+                                        <span class="star active"></span>
+                                        <span class="star active"></span>
+                                        <span class="star active"></span>
+                                        <span class="star active"></span>
+                                        <span class="star active"></span>
+                                        <span class="fsz-12 gray-color"> Overall Rating : 5/5  </span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <form class="review-form row">
+                                <div class="form-group col-sm-4">
+                                    <input class="form-control" placeholder="Name" required="" type="text">
+                                </div>
+                                <div class="form-group col-sm-4">
+                                    <input class="form-control" placeholder="Email" required="" type="email">
+                                </div>
+                                <div class="form-group col-sm-4">
+                                    <input class="form-control" placeholder="Website" type="text">
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <textarea class="form-control"  placeholder="Message" cols="12" rows="4"></textarea>
+                                </div>
+                                <div class="form-group col-sm-12 text-center ptb-15">
+                                    <button class="theme-btn" type="submit"> <strong> SUBMIT REVIEW </strong> </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--右侧结束-->
+            </div>
+        </div>
+    </section>
+    <!-- / Shop Ends -->
+
+    <!-- / CONTENT AREA -->
+
+    <!-- FOOTER -->
+    <include file="Common/footer" />
+    <!-- /FOOTER -->
+
+    <div id="to-top-mb" class="to-top mb"> <i class="fa fa-arrow-circle-o-up"></i> </div>
+
+</main>
+<!-- /WRAPPER -->
+
+<!-- JS Global -->
+<script src="__PUBLIC__/Home/js/plugin/jquery-2.2.4.min.js"></script>
+<script src="__PUBLIC__/Home/js/plugin/bootstrap.min.js"></script>
+<script src="__PUBLIC__/Home/js/plugin/bootstrap-select.min.js"></script>
+<script src="__PUBLIC__/Home/js/plugin/owl.carousel.min.js"></script>
+<script src="__PUBLIC__/Home/js/plugin/jquery-ui.min.js"></script>
+
+<!-- Custom JS -->
+<script src="__PUBLIC__/Home/js/theme.js"></script>
+<!--自定义js-->
+<script src="__PUBLIC__/Home/js/index.js"></script>
+<script src="__PUBLIC__/Home/js/detail.js"></script>
+
+<script src="__PUBLIC__/Plugins/layer/layer.min.js"></script>
+</body>
+</html>
+

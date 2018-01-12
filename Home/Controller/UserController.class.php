@@ -11,7 +11,7 @@ class UserController extends CommonController{
         $this -> check_login();
 
         $goods_id = I('post.id', '', 'intval');
-        empty($data['goods_id']) ? $this -> ajaxReturnData(0, '参数错误') : true;
+        empty($goods_id) ? $this -> ajaxReturnData(0, '参数错误') : true;
 
         $data = array(
             'goods_id' => $goods_id,
@@ -21,7 +21,12 @@ class UserController extends CommonController{
 
         $model = D('User_goods');
 
-        $rep = $model -> where(['user_id' => $data['user_id']]) -> find();
+        $where = array(
+            'user_id'  => $data['user_id'],
+            'goods_id' => $data['goods_id'],
+        );
+
+        $rep = $model -> where($where) -> find();
         $rep ? $this -> ajaxReturnData(0,'此商品您已经收藏过了哦！') : true;
 
         $res = $model-> add($data);
