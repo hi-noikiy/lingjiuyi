@@ -61,6 +61,7 @@ function is_weixin_browser()
  */
 function curl_request($url, $post = true, $data = array(), $https = false){
     $ch = curl_init($url);//A、使用curl_init函数初始化curl请求(设置请求地址)
+    curl_setopt($ch,CURLOPT_SAFE_UPLOAD,false);//关闭上传文件安全验证功能，在php5.6以前是关闭的
     if($post)
     {//判断post请求
         curl_setopt($ch, CURLOPT_POST, true);// B、使用curl_setopt函数配置curl请求(设置请求方式请求参数等)//设置请求方式

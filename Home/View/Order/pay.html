@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<!--[if IE 7]><html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]><html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <title>shop</title>
+    <!-- Font Icon -->
+    <link href="__PUBLIC__/Home/css/plugin/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <!-- CSS Global -->
+    <link href="__PUBLIC__/Home/css/plugin/bootstrap.min.css" rel="stylesheet" type="text/css">
+    <link href="__PUBLIC__/Home/css/plugin/bootstrap-select.min.css" rel="stylesheet" type="text/css">
+    <link href="__PUBLIC__/Home/css/plugin/owl.carousel.css" rel="stylesheet" type="text/css">
+    <link href="__PUBLIC__/Home/css/plugin/animate.css" rel="stylesheet" type="text/css">
+    <!-- Custom CSS -->
+    <link href="__PUBLIC__/Home/css/style.css" rel="stylesheet" type="text/css">
+    <!-- Color CSS -->
+    <!--[if lt IE 9]>
+    <script src="__PUBLIC__/Home/js/plugin/html5shiv.js"></script>
+    <script src="__PUBLIC__/Home/js/plugin/respond.js"></script>
+    <![endif]-->
+</head>
+<body id="home" class="wide">
+<!-- WRAPPER -->
+<main class="wrapper">
+    <!-- CONTENT AREA -->
+
+    <!-- Blog Starts-->
+    <section class="blog-wrap sec-space-bottom">
+        <div class="container pt-50">
+            <div class="commerce commerce-page commerce-cart noo-shop-main">
+                <div class="noo-main col-md-12">
+                    <aside class="col-md-9 col-sm-8 ptb-15">
+                        <div class="account-wrap" >
+                            <div class="row">
+                                <div class="cart-collaterals" >
+                                    <div class="cart_totals" style="width: 100%;">
+                                        <p><label>
+                                            <img src="__PUBLIC__/Home/img/pay/order.png" alt="" style="width: 40px;">&emsp;请仔细核对以下订单内容，确认无误后扫描右侧二维码支付。
+                                        </label></p>
+                                        <table>
+                                            <tr>
+                                                <th style="width:25%;text-align: center;">
+                                                    <img src="__PUBLIC__/Home/img/pay/sn.png" alt="" style="width:20px;">&emsp;&emsp;订单编号</th>
+                                                <td><span class="amount">{$order['order_sn']}</span> </td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width:25%;text-align: center;">
+                                                    <img src="__PUBLIC__/Home/img/pay/wuliu.png" alt="" style="width:20px;">&emsp;&emsp;配送方式</td>
+                                                <td><span class="amount">{$order['shipping_type']}</span> </td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width:25%;text-align: center;">
+                                                    <img src="__PUBLIC__/Home/img/pay/zhifu.png" alt="" style="width:20px;">&emsp;&emsp;支付方式</th>
+                                                <td><span class="amount">{$order['pay_type']}</span> </td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width:25%;text-align: center;">
+                                                    <img src="__PUBLIC__/Home/img/pay/order_price.png" alt="" style="width:20px;">&emsp;&emsp;订单金额</th>
+                                                <td><span class="amount">{$order['order_amount']}</span> </td>
+                                            </tr>
+                                            <tr>
+                                                <th style="width:25%;text-align: center;">
+                                                    <img src="__PUBLIC__/Home/img/pay/address.png" alt="" style="width:20px;">&emsp;收货人信息</th>
+                                                <td><span class="amount">{$order['address_info']}</span> </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div style="height: 20px;"></div>
+                                <form action="" id="form_pay">
+                                    <div class="form-group col-sm-2" style="text-align: center;line-height: 40px;"><label> 手机号 </label></div>
+                                    <div class="form-group col-sm-10">
+                                        <input type="text" class="form-control" required="" name="tele">
+                                        <span style="color: #ccc;font-size: 10px;">&nbsp;&nbsp;*&nbsp;购买成功之后将发送短信提示，如果未收到提示，请及时与我们联系！</span>
+                                    </div>
+                                    <div class="form-group col-sm-2" style="text-align: center;line-height: 40px;"><label> {$order['name']} </label></div>
+                                    <div class="form-group col-sm-10">
+                                        <input type="text" class="form-control" required="" name="WxOrPay">
+                                        <span style="color: #ccc;font-size: 10px;">{$order['desc']}</span>
+                                    </div>
+                                    <div class="form-group col-sm-2" style="text-align: center;line-height: 40px;"><label> 图片凭证 </label></div>
+                                    <div class="form-group col-sm-10">
+                                        <input type="file" class="fileInput" id="fileInput" name="img">
+                                        <a href="javascript:void(0);" class="theme-btn-sm-3 btn"> 上传图片 </a><br/>
+                                        <span style="color: #ccc;font-size: 10px;">&nbsp;&nbsp;*&nbsp;请在付款成功之后将截图保存上传</span><br/>
+                                    </div>
+                                    <div class="pt-15 col-sm-12">
+                                        <a href="javascript:void(0);" class="theme-btn-sm-2 btn">提交</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </aside>
+                    <aside class="col-md-3 col-sm-4">
+                        <img src="{$order['img']}" alt="" >
+                        <span style="color:#ccc;float: right;"> * 请扫描二维码支付 &emsp;&emsp;</span>
+                        <span style="color:#ccc;float: right;"> 提示：支付完请截图保存上传！ &emsp;&emsp;</span>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- / Blog Ends -->
+    <div id="to-top-mb" class="to-top mb"> <i class="fa fa-arrow-circle-o-up"></i> </div>
+</main>
+<div class="layer_address" style="display: none;">
+    <div id="login_frame">
+
+        <div class="close">
+            <i></i>
+        </div>
+    </div>
+</div>
+<!-- /WRAPPER -->
+<!-- JS Global -->
+<script src="__PUBLIC__/Home/js/plugin/jquery-2.2.4.min.js"></script>
+<script src="__PUBLIC__/Home/js/plugin/bootstrap.min.js"></script>
+<script src="__PUBLIC__/Home/js/plugin/bootstrap-select.min.js"></script>
+<script src="__PUBLIC__/Home/js/plugin/owl.carousel.min.js"></script>
+<!-- Custom JS -->
+<script src="__PUBLIC__/Home/js/theme.js"></script>
+<script src="__PUBLIC__/Plugins/layer/layer.min.js"></script>
+<script src="/Public/Plugins/ajaxfileuploader/ajaxfileupload.js"></script>
+<script src="__PUBLIC__/Plugins/jcrop/imagecropper.js"></script>
+<!--自定义js-->
+
+<script src="__PUBLIC__/Home/js/index.js"></script>
+<script>
+    function show_img(obj){
+        var _this = obj;//obj不能直接获取，所以在这里接收一下
+        //判断浏览器是否支持FileReader接口
+        if (typeof FileReader == 'undefined') {
+            layer.msg('当前浏览器不支持FileReader接口', {icon: 5});
+            //使选择控件不可操作
+            document.getElementById('"fileInput"').setAttribute("disabled", "disabled");
+        }
+        var file = obj.files[0];
+        // 获取文件路径
+        var filePath = file['name'];
+        // 获取“.”位置
+        var extStart = filePath.lastIndexOf(".");
+        // 获取文件格式后缀，并全部大写
+        var ext = filePath.substring(extStart, filePath.length).toUpperCase();
+        // 判断文件格式
+        if (ext != ".BMP" && ext != ".PNG" && ext != ".JPG" && ext != ".JPEG") {
+            layer.open({
+                content: "图片仅限于.gif .png .jpg .jpeg文件。"
+                ,skin: 'msg'
+                ,time: 1 //2秒后自动关闭
+            });
+            // alert("图片仅限于.gif .png .jpg .jpeg文件。");
+            return false;
+        }else{
+            var html = '';
+            var reader = new FileReader();
+            //读取文件过程方法
+            reader.onloadstart = function (e) {console.log("开始读取....");};
+            reader.onprogress = function (e) {console.log("正在读取中....");};
+            reader.onabort = function (e) {console.log("中断读取....");};
+            reader.onerror = function (e) {console.log("读取异常....");};
+            reader.onload = function (e) {
+                console.log("成功读取....");
+                //商品图片添加
+                html += '<img src="'+ e.target.result +'" alt="暂无图片" style="width: 100px;">';
+                var obj = $('#fileInput').closest('div').find('img');
+                var length = obj.length;
+                if(length >= 1){
+                    obj.remove();
+                }
+                $('#fileInput').closest('div').append(html);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    $(function(){
+        //点击上传图片
+        $(document).on('change','.fileInput',function(){
+            show_img(this);
+        });
+        //点击提交
+        $('.theme-btn-sm-2').click(function(){
+            var tele,WxOrPay,img,type,order_id;
+            tele = $("input[name='tele']").val();
+            WxOrPay = $("input[name='WxOrPay']").val();
+            img = $("input[name='img']").val();
+            type = "{$Think.get.type}";
+            order_id = "{$Think.get.order_id}";
+            $.ajaxFileUpload({
+                type:"POST",
+                url:'/Order/pay',
+                data : {tele:tele,WxOrPay:WxOrPay,img:img,type:type,order_id:order_id},
+                secureuri:false,
+                fileElementId:"fileInput",//文件选择框的id属性
+                dataType: 'JSON',   //json
+                success: function (data) {
+                    var start = data.indexOf('{');
+                    var end = data.indexOf('}') + 1;
+                    var _data = data.slice(start,end);
+                    _data = eval('('+ _data +')');
+
+                    if(_data.code == 0){
+                        if(_data.msg == '手机号不能为空' || data.msg == '手机号码格式不正确'){
+                            layer.tips(_data.msg, "input[name='tele']", {tips: [2, '#1ab394'], maxWidth:400, time: 3000});
+                        }else if(_data.msg == '必填项不能为空'){
+                            layer.tips(_data.msg, "input[name='WxOrPay']", {tips: [2, '#1ab394'], maxWidth:400, time: 3000});
+                        }else if(_data.msg == '图片凭证不能为空!'){
+                            layer.tips(_data.msg, "input[name='img']", {tips: [2, '#1ab394'], maxWidth:400, time: 3000});
+                        }else{
+                            layer.msg(_data.msg);
+                        }
+                    }else if(_data.code == 10000){
+                        layer.msg('提交成功', {time: 5000, icon:6});
+                        location.href = '/User/index/type/order';
+                    }
+                },
+                error: function(xhr){
+                    show_error(xhr);
+                }
+            });
+        });
+
+    });
+
+</script>
+</body>
+</html>

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<!--[if IE 7]><html class="no-js ie7 oldie" lang="en-US"> <![endif]-->
+<!--[if IE 8]><html class="no-js ie8 oldie" lang="en-US"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]-->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<title>shop</title>
+	<!-- Font Icon -->
+	<link href="__PUBLIC__/Home/css/plugin/font-awesome.min.css" rel="stylesheet" type="text/css">
+	<!-- CSS Global -->
+	<link href="__PUBLIC__/Home/css/plugin/bootstrap.min.css" rel="stylesheet" type="text/css">
+	<link href="__PUBLIC__/Home/css/plugin/bootstrap-select.min.css" rel="stylesheet" type="text/css">
+	<link href="__PUBLIC__/Home/css/plugin/owl.carousel.css" rel="stylesheet" type="text/css">
+	<link href="__PUBLIC__/Home/css/plugin/animate.css" rel="stylesheet" type="text/css">
+	<!-- Custom CSS -->
+	<link href="__PUBLIC__/Home/css/style.css" rel="stylesheet" type="text/css">
+	<!-- Color CSS -->
+	<!--[if lt IE 9]>
+	<script src="__PUBLIC__/Home/js/plugin/html5shiv.js"></script>
+	<script src="__PUBLIC__/Home/js/plugin/respond.js"></script>
+	<![endif]-->
+</head>
+<body id="home" class="wide">
+<!-- WRAPPER -->
+<main class="wrapper">
+	<!-- CONTENT AREA -->
+	<!-- Main Header Start -->
+	<header class="main-header white-bg">
+		<include file="Common/header" />
+	</header>
+	<!-- / Main Header Ends -->
+	<!--Breadcrumb Section Start-->
+	<section class="noo-page-heading eff">
+		<div class="container">
+			<div class="noo-heading-content">
+				<h1 class="page-title eff">Cart</h1>
+				<div class="noo-page-breadcrumb eff">
+					<a href="/Index/index" class="home">HOME</a>/<span>Cart</span>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!--Breadcrumb Section End-->
+	<!-- Blog Starts-->
+	<section class="blog-wrap sec-space-bottom">
+		<div class="container pt-50">
+			<div class="row">
+				<div class="col-md-12 pt-15">
+					<div class="blog-wrap">
+						<div class="blog-content tab-content">
+							<div id="blog-tab-1" class="tab-pane fade active in">
+								<div class="commerce commerce-page commerce-cart noo-shop-main">
+									<div class="noo-main col-md-12">
+
+										<table class="shop_table cart">
+											<thead>
+											<tr>
+												<th class="product-remove" style="padding-left: 10px;">&nbsp;</th>
+												<th class="product-thumbnail">商品详情</th>
+												<th class="product-price">价格</th>
+												<th class="product-quantity">数量</th>
+												<th class="product-subtotal">总价</th>
+												<th class="product-remove"  style="padding-right: 10px;">&nbsp;</th>
+											</tr>
+											</thead>
+											<tbody>
+											<volist name="carts" id="val">
+											<tr class="cart_item" cart_id="{$val['cart_id']}" gid="{$val['gid']}">
+												<td style="padding-left: 10px;">
+													<div class="form-group">
+														<label class="checkbox-inline">
+															<input value="{$val['cart_id']}" type="checkbox" checked="" name="cart_id"> <span></span>
+														</label>
+													</div>
+												</td>
+												<td class="product-thumbnail">
+													<a href="/Goods/detail/id/{$val['gid']}" style="float: left">
+														<img width="100" height="100" src="{$val['img']}" alt="" />
+													</a>
+													<a href="/Goods/detail/id/{$val['gid']}" style="float: left;line-height: 50px;margin-left: 10px;font-size: 10px;">
+														<span title="{$val['name']}">{$val['name']}</span><br/>
+														<volist name="val['goods_attr_ids']" id="v">
+															<span data-gattr-id="{$v['id']}" class="attr-id">{$v['attr_name']}：{$v['attr_value']}&emsp;</span>
+														</volist>
+													</a>
+												</td>
+												<td class="product-price">
+													<span class="amount">&#36;{$val['price']}</span>
+												</td>
+												<td class="product-quantity">
+													<div class="prod-btns" style="border-bottom:0;border-top:0;">
+													<div class="quantity" style="width:90px;">
+														<button class="btn minus"><i class="fa fa-minus-circle"></i></button>
+														<input title="Qty" value="1" class="form-control qty" type="text" name="num" style="width:7em;">
+														<button class="btn plus"><i class="fa fa-plus-circle"></i></button>
+													</div>
+													</div>
+												</td>
+												<td class="product-subtotal">
+													<span class="amount">&#36;{$val['price'] * $val['num']}</span>
+												</td>
+												<td class="product-remove" style="padding-right: 10px;">
+													<a href="#" class="remove">&times;</a>
+												</td>
+											</tr>
+											</volist>
+											</tbody>
+										</table>
+										<if condition=" $addr != null " >
+											<div class="cart-collaterals" address_id="{$addr['id']}">
+												<div class="cart_totals" >
+													<p>
+														<strong>收货地址</strong>
+														<label class="form-group checkbox-inline" style="float: right;padding-top: 10px;"><input type="checkbox" name="default" address_id="{$addr['id']}" <if condition=" $addr['default_addr'] == 1">checked=""</if> > <span><if condition=" $addr['default_addr'] == 1">取消默认地址<else/>设为默认地址</if></span></label>
+													</p>
+													<table class="address">
+														<tr class="order-total">
+															<th>姓名</th>
+															<td><strong><span class="amount">{$addr['consignee']}</span></strong> </td>
+														</tr>
+														<tr class="order-total">
+															<th>电话</th>
+															<td><span class="amount">{$addr['phone']}</span></td>
+														</tr>
+														<tr class="order-total">
+															<th>地址</th>
+															<td>
+																<span>{$addr['address']}（{$addr['zipcode']}）</span>
+															</td>
+														</tr>
+														<tr class="order-total">
+															<th>付款方式</th>
+															<td class="tags-widget pay" data-value="">
+																	<a href="javascript:void(0);" data-value="2"><img src="__PUBLIC__/Home/img/pay/zhifubaopay.png" style="width: 30px;">支付宝</a>&emsp;
+																	<a href="javascript:void(0);" data-value="1"><img src="__PUBLIC__/Home/img/pay/weixinpay.png" style="width: 30px;"> 微信</a>&emsp;
+																	<a href="javascript:void(0);" data-value="3"><img src="__PUBLIC__/Home/img/pay/yue.png" style="width: 30px;"> 余额</a>&emsp;
+															</td>
+														</tr>
+														<tr class="order-total">
+															<th>物流方式</th>
+															<td>
+																<ul class="op_express_delivery_hot" data-value="">
+																	<li data-value="0">
+																		<i class="c-gap-right" style="background-position:0px -468px"></i> 圆通
+																	</li>
+																	<li data-value="2">
+																		<i class="c-gap-right" style="background-position:0px -576px"></i> 韵达
+																	</li>
+																	<li data-value="1">
+																		<i class="c-gap-right" style="background-position:0px -1008px"></i> 申通
+																	</li>
+																	<li data-value="3" class="op_express_delivery_hot_last ">
+																		<i class="c-gap-right" style="background-position:0px -324px"></i> 中通
+																	</li>
+																	<li data-value="4" class="op_express_delivery_hot_bottom">
+																		<i class="c-gap-right" style="background-position:0px -180px"></i> 顺丰
+																	</li>
+																</ul>
+															</td>
+														</tr>
+													</table>
+													<div class="wc-proceed-to-checkout">
+														<a href="javascript:void(0);" class="checkout-button button alt wc-forward show_other_addr">
+															选择其他地址
+														</a>
+													</div>
+													<!--其他地址-->
+												</div>
+											</div>
+										<else/>
+											<div class="cart-collaterals">
+												<div class="cart_totals" id="show_myAddress">
+													<p><strong>收货地址为空</strong></p>
+													<div class="wc-proceed-to-checkout" onclick="show_myAddress()">
+														<a href="javascript:void(0);" class="checkout-button button alt wc-forward" >
+															添加收货地址
+														</a>
+													</div>
+												</div>
+												<div class="cart_totals" id="add_myAddress" style="display: none;">
+													<div class="wc-proceed-to-checkout">
+														<form class="gray-control" id="addr_form">
+															<div class="row">
+																<div class="form-group col-sm-6">
+																	<label> * 收货人姓名 </label>
+																	<input type="text" name="name" class="form-control" required="">
+																</div>
+																<div class="form-group col-sm-6">
+																	<label> * 收货人手机号 </label>
+																	<input type="text" name="tele" class="form-control" required="">
+																</div>
+																<div class="form-group col-sm-12">
+																	<label> * 收货地址</label>
+																	<div class="search-selectpicker selectpicker-wrapper">
+																	<div class="form-group col-sm-4">
+																	<select class="selectpicker" data-width="100%" data-toggle="tooltip" tabindex="-98" id="d1" name="addr">
+																		<option> 请选择 </option>
+																	</select>
+																	</div>
+																	<div class="form-group col-sm-4">
+																	<select class="selectpicker" data-width="100%" data-toggle="tooltip" tabindex="-98" id="d2" name="addr">
+																		<option> 请选择 </option>
+																	</select>
+																	</div>
+																	<div class="form-group col-sm-4">
+																	<select class="selectpicker" data-width="100%" data-toggle="tooltip" tabindex="-98" id="d3" name="addr">
+																		<option> 请选择 </option>
+																	</select>
+																	</div>
+																	</div>
+																</div>
+																<div class="form-group col-sm-8">
+																	<label> * 详细地址 </label>
+																	<input type="text" name="addrinfo" class="form-control" required="">
+																</div>
+																<div class="form-group col-sm-4">
+																	<label> * 邮编 </label>
+																	<input type="text" name="zipcode" class="form-control" required="" disabled>
+																</div>
+																<input type="hidden" name="address">
+																<input type="hidden" name="zip">
+																<div class="pt-15 col-sm-6">
+																	<input type="button" class="button" value="保存" onclick="add_myAddress()">
+																</div>
+															</div>
+														</form>
+
+													</div>
+												</div>
+											</div>
+										</if>
+										<div style="width: 100%;float: right;"><input type="button" class="button" style="float: right;" name="submit_order" value="结算"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</section>
+	<!-- / Blog Ends -->
+	<!-- FOOTER -->
+	<include file="Common/footer" />
+	<!-- /FOOTER -->
+	<div id="to-top-mb" class="to-top mb"> <i class="fa fa-arrow-circle-o-up"></i> </div>
+</main>
+<div class="layer_address" style="display: none;">
+	<div id="login_frame">
+
+		<div class="close">
+			<i></i>
+		</div>
+	</div>
+</div>
+<!-- /WRAPPER -->
+<!-- JS Global -->
+<script src="__PUBLIC__/Home/js/plugin/jquery-2.2.4.min.js"></script>
+<script src="__PUBLIC__/Home/js/plugin/bootstrap.min.js"></script>
+<script src="__PUBLIC__/Home/js/plugin/bootstrap-select.min.js"></script>
+<script src="__PUBLIC__/Home/js/plugin/owl.carousel.min.js"></script>
+<!-- Custom JS -->
+<script src="__PUBLIC__/Home/js/theme.js"></script>
+<script src="__PUBLIC__/Plugins/layer/layer.min.js"></script>
+
+<!--自定义js-->
+<script src="/Public/H5/js/allcity.js"></script>
+
+<script src="__PUBLIC__/Home/js/index.js"></script>
+<script src="__PUBLIC__/Home/js/cartindex.js"></script>
+</body>
+</html>

@@ -256,12 +256,7 @@ class CartController extends CommonController {
 		(empty($ids) || empty($addr_id)) ? $this -> ajaxReturnData(0,'参数为空') : true;
 
 		$fields = 'a.*,b.goods_price';
-		$cart = M('Cart')
-				-> alias('a')
-				-> field($fields)
-				-> where("id in ($ids)")
-				-> join('zhouyuting_goods b on a.goods_id = b.goods_id')
-				-> select();//查询购物车中的数据
+		$cart = M('Cart') -> alias('a') -> field($fields) -> where("id in ($ids)") -> join('zhouyuting_goods b on a.goods_id = b.goods_id') -> select();//查询购物车中的数据
 		$address = M('Address') -> where("id = $addr_id") -> find();//查询选择的地址详情
 		$order_sn = date("Ymd").time().rand(1000,9999);//设置长的订单编号
 		$order_amount = 0;//初始化订单金额

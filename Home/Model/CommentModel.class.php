@@ -4,6 +4,5 @@ use Think\Model\RelationModel;
 class CommentModel extends RelationModel
 {
 
-    protected $pk = 'id';
 
 }

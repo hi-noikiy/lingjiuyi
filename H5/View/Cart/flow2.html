@@ -307,7 +307,7 @@ $(function(){
                         });
                     }else if(data.code == 10020){
 
-                        //1微信
+                        //1微信扫码
                         var url = '__MODULE__' + data.info.url;
                         $.ajax({
                             type : 'GET',
@@ -351,6 +351,10 @@ $(function(){
                                 location.href = '__MODULE__' + data.info.url;
                             }
                         });
+                    }else if(data.code == 10040){
+                        alert(data.info);
+                        console.log(data.info);
+                        location.href = data.info;
                     }
                 }
             });

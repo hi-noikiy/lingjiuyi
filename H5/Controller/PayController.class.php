@@ -127,7 +127,17 @@ class PayController extends CommonController {
 
         }elseif(isMobile()){
 
-            $config = C('WEIXIN_JSAPI_PAY');
+//            $config = C('WEIXIN_JSAPI_PAY');
+            $config =
+                array(
+                    'APPID'      => 'wx02f1ef39672b54ca', // 微信支付APPID
+                    'MCHID'      => '1327248801', // 微信支付MCHID 商户收款账号
+                    'KEY'        => '084fccd48ed8d3e2115faa56f6db579b', // 微信支付KEY
+                    'APPSECRET'  => '6a8ecf87d7b4fb648b88e6f5fea8692c',  //公众帐号secert
+
+                    'REDIRECT_URL'=>'http://sj.v-town.cc/pages/recharge.html',//回调路径(支付成功跳转的路径)
+                    'NOTIFY_URL' => 'http://sjsc.v-town.cc/wechatH5/H5Notify/', // 接收支付状态的连接
+                );
 
 
             $subject = "零玖一" . $order['order_sn']; //商品描述
@@ -141,8 +151,8 @@ class PayController extends CommonController {
             //$spbill_create_ip = '118.144.37.98'; //终端ip测试
             $trade_type = 'MWEB';//交易类型 具体看API 里面有详细介绍
 
-            $notify_url = 'http://jl.v-town.cc/'; //回调地址
-            $scene_info ='{"h5_info":{"type":"Wap","wap_url":"http://www.123.com","wap_name":"测试支付"}}'; //场景信息
+            $notify_url = 'http://sj.v-town.cc/pages/recharge.html'; //回调地址
+            $scene_info ='{"h5_info":{"type":"Wap","wap_url":"http://www.123.com","wap_name":"test"}}'; //场景信息
             //对参数按照key=value的格式，并按照参数名ASCII字典序排序生成字符串
             $signA = "appid=".$config['APPID']."&body=$subject&mch_id=".$config['MCHID']."&nonce_str=$nonce_str&notify_url=$notify_url&out_trade_no=$order_id
 　　　　　　&scene_info=$scene_info&spbill_create_ip=$spbill_create_ip&total_fee=$total_amount&trade_type=$trade_type";
@@ -151,55 +161,46 @@ class PayController extends CommonController {
 
             $sign = strtoupper(MD5($strSignTmp)); // MD5 后转换成大写
 
+//            $post_data = "<xml>
+//                       <appid>".$config['APPID']."</appid>
+//                       <body>$subject</body>
+//                       <mch_id>".$config['MCHID']."</mch_id>
+//                       <nonce_str>$nonce_str</nonce_str>
+//                       <notify_url>$notify_url</notify_url>
+//                       <out_trade_no>$order_id</out_trade_no>
+//                       <scene_info>$scene_info</scene_info>
+//                       <spbill_create_ip>$spbill_create_ip</spbill_create_ip>
+//                       <total_fee>$total_amount</total_fee>
+//                       <trade_type>$trade_type</trade_type>
+//                       <sign>$sign</sign>
+//                       </xml>";//拼接成XML 格式
             $post_data = "<xml>
-                       <appid>".$config['APPID']."</appid>
-                       <body>$subject</body>
-                       <mch_id>".$config['MCHID']."</mch_id>
-                       <nonce_str>$nonce_str</nonce_str>
-                       <notify_url>$notify_url</notify_url>
-                       <out_trade_no>$order_id</out_trade_no>
-                       <scene_info>$scene_info</scene_info>
-                       <spbill_create_ip>$spbill_create_ip</spbill_create_ip>
-                       <total_fee>$total_amount</total_fee>
-                       <trade_type>$trade_type</trade_type>
-                       <sign>$sign</sign>
-                       </xml>";//拼接成XML 格式
+	<appid>wx02f1ef39672b54ca</appid>
+	<body>零玖一2018011715161748203750</body>
+	<mch_id>1327248801</mch_id>
+	<nonce_str>4a4fd08391865a1e012f912ae8cdeb6c</nonce_str>
+	<notify_url>http://sj.v-town.cc/pages/recharge.html</notify_url>
+	<out_trade_no>2018011715161748203750</out_trade_no>
+	<scene_info>{\"h5_info\":{\"type\":\"Wap\",\"wap_url\":\"http://www.123.com\",\"wap_name\":\"test\"}}</scene_info>
+	<spbill_create_ip>124.202.218.226</spbill_create_ip>
+	<total_fee>89900</total_fee>
+	<trade_type>MWEB</trade_type>
+	<sign>90570D24D5D2AD27BD28DE769ECFAE3C</sign>
+</xml>";//拼接成XML 格式
 
             $url = "https://api.mch.weixin.qq.com/pay/unifiedorder";//微信传参地址
             $dataxml = http_post($url,$post_data); //后台POST微信传参地址  同时取得微信返回的参数，http_post方法请看下文
-            dump($dataxml);
             $objectxml = (array)simplexml_load_string($dataxml, 'SimpleXMLElement', LIBXML_NOCDATA); //将微信返回的XML 转换成数组
-            dump($objectxml);
             if($objectxml['return_code'] == 'SUCCESS')  {
                 if($objectxml['result_code'] == 'SUCCESS'){//如果这两个都为此状态则返回mweb_url，详情看‘统一下单’接口文档
-                    return $objectxml['mweb_url']; //mweb_url是微信返回的支付连接要把这个连接分配到前台
+                    $this -> ajaxReturnData(10040,'微信h5支付',$objectxml['mweb_url']);
+//                    return $objectxml['mweb_url']; //mweb_url是微信返回的支付连接要把这个连接分配到前台
                 }
                 if($objectxml['result_code'] == 'FAIL'){
                     $err_code_des = $objectxml['err_code_des'];
                     return $err_code_des;
                 }
             }
-
-
-
-
-            //如果是移动端 ，但是非微信浏览器则h5支付 暂时没有权限
-            //$input->SetTrade_type("MWEB");//交易类型（MWEB为h5支付）JSAPI | NATIVE | APP | WAP
-            //$input->SetProduct_id("123456789");//商品ID
-            echo '1';
-
-
-            //c，获取支付地址
-            //$result = \WxPayApi::unifiedOrder($input);
-            //if($result['mweb_url']){
-            //    $url = $result['mweb_url'].'&redirect_url=https%3A%2F%2Fwww.gujia.la';//希望用户支付完成后跳转至redirect_url
-            //    $this -> ajaxReturnSuccess($url);
-            //}else{
-            //    $this -> ajaxReturnData(0,'目前只支持微信扫码支付，请在网页端进行扫码支付！<br/>'.$result['return_msg']);
-            //}
-            //$result = $wechatAppPay->unifiedOrder( $params );
-            //$url = $result['mweb_url'].'&redirect_url=https%3A%2F%2Fwww.gujia.la';//希望用户支付完成后跳转至redirect_url
-            //return $url;
 
 
         }else{
