@@ -1,6 +1,7 @@
 <?php
 namespace Home\Controller;
 use Think\Controller;
+require_once './Application/Tools/Gt3/class.geetestlib.php';
 class PublicController extends Controller{
 
 	protected function ajaxReturnData($code = 10000, $msg = 'success',$info = [])
@@ -88,7 +89,6 @@ class PublicController extends Controller{
 			//接收数据
 			$data['username'] = I('post.e');
 			$data['password'] = I('post.p');
-
 			$model = D('User');
 			//必须做校验
 			if(empty($data['username']) || empty($data['password'])){
@@ -96,8 +96,8 @@ class PublicController extends Controller{
 			}
 			$user = $model->where("username='{$data['username']}' or email='{$data['username']}' or phone='{$data['username']}'")->find();
 			empty($user) ? $this -> ajaxReturnData(0,'用户名/邮箱/手机号不存在！') : true;
-			if($user['is_check'] == 0 && $user['email'] != ''){
-				//邮箱账户需要先激活才能登陆
+			if($user['is_check'] == 0 && $user['email'] != '' && empty($user['phone'])){
+				//邮箱账户,并且不存在手机号时 需要先激活才能登陆
 				$this -> ajaxReturnData(10001,'账户未激活');
 			}
 
@@ -108,7 +108,9 @@ class PublicController extends Controller{
 				cookie('userinfo_id',$user['id']);
 				//调用cart模型 cookieTodb方法,迁移购物车数据
 				D('cart')->cookieTodb();
-
+				$data['id'] = session('userinfo.id');
+				$data['last_login_time'] = time();
+				D('User') -> save($data);
 				$this -> ajaxReturnData();
 
 			}else{
@@ -122,15 +124,29 @@ class PublicController extends Controller{
 
 	//发送邮件激活
 	public function sendEmail(){
-		$email = I('post.e');
+		!IS_POST && !IS_AJAX ? $this -> ajaxReturnData(0,'访问方式错误') : true;
+		$sendtime = session('sendtime') ? session('sendtime') : 0;//是否存在过期时间
+		time() - $sendtime < 300 ? $this -> ajaxReturnData(0,'发送太频繁，请稍后再试！') : true;//限制发送频率 300秒
 		$model = D('User');
-		$id = $model -> where(['email' => $email]) -> getField('id');
-		$data['email_code'] = rand(100000,999999);
-		$res_save = $model -> where(['id' => $id]) -> save($data);
-		empty($res_save) ? $this -> ajaxReturnData(0,'保存邮箱验证码失败！') : true;
-		$res = sendmail($email,$id,$data['email_code']);
-		$this -> ajaxReturnData(0,'',$res);
+		$data['id'] = session('userinfo.id');//获取当前用户id
+		$email = I('post.e','','string') ? I('post.e','','string') : $model -> where(['id' => $data['id']]) -> getField('email');//注册页面传递邮箱，重置密码页面不传递邮箱
+		$data['email_code'] = rand(100000,999999);//生成邮箱验证码
+		$res_save = M('User') -> save($data);//保存邮箱验证码
+		$res_save !== false ? true : $this -> ajaxReturnData(0,'保存邮箱验证码失败！');
+		$res = sendmail($email,$data['id'],$data['email_code']);//发送邮件
+		session('sendtime',time());//设置过期时间
 		$res !== true ? $this -> ajaxReturnData(0,'发送失败',$res) : $this -> ajaxReturnData();
+
+	}
+	//发送短信
+	public function sendMsg(){
+		!IS_POST && !IS_AJAX ? $this -> ajaxReturnData(0,'访问方式错误') : true;
+		$sendtime = session('sendtime') ? session('sendtime') : 0;
+		time() - $sendtime < 300 ? $this -> ajaxReturnData(0,'发送太频繁，请稍后再试！') : true;
+		$model = D('User');
+		$data['id'] = session('userinfo.id');
+		$phone = I('post.p','','string') ? I('post.p','','string') : $model -> where(['id' => $data['id']]) -> getField('phone');//注册页面传递手机号，重置密码页面不传递手机号
+		$url = "https://api.miaodiyun.com/20150822/industrySMS/sendSMS";
 
 	}
 
@@ -166,6 +182,114 @@ class PublicController extends Controller{
 			}
 		}else{
 			$this->error('参数不合法',U('User/register'));
+		}
+	}
+
+	//获取验证
+	public function StartCaptchaServlet(){
+		$CAPTCHA_ID  = C('GEETESTLIB_CONFIG.CAPTCHA_ID');
+		$PRIVATE_KEY = C('GEETESTLIB_CONFIG.PRIVATE_KEY');
+		$GtSdk = new \GeetestLib($CAPTCHA_ID, $PRIVATE_KEY);
+		session_start();
+		$data = array(
+				"user_id" => "test", # 网站用户id
+				"client_type" => "web", #web:电脑上的浏览器；h5:手机上的浏览器，包括移动应用内完全内置的web_view；native：通过原生SDK植入APP应用的方式
+				"ip_address" => "127.0.0.1" # 请在此处传输用户请求验证时所携带的IP
+		);
+		$status = $GtSdk->pre_process($data, 1);
+		$_SESSION['gtserver'] = $status;
+		$_SESSION['user_id'] = $data['user_id'];
+		echo $GtSdk->get_response_str();
+	}
+	//提交验证
+	public function VerifyLoginServlet(){
+		$CAPTCHA_ID  = C('GEETESTLIB_CONFIG.CAPTCHA_ID');
+		$PRIVATE_KEY = C('GEETESTLIB_CONFIG.PRIVATE_KEY');
+		$GtSdk = new \GeetestLib($CAPTCHA_ID, $PRIVATE_KEY);
+		// 比如你设置了一个验证码是否验证通过的标识
+		$code_flag = false;
+		// 这里获取你之前设置的user_id，传送给极验服务器做校验
+		$user_id = $_SESSION['user_id'];
+		if ($_SESSION['gtserver'] == 1) {
+			$result = $GtSdk -> success_validate($_POST['geetest_challenge'], $_POST['geetest_validate'], $_POST['geetest_seccode'], $user_id);
+			$result ? $code_flag = true : false;
+		}else{
+			if ($GtSdk->fail_validate($_POST['geetest_challenge'],$_POST['geetest_validate'],$_POST['geetest_seccode'])) {
+				$code_flag=true;// 验证码验证成功
+			}
+		}
+//		$code_flag ? $this -> sendEmail() : $this -> ajaxReturnData(0,'验证未通过');// 如果验证码验证成功，再进行其他校验
+		session_start();
+		$this -> sendEmail();
+	}
+
+	//初始化及获取字符串（API1）
+	public function pre_process($user_id = null, $new_captcha=1) {
+		$data = array('gt'=>$this->captcha_id,
+				'new_captcha'=>$new_captcha
+		);
+		if (($user_id != null) and (is_string($user_id))) {
+			$data['user_id'] = $user_id;
+		}
+		$query = http_build_query($data);
+		$url = "http://api.geetest.com/register.php?" . $query;
+		$challenge = $this->send_request($url);
+		if (strlen($challenge) != 32) {
+			$this->failback_process();
+			return 0;
+		}
+		$this->success_process($challenge);
+		return 1;
+	}
+	//二次验证及宕机（API2）
+	/**
+	 * 正常模式获取验证结果
+	 *
+	 * @param      $challenge
+	 * @param      $validate
+	 * @param      $seccode
+	 * @param null $user_id
+	 * @return int
+	 */
+	public function success_validate($challenge, $validate, $seccode, $user_id = null, $data='', $userinfo='', $json_format=1) {
+		if (!$this->check_validate($challenge, $validate)) {
+			return 0;
+		}
+		$query = array(
+				"seccode" => $seccode,
+				"data"=>$data,
+				"timestamp"=>time(),
+				"challenge"=>$challenge,
+				"userinfo"=>$userinfo,
+				"captchaid"=>$this->captcha_id,
+				"json_format"=>$json_format,
+				"sdk"     => self::GT_SDK_VERSION
+		);
+		if (($user_id != null) and (is_string($user_id))) {
+			$query["user_id"] = $user_id;
+		}
+		$url          = "http://api.geetest.com/validate.php";
+		$codevalidate = $this->post_request($url, $query);
+		$obj = json_decode($codevalidate);
+		if ($obj->{'seccode'} == md5($seccode)) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+	/**
+	 * 宕机模式获取验证结果
+	 *
+	 * @param $challenge
+	 * @param $validate
+	 * @param $seccode
+	 * @return int
+	 */
+	public function fail_validate($challenge, $validate, $seccode) {
+		if(md5($challenge) == $validate){
+			return 1;
+		}else{
+			return 0;
 		}
 	}
 

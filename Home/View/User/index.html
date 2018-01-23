@@ -62,160 +62,171 @@
         <div class="container">
             <div class="row">
                 <aside class="col-md-9 col-sm-8 ptb-15">
-                    <!--我的账户start-->
-                    <div class="panel-group chk-panel" id="accordion">
-                        <div class="panel">
-                            <div class="accordion-heading">
-                                <a class="title-2" data-toggle="collapse" data-parent="#accordion" href="#accordion-1" aria-expanded="true"> <span class="light-font">01. 我的 </span> <strong> 账户 </strong> </a>
-                            </div>
-                            <div id="accordion-1" class="panel-collapse collapse in">
-                                <div class="account-body">
-                                    <ul class="acnt-list">
-                                        <li>
-                                            <i class="fa fa-arrow-circle-o-right clr-txt"></i>
-                                            <a href="javascript:void(0);" > 修改 你的 账户 信息</a>
-                                        </li>
-                                        <li>
-                                            <i class="fa fa-arrow-circle-o-right clr-txt"></i>
-                                            <a href="cng-pw.html"> 修改 你的 登录密码</a>
-                                        </li>
-                                        <li>
-                                            <i class="fa fa-arrow-circle-o-right clr-txt"></i>
-                                            <a href="address-book.html"> 修改 你的 电子邮箱 地址</a>
-                                        </li>
-                                        <li>
-                                            <i class="fa fa-arrow-circle-o-right clr-txt"></i>
-                                            <a href="address-book.html"> 修改 你的 收货 地址</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="panel">
-                            <div class="accordion-heading">
-                                <a class="title-2" data-toggle="collapse" data-parent="#accordion" href="#accordion-2"> <span class="light-font">02. 订单 与 </span> <strong>  评论 </strong>  </a>
-                            </div>
-                            <div id="accordion-2" class="panel-collapse collapse">
-                                <div class="account-body">
-                                    <ul class="acnt-list">
-                                        <li>
-                                            <i class="fa fa-arrow-circle-o-right clr-txt"></i>
-                                            <a href="order-history.html"> 查看 你的 历史 订单</a>
-                                        </li>
-                                        <li>
-                                            <i class="fa fa-arrow-circle-o-right clr-txt"></i>
-                                            <a href="review-rating.html"> 你的 评论 与 等级</a>
-                                        </li>
-                                        <li>
-                                            <i class="fa fa-arrow-circle-o-right clr-txt"></i>
-                                            <a href="return.html"> View your retun requests</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="panel">
-                            <div class="accordion-heading">
-                                <a class="title-2" data-toggle="collapse" data-parent="#accordion" href="#accordion-3">  <span class="light-font">03.订阅 </span> <strong> 时事通讯 </strong> </a>
-                            </div>
-                            <div id="accordion-3" class="panel-collapse collapse">
-                                <div class="account-body">
-                                    <ul class="acnt-list">
-                                        <li>
-                                            <a href="newsletter.html"> 订阅 / 取消订阅 时事通讯</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!--我的账户end-->
-
                     <!--账户信息start-->
-                    <div class="account-wrap cart-box" id="info" style="display: none;">
-                        <form class="gray-control">
+                    <div class="account-wrap cart-box" id="info" >
+                        <form class="gray-control" id="User_form">
                             <div class="row">
-                                <div class="form-group col-sm-6">
-                                    <label> * 昵称 </label>
-                                    <input type="text" class="form-control" required="">
-                                </div>
-                                <!--后期改为span标签显示-->
-                                <div class="form-group col-sm-6">
-                                    <label> * 用户余额 </label>
-                                    <input type="text" class="form-control" required="">
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <label> * 用户积分 </label>
-                                    <input type="text" class="form-control" required="">
-                                </div>
-                                <!--后期改为span标签显示-->
-                                <div class="form-group col-sm-6">
+                                <div class="form-group col-sm-2">
                                     <label> * 头像 </label>
-                                    <input type="text" class="form-control" required="">
                                 </div>
-                                <div class="form-group col-sm-6">
-                                    <label> * 真实姓名 </label>
-                                    <input type="text" class="form-control" required="">
+                                <div class="form-group col-sm-10">
+                                    <div class="form-group">
+                                        <input type="file" value="" class="fileInput" id="fileInput" style="width: 100px;height: 100px;">
+                                        <img src="{$User['header_img']}" class="img-circle" alt="用户头像" style="width: 100px;"/>
+                                    </div>
                                 </div>
-                                <div class="form-group col-sm-6">
+                                <div class="form-group col-sm-2">
+                                    <label> * 昵称 </label>
+                                </div>
+                                <div class="form-group col-sm-10">
+                                    <input type="text" class="form-control" required="" name="username" value="{$User['username']}">
+                                </div>
+                                <div class="form-group col-sm-2">
+                                    <label> * 用户余额 </label>
+                                </div>
+                                <div class="form-group col-sm-10">
+                                    <input type="text" class="form-control"  value="{$User['balance']}" disabled>
+                                </div>
+                                <div class="form-group col-sm-2">
+                                    <label> * 用户积分 </label>
+                                </div>
+                                <div class="form-group col-sm-10">
+                                    <input type="text" class="form-control" value="{$User['integral']}" disabled>
+                                </div>
+                                <div class="form-group col-sm-2">
                                     <label> * 性别 </label>
-                                    <input type="text" class="form-control" required="">
                                 </div>
-                                <div class="form-group col-sm-6">
+                                <div class="form-group col-sm-10">
+                                    <div class="form-group">
+                                    <label class="checkbox-inline">
+                                        &emsp;&emsp;
+                                        <input type="checkbox" name="gender" value="男" <if condition=" $User['gender'] == '男' ">checked=""</if> > <span>男</span>&emsp;
+                                        <input type="checkbox" name="gender" value="女" <if condition=" $User['gender'] == '女' ">checked=""</if> > <span>女</span>&emsp;
+                                        <input type="checkbox" name="gender" value="保密" <if condition=" $User['gender'] == '保密' ">checked=""</if> > <span>保密</span>&emsp;
+                                    </label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-2">
                                     <label> * 生日 </label>
-                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <div class="form-group col-sm-10">
+                                    <div class="search-selectpicker selectpicker-wrapper">
+                                        <select class="selectpicker sel_year" data-width="20%" data-toggle="tooltip" tabindex="-98" name="year" rel="{$User['birthday_Y']}">
+                                        </select>&emsp;
+                                        <select class="selectpicker sel_month" data-width="20%" data-toggle="tooltip" tabindex="-98" name="month" rel="{$User['birthday_M']}">
+                                        </select>&emsp;
+                                        <select class="selectpicker sel_day" data-width="20%" data-toggle="tooltip" tabindex="-98" name="day" rel="{$User['birthday_D']}">
+                                        </select>&emsp;
+                                    </div>
                                 </div>
                                 <!--如果有电子邮箱，需要在后面添加是否激活的说明-->
-                                <div class="form-group col-sm-6">
+                                <div class="form-group col-sm-2">
                                     <label> * 电子邮箱 </label>
-                                    <input type="text" class="form-control" required="">
                                 </div>
-                                <div class="form-group col-sm-6">
+                                <div class="form-group col-sm-10">
+                                    <input type="text" class="form-control" name="email" value="{$User['email']}">
+                                    <if condition=" $User['is_check'] == 0 && $User['email'] != '' ">
+                                        &emsp;<a href="javascript:void(0);" onclick="show_huadong(this);">是否激活邮箱？</a>
+                                    </if>
+                                    <div style="display: none;">
+                                        <div id="embed-captcha" style="float: left;margin-right: 10px;"></div>
+                                        <p id="wait" class="show">正在加载验证码......</p>&emsp;
+                                        <a href="javascript:void(0);" class="theme-btn-sm-3 btn" id="embed-submit" style="float: left;margin-right: 10px;"> 发送邮件 </a>
+                                        <p id="notice" class="hide" style="float: left;margin-right: 10px;">请先完成验证</p>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-2">
                                     <label> 手机号码 </label>
-                                    <input type="text" class="form-control" required="">
                                 </div>
-                                <div class="form-group col-sm-6">
+                                <div class="form-group col-sm-10">
+                                    <input type="text" class="form-control" name="phone" value="{$User['phone']}">
+                                </div>
+                                <div class="form-group col-sm-2">
                                     <label> 微信</label>
-                                    <input type="text" class="form-control">
                                 </div>
-                                <div class="form-group col-sm-6">
+                                <div class="form-group col-sm-10">
+                                    <input type="text" class="form-control" name="weixin" value="{$User['weixin']}">
+                                </div>
+                                <div class="form-group col-sm-2">
                                     <label> QQ</label>
-                                    <input type="text" class="form-control">
                                 </div>
-                                <div class="form-group col-sm-6">
+                                <div class="form-group col-sm-10">
+                                    <input type="text" class="form-control" name="qq" value="{$User['qq']}">
+                                </div>
+                                <div class="form-group col-sm-2">
                                     <label> 微博</label>
-                                    <input type="text" class="form-control">
+                                </div>
+                                <div class="form-group col-sm-10">
+                                    <input type="text" class="form-control" name="weibo" value="{$User['weibo']}">
+                                </div>
+                                <div class="form-group col-sm-2">
+                                    <label> 第一次登录时间</label>
+                                </div>
+                                <div class="form-group col-sm-10">
+                                    <input type="text" class="form-control" name="create_time" disabled value="{$User['create_time']}">
+                                </div>
+                                <div class="form-group col-sm-2">
+                                    <label> 上次登录时间</label>
+                                </div>
+                                <div class="form-group col-sm-10">
+                                    <input type="text" class="form-control" name="last_login_time" disabled value="{$User['last_login_time']}">
                                 </div>
                                 <div class="pt-15 col-sm-12">
-                                    <button type="submit" class="theme-btn btn-black"> <b> 更新 </b> </button>
+                                    <button type="button" id="save_userinfo" class="theme-btn-sm-2 btn"> <b> 更新 </b> </button>
                                 </div>
                             </div>
                         </form>
                     </div>
                     <!--账户信息end-->
 
-                    <!--登录密码start-->
+                    <!--修改密码start-->
                     <div class="account-wrap cart-box" id="pass" style="display: none;">
                         <form class="gray-control">
                             <div class="row">
-                                <div class="form-group col-sm-6">
-                                    <label> * 新密码 </label>
-                                    <input type="text" class="form-control" required="">
+                                <div class="form-group col-sm-2">
+                                    <label> * 旧密码 </label>
                                 </div>
-                                <!--后期改为span标签显示-->
-                                <div class="form-group col-sm-6">
-                                    <label> * 发送邮件 </label>
-                                    <input type="text" class="form-control" required="">
+                                <div class="form-group col-sm-10">
+                                    <input type="text" class="form-control" required="" name="oldPass">
+                                </div>
+                                <div class="form-group col-sm-2">
+                                    <label> * 新密码 </label>
+                                </div>
+                                <div class="form-group col-sm-10">
+                                    <input type="text" class="form-control" required="" name="newPass">
+                                </div>
+                                <div class="form-group col-sm-2">
+                                    <label> * 重复新密码 </label>
+                                </div>
+                                <div class="form-group col-sm-10">
+                                    <input type="text" class="form-control" required="" name="reNewPass">
+                                </div>
+                                <div class="form-group col-sm-2">
+                                    <label> * 验证方式 </label>
+                                </div>
+                                <div class="form-group col-sm-10">
+                                    <if condition=" $User['email'] != '' &&  $User['phone'] != '' " >
+                                        <a href="javascript:void(0);" class="theme-btn-sm-3 btn" id="email_check" style="float: left;margin-right: 10px;"> 邮件验证 </a>
+                                        <a href="javascript:void(0);" class="theme-btn-sm-2 btn" id="phone_check" style="float: left;margin-right: 10px;"> 短信验证 </a>
+                                    <elseif condition=" $User['email'] != ''  && $User['phone'] == '' "/>
+                                        <a href="javascript:void(0);" class="theme-btn-sm-3 btn" id="email_check" style="float: left;margin-right: 10px;"> 邮件验证 </a>
+                                    <elseif condition=" $User['phone'] != '' &&$User['email'] == '' " />
+                                        <a href="javascript:void(0);" class="theme-btn-sm-2 btn" id="phone_check" style="float: left;margin-right: 10px;"> 短信验证 </a>
+                                    <else />
+                                        需要手机号或者邮箱才能修改密码
+                                    </if>
+                                        <div style="display: none;">
+                                            <input type="text" class="form-control" required=""><br/>
+                                            <input type="button" class="theme-btn-sm-3 btn" />
+                                        </div>
                                 </div>
                                 <div class="pt-15 col-sm-12">
-                                    <button type="submit" class="theme-btn btn-black"> <b> 更新 </b> </button>
+                                    <button type="button" id="save_pass" class="theme-btn-sm-2 btn"> <b> 更新 </b> </button>
                                 </div>
                             </div>
                         </form>
                     </div>
-                    <!--登录密码end-->
+                    <!--修改密码end-->
 
                     <!--收货地址start-->
                     <div class="account-wrap" id="addr" style="display: none;">
@@ -261,7 +272,7 @@
                                 </div>
                                 <div class="form-group col-sm-6">
                                     <label> Email </label>
-                                    <input type="email" class="form-control" required="">
+                                    <input type="" class="form-control" required="">
                                 </div>
                                 <div class="form-group col-sm-6">
                                     <label> Phone Number </label>
@@ -292,7 +303,7 @@
                                 <tr>
                                     <td class="image">
                                         <div class="white-bg">
-                                            <a class="media-link" href="#"><img src="__PUBLIC__/Home/img/extra/cart-1.png" alt=""></a>
+                                            <a class="media-link" href="javascript:void(0);"><img src="__PUBLIC__/Home/img/extra/cart-1.png" alt=""></a>
                                         </div>
                                     </td>
                                     <td class="description">
@@ -305,7 +316,7 @@
                                         </div>
                                         <h6 class="fsz-12 gray-color"> Overall Rating : 5/5 </h6>
                                         <div class="divider-2"></div>
-                                        <h3 class="product-title no-margin"> <a href="#"> <span class="light-font">organic </span> <strong>almonds </strong> </a> </h3>
+                                        <h3 class="product-title no-margin"> <a href="javascript:void(0);"> <span class="light-font">organic </span> <strong>almonds </strong> </a> </h3>
                                         <h6>DRY FRUITS</h6>
                                     </td>
                                     <td>
@@ -318,9 +329,9 @@
                                     </td>
                                     <td>
                                         <div class="order-status pt-15">
-                                            <a href="#" class="theme-btn-sm-2 btn">付款</a>
+                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn">付款</a>
                                             <br/>
-                                            <a href="#" class="theme-btn-sm-3 btn"> Re Order </a>
+                                            <a href="javascript:void(0);" class="theme-btn-sm-3 btn"> Re Order </a>
                                         </div>
                                     </td>
                                 </tr>
@@ -336,6 +347,28 @@
                     </div>
                     <!--历史订单end-->
 
+                    <!--我的收藏start-->
+                    <div class="account-wrap cart-box" id="heart" style="display: none;">
+                        <form class="gray-control">
+                            <div class="row">
+                                <div class="form-group col-sm-6">
+                                    <label> *  </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <!--后期改为span标签显示-->
+                                <div class="form-group col-sm-6">
+                                    <label> *  </label>
+                                    <input type="text" class="form-control" required="">
+                                </div>
+                                <div class="pt-15 col-sm-12">
+                                    <button type="submit" class="theme-btn btn-black"> <b> 更新 </b> </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <!--我的收藏end-->
+
+                    <!--时事通讯start-->
                     <div class="account-wrap" id="subscribe" style="display: none;">
                         <form class="">
                             <div class="row">
@@ -352,6 +385,7 @@
                             </div>
                         </form>
                     </div>
+                    <!--时事通讯end-->
 
                 </aside>
 
@@ -393,14 +427,15 @@
 <script src="__PUBLIC__/Home/js/plugin/bootstrap.min.js"></script>
 <script src="__PUBLIC__/Home/js/plugin/bootstrap-select.min.js"></script>
 <script src="__PUBLIC__/Home/js/plugin/owl.carousel.min.js"></script>
-
-
+<script src="/Public/Plugins/layer/2.4/layer.js"></script>
+<script src="__PUBLIC__/Plugins/jcrop/imagecropper.js"></script>
 <!-- Custom JS -->
 <script src="__PUBLIC__/Home/js/theme.js"></script>
 <!--自定义js-->
 <script src="__PUBLIC__/Home/js/index.js"></script>
 <script src="__PUBLIC__/Home/js/myAccount.js"></script>
-
+<script src="__PUBLIC__/Home/js/birthday.js"></script>
+<script src="__PUBLIC__/Home/js/gt.js"></script>
 
 </body>
 </html>
