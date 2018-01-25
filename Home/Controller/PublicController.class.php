@@ -108,9 +108,9 @@ class PublicController extends Controller{
 				cookie('userinfo_id',$user['id']);
 				//调用cart模型 cookieTodb方法,迁移购物车数据
 				D('cart')->cookieTodb();
-				$data['id'] = session('userinfo.id');
-				$data['last_login_time'] = time();
-				D('User') -> save($data);
+				$save['id'] = session('userinfo.id');
+				$save['last_login_time'] = time();
+				M('User') -> save($save);
 				$this -> ajaxReturnData();
 
 			}else{
@@ -123,17 +123,36 @@ class PublicController extends Controller{
 	}
 
 	//发送邮件激活
-	public function sendEmail(){
+	public function sendEmail($type){
 		!IS_POST && !IS_AJAX ? $this -> ajaxReturnData(0,'访问方式错误') : true;
+		if(isset($type)){
+			$type = $type;
+		}else{
+			I('post.type','','string') ? $type = I('post.type','','string') : $this -> ajaxReturnData(0,'参数错误');//是否存在传递类型
+		}
 		$sendtime = session('sendtime') ? session('sendtime') : 0;//是否存在过期时间
 		time() - $sendtime < 300 ? $this -> ajaxReturnData(0,'发送太频繁，请稍后再试！') : true;//限制发送频率 300秒
 		$model = D('User');
 		$data['id'] = session('userinfo.id');//获取当前用户id
-		$email = I('post.e','','string') ? I('post.e','','string') : $model -> where(['id' => $data['id']]) -> getField('email');//注册页面传递邮箱，重置密码页面不传递邮箱
+		$email = I('post.e','','string') ? I('post.e','','string') : $model -> where(['id' => $data['id']]) -> getField('email');//注册页面传递邮箱参数，重置密码页面从数据库获取邮箱
 		$data['email_code'] = rand(100000,999999);//生成邮箱验证码
 		$res_save = M('User') -> save($data);//保存邮箱验证码
 		$res_save !== false ? true : $this -> ajaxReturnData(0,'保存邮箱验证码失败！');
-		$res = sendmail($email,$data['id'],$data['email_code']);//发送邮件
+		if($type == 'jihuo'){
+			//商城激活模板
+			$body = "<html><head><title>零玖一</title></head><body>
+					<div style='width:90%;padding:30px;'><p>尊敬的用户：</p><p>您好，感谢您注册零玖一！</p>
+					<p>您的激活验证码为：<span style='color:blue'>{$data['email_code']}</span>，30分钟内此验证码有效！</p>
+					<p>如您未做出此操作，可能是他人误填，请忽略此邮件。</p><p>本邮件为系统发送，请勿回复。</p></div></body></html>";
+		}elseif($type == 'repass'){
+			//重置密码模板
+			$body = "<html><head><title>零玖一</title></head><body>
+					<div style='width:90%;padding:30px;'><p>尊敬的用户：</p>
+					<p>我们已经收到您修改密码的请求，您的修改密码验证码为：<span style='color:blue'>{$data['email_code']}</span>
+					，30分钟内此验证码有效！</p>
+					<p>如您未做出此操作，可能是他人误填，请忽略此邮件。</p><p>本邮件为系统发送，请勿回复。</p></div></body></html>";
+		}
+		$res = sendmail($email,$body);//发送邮件
 		session('sendtime',time());//设置过期时间
 		$res !== true ? $this -> ajaxReturnData(0,'发送失败',$res) : $this -> ajaxReturnData();
 
@@ -145,8 +164,25 @@ class PublicController extends Controller{
 		time() - $sendtime < 300 ? $this -> ajaxReturnData(0,'发送太频繁，请稍后再试！') : true;
 		$model = D('User');
 		$data['id'] = session('userinfo.id');
+		$code = rand(1000, 9999);//短信验证码
+		$minute = 300/60;
 		$phone = I('post.p','','string') ? I('post.p','','string') : $model -> where(['id' => $data['id']]) -> getField('phone');//注册页面传递手机号，重置密码页面不传递手机号
-		$url = "https://api.miaodiyun.com/20150822/industrySMS/sendSMS";
+		$url = "https://api.miaodiyun.com/20150822/industrySMS/sendSMS";//请求地址
+		$accountSid = C('MIAODIYUN_CONFIG.ACCOUNT_SID');
+		$authToken  = C('MIAODIYUN_CONFIG.AUTH_TOKEN');
+		$timestamp  = date('YmdHis');
+		$data = array(
+			'accountSid'   => C('MIAODIYUN_CONFIG.ACCOUNT_SID'),   //开发者主账号ID
+			'smsContent'   => "【零玖一】您的验证码为{1}，请于{2}分钟内正确输入，如非本人操作，请忽略此短信。",    //短信内容
+			'templateid'   => '164837011',
+			'param'        => $code.','.$minute,
+			'to'           => $phone,
+			'timestamp'    => $timestamp,  //时间戳 yyyyMMddHHmmss
+			'sig'          => MD5($accountSid.$authToken.$timestamp),   //签名
+			'respDataType' => 'JSON',    //响应数据类型，JSON 或 XML 格式
+		);
+		$res = curl_request($url,true,$data);
+		echo $res;
 
 	}
 
@@ -220,7 +256,7 @@ class PublicController extends Controller{
 		}
 //		$code_flag ? $this -> sendEmail() : $this -> ajaxReturnData(0,'验证未通过');// 如果验证码验证成功，再进行其他校验
 		session_start();
-		$this -> sendEmail();
+		$this -> sendEmail($type = 'jihuo');
 	}
 
 	//初始化及获取字符串（API1）

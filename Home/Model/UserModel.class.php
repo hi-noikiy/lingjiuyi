@@ -17,8 +17,9 @@ class UserModel extends Model{
 		array('phone','','手机号码已被注册','0','unique'),
 
 		array('password','require','密码不能为空!'),
+		array('oldpassword','require','密码不能为空!'),
 		array('repassword','require','确认密码不能为空!'),
-		array('password','repassword','密码输入不一致','0','confirm'),
+		array('password','repassword','两次密码输入不一致','0','confirm'),
 
 	);
 

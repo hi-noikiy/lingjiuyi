@@ -37,8 +37,8 @@ class GoodsController extends CommonController {
         IS_AJAX && IS_GET ? true : $this -> ajaxReturnData(0,'访问方式错误');
         $goods_id = I('get.gid','','intval');
         $where = "goods_id = $goods_id";
-        $filed = 'a.*,b.username,b.header_img';
-        $comment = D('Comment') -> field($filed) -> alias('a') -> where($where) -> join('zhouyuting_user b on a.user_id = b.id') -> select();
+        $fileds = 'a.*,b.username,b.header_img';
+        $comment = D('Comment') -> field($fileds) -> alias('a') -> where($where) -> join('zhouyuting_user b on a.user_id = b.id') -> select();
         foreach($comment as $key => $value){
             $comment[$key]['add_time'] = date('Y/m/d');
         }

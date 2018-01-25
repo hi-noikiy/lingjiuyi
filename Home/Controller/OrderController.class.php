@@ -151,7 +151,14 @@ class OrderController extends CommonController
                 $data['user_alipay'] = $WxOrPay;
             }
             $res = M('Order_img') -> add($data);
-            $res ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'提交失败！');
+            if($res){
+                $status['id'] = $order_id;
+                $status['pay_status'] = 2;
+                M('Order') -> save($status);//修改订单状态
+                $this -> ajaxReturnData();
+            }else{
+                $this -> ajaxReturnData(0,'提交失败！');
+            }
         }else{
             $this -> ajaxReturnData(0,'访问方式错误');
         }

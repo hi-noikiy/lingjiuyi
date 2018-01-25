@@ -98,12 +98,15 @@
                                 </div>
                                 <div class="form-group col-sm-10">
                                     <div class="form-group">
-                                    <label class="checkbox-inline">
-                                        &emsp;&emsp;
-                                        <input type="checkbox" name="gender" value="男" <if condition=" $User['gender'] == '男' ">checked=""</if> > <span>男</span>&emsp;
-                                        <input type="checkbox" name="gender" value="女" <if condition=" $User['gender'] == '女' ">checked=""</if> > <span>女</span>&emsp;
-                                        <input type="checkbox" name="gender" value="保密" <if condition=" $User['gender'] == '保密' ">checked=""</if> > <span>保密</span>&emsp;
-                                    </label>
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" name="gender" value="男" <if condition=" $User['gender'] == '男' ">checked=""</if> > <span>男</span>
+                                        </label>
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" name="gender" value="女" <if condition=" $User['gender'] == '女' ">checked=""</if> > <span>女</span>
+                                        </label>
+                                        <label class="checkbox-inline">
+                                            <input type="checkbox" name="gender" value="保密" <if condition=" $User['gender'] == '保密' ">checked=""</if> > <span>保密</span>
+                                        </label>
                                     </div>
                                 </div>
                                 <div class="form-group col-sm-2">
@@ -187,19 +190,19 @@
                                     <label> * 旧密码 </label>
                                 </div>
                                 <div class="form-group col-sm-10">
-                                    <input type="text" class="form-control" required="" name="oldPass">
+                                    <input type="password" class="form-control" required="" name="oldPass">
                                 </div>
                                 <div class="form-group col-sm-2">
                                     <label> * 新密码 </label>
                                 </div>
                                 <div class="form-group col-sm-10">
-                                    <input type="text" class="form-control" required="" name="newPass">
+                                    <input type="password" class="form-control" required="" name="newPass">
                                 </div>
                                 <div class="form-group col-sm-2">
                                     <label> * 重复新密码 </label>
                                 </div>
                                 <div class="form-group col-sm-10">
-                                    <input type="text" class="form-control" required="" name="reNewPass">
+                                    <input type="password" class="form-control" required="" name="reNewPass">
                                 </div>
                                 <div class="form-group col-sm-2">
                                     <label> * 验证方式 </label>
@@ -229,57 +232,87 @@
                     <!--修改密码end-->
 
                     <!--收货地址start-->
-                    <div class="account-wrap" id="addr" style="display: none;">
-                        <form class="">
+                    <div id="addr" style="display: none;">
+
+                        <volist name="Addr" id="val">
+                        <div  <if condition=" $val['default_addr'] == 1 " >class="form-group addr_active" <else /> class="form-group addr_cancel" </if> >
+                            <if condition=" $val['default_addr'] == 0 " >
+                                <label class="checkbox-inline" style="padding: 10px;">
+                                    <input type="checkbox" name="default" value="{$val['id']}" > <span>设为默认地址</span>
+                                </label>
+                                <a href="javascript:void(0);"><i class="fa fa-close" style="float: right;padding: 10px;" onclick="show_del_myAddress(this)"></i></a>
+                                <else />
+                                <label class="checkbox-inline" style="padding: 10px;">
+                                    <input type="hidden" name="default" value="{$val['id']}">
+                                </label>
+                                <a href="javascript:void(0);"><i class="fa fa-close" style="float: right;padding: 10px;" onclick="del_myAddress(this)"></i></a>
+                            </if>
+                            <table class="new_table">
+                                <tr>
+                                    <td><img src="/Public/Home/img/pay/user.png" style="width: 20px;"></td>
+                                    <td>&emsp;<span class="amount">{$val['consignee']}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><img src="/Public/Home/img/pay/tele.png" style="width: 20px;"></td>
+                                    <td>&emsp;<span class="amount">{$val['phone']}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><img src="/Public/Home/img/pay/zip.png" style="width: 20px;"></td>
+                                    <td>&emsp;<span>{$val['zipcode']}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><img src="/Public/Home/img/pay/dizhi.png" style="width: 20px;"></td>
+                                    <td>&emsp;<span>{$val['address']}</span></td>
+                                </tr>
+                            </table>
+                        </div>
+                        </volist>
+                        <div class="pt-15 col-sm-12">
+                            <button type="button" id="add_addr" class="theme-btn-sm-2 btn"> <b> 添加收货地址 </b> </button>
+                        </div>
+                        <form class="" style="display: none;" id="addr_form">
                             <div class="row">
                                 <div class="form-group col-sm-6">
-                                    <label> Address-1 </label>
-                                    <input type="text" class="form-control" required="">
+                                    <label> * 收货人姓名 </label>
+                                    <input type="text" name="name" class="form-control" required="">
                                 </div>
                                 <div class="form-group col-sm-6">
-                                    <label> Address-2 </label>
-                                    <input type="text" class="form-control" required="">
+                                    <label> * 收货人手机号 </label>
+                                    <input type="text" name="tele" class="form-control" required="">
                                 </div>
-                                <div class="form-group col-sm-6">
-                                    <label> Country </label>
+                                <div class="form-group col-sm-12">
+                                    <label> * 收货地址</label>
                                     <div class="search-selectpicker selectpicker-wrapper">
-                                        <select class="selectpicker" data-width="100%" data-toggle="tooltip" tabindex="-98">
-                                            <option> 请选择 </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <label>  State/Province  </label>
-                                    <div class="search-selectpicker selectpicker-wrapper">
-                                        <select class="selectpicker" data-width="100%" data-toggle="tooltip" tabindex="-98">
-                                            <option> 请选择 </option>
-                                        </select>
-                                    </div>
-                                </div>
-                                <div class="form-group col-sm-6">
-                                    <label>  City  </label>
-                                    <div class="search-selectpicker selectpicker-wrapper">
-                                        <div class="btn-group bootstrap-select" style="width: 100%;">
-                                            <select class="selectpicker" data-width="100%" data-toggle="tooltip" tabindex="-98">
+                                        <div class="form-group col-sm-4">
+                                            <select class="selectpicker" data-width="100%" data-toggle="tooltip" tabindex="-98" id="d1" name="addr">
+                                                <option> 请选择 </option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-sm-4">
+                                            <select class="selectpicker" data-width="100%" data-toggle="tooltip" tabindex="-98" id="d2" name="addr">
+                                                <option> 请选择 </option>
+                                            </select>
+                                        </div>
+                                        <div class="form-group col-sm-4">
+                                            <select class="selectpicker" data-width="100%" data-toggle="tooltip" tabindex="-98" id="d3" name="addr">
                                                 <option> 请选择 </option>
                                             </select>
                                         </div>
                                     </div>
                                 </div>
-                                <div class="form-group col-sm-6">
-                                    <label> Zip/Postal Code </label>
-                                    <input type="text" class="form-control" required="">
+                                <div class="form-group col-sm-8">
+                                    <label> * 详细地址 </label>
+                                    <input type="text" name="addrinfo" class="form-control" required="">
                                 </div>
-                                <div class="form-group col-sm-6">
-                                    <label> Email </label>
-                                    <input type="" class="form-control" required="">
+                                <div class="form-group col-sm-4">
+                                    <label> * 邮编 </label>
+                                    <input type="text" name="zipcode" class="form-control" required="" disabled>
                                 </div>
-                                <div class="form-group col-sm-6">
-                                    <label> Phone Number </label>
-                                    <input type="text" class="form-control" required="">
-                                </div>
-                                <div class="pt-15 col-sm-12">
-                                    <button type="submit" class="theme-btn btn-black"> <b> Update </b> </button>
+                                <input type="hidden" name="address">
+                                <input type="hidden" name="zip">
+                                <div class="pt-15 col-sm-6">
+                                    <button type="button" class="theme-btn-sm-2 btn" onclick="add_myAddress()"> <b> 确定 </b> </button>
+                                    <button type="reset" class="theme-btn-sm-3 btn" onclick="cancel_add_myAddress()"> <b> 取消 </b> </button>
                                 </div>
                             </div>
                         </form>
@@ -288,83 +321,117 @@
 
                     <!--历史订单start-->
                     <div class="cart-table" id="order" style="display: none;">
-                        <form class="cart-form">
-                            <table class="product-table">
-                                <thead class="">
-                                <tr>
-                                    <th>商品详情</th>
-                                    <th></th>
-                                    <th>价格</th>
-                                    <th>购买日期</th>
-                                    <th>订单状态</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                <tr>
-                                    <td class="image">
-                                        <div class="white-bg">
-                                            <a class="media-link" href="javascript:void(0);"><img src="__PUBLIC__/Home/img/extra/cart-1.png" alt=""></a>
-                                        </div>
-                                    </td>
-                                    <td class="description">
-                                        <div class="rating">
-                                            <span class="star active"></span>
-                                            <span class="star active"></span>
-                                            <span class="star active"></span>
-                                            <span class="star active"></span>
-                                            <span class="star active"></span>
-                                        </div>
-                                        <h6 class="fsz-12 gray-color"> Overall Rating : 5/5 </h6>
-                                        <div class="divider-2"></div>
-                                        <h3 class="product-title no-margin"> <a href="javascript:void(0);"> <span class="light-font">organic </span> <strong>almonds </strong> </a> </h3>
-                                        <h6>DRY FRUITS</h6>
-                                    </td>
-                                    <td>
-                                        <div class="price fontbold-2">
-                                            <strong class="fsz-14">$50.00 </strong>X<b class="fsz-14"> 1 </b>
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="text-center pt-20"> <b class="fsz-16"> 12th Dec'15 </b> </div>
-                                    </td>
-                                    <td>
-                                        <div class="order-status pt-15">
-                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn">付款</a>
-                                            <br/>
-                                            <a href="javascript:void(0);" class="theme-btn-sm-3 btn"> Re Order </a>
-                                        </div>
-                                    </td>
-                                </tr>
-
-                                </tbody>
-                            </table>
-
-                            <div class="continue-shopping text-center">
-                                <a href="javascript:void(0);" class="theme-btn btn"> 加载更多 </a>
+                        <div class="row">
+                            <div class="form-group col-sm-12">
+                                <div class="form-group col-sm-8"><label> 商品详情 </label></div>
+                                <div class="form-group col-sm-4"><label> 订单状态</label></div>
                             </div>
-
-                        </form>
+                            <div class="divider-full-1"></div>
+                            <volist name="Order" id="val">
+                                <div class="col-sm-12 order_box" order_id="{$val['id']}">
+                                    <div class="col-sm-12">
+                                        <h6>订单编号：{$val['order_sn']}
+                                            <strong class="fsz-12 gray-color" style="float: right;color: red;">{$val['status']}&emsp;&emsp;&emsp;&emsp;</strong>
+                                        </h6>
+                                    </div>
+                                    <div class="col-sm-8">
+                                        <volist name="val['Order_goods']" id="v">
+                                            <div class="col-sm-2">
+                                                <a href="/Goods/detail/id/{$v['goods_id']}"><img src="{$v['goods_small_img']}" alt="" style="width: 50px;"></a>
+                                            </div>
+                                            <div class="col-sm-10">
+                                                <span> $ {$v['goods_price']}元 (单价) <strong>X {$v['number']}</strong> (数量)</span>
+                                                <h6 class="fsz-12 gray-color">商品属性：{$v['attr_ids']} </h6>
+                                                <a href="/Goods/detail/id/{$v['goods_id']}" style="font-size: 10px;">{$v['goods_name']}</a>
+                                            </div>
+                                            <div class="divider-full-1" style="border-color: #fff;"></div>
+                                        </volist>
+                                    </div>
+                                    <div class="col-sm-4">
+                                        <span> 总价 ： $ {$val['order_amount']}元 </span>
+                                        <h6 class="fsz-12 gray-color"> 配送方式 ：{$val['shipping_type']} </h6>
+                                        <h6 class="fsz-12 gray-color" style="color:red;"> 支付状态 ：{$val['pay_status']} </h6>
+                                        <h6 class="fsz-12 gray-color p_type" >支付方式：{$val['pay_type']}</h6>
+                                        <h6 class="fsz-12 gray-color"> 购买时间 ：{$val['create_time']} </h6>
+                                    </div>
+                                    <div class="col-sm-12">
+                                        <h6 class="fsz-12 gray-color">收货地址：{$val['address_info']} </h6>
+                                    </div>
+                                    <div class="col-sm-12" style="text-align: right;">
+                                        <if condition="$val['order_status'] == 0 ">
+                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn" onclick="pay(this);">付款</a>&emsp;
+                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn">取消订单</a>&emsp;
+                                        <elseif condition="$val['order_status'] == 1 "/>
+                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn">提醒卖家发货</a>&emsp;
+                                        <elseif condition="$val['order_status'] == 2 "/>
+                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn">查看物流</a>&emsp;
+                                        <elseif condition="$val['order_status'] == 3 "/>
+                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn">评价</a>&emsp;
+                                        <elseif condition="$val['order_status'] == 4 "/>
+                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn">追加评价</a>&emsp;
+                                        </if>&emsp;&emsp;
+                                    </div>
+                                </div>
+                            </volist>
+                        </div>
+                        <if condition=" $OrderCount lt 10">
+                            <div class="text-center text-center-span">
+                                <span></span>
+                            </div>
+                            <else/>
+                            <div class="text-center text-center-order">
+                                <a href="javascript:void(0);" class="theme-btn-sm-3 btn" onclick="load_more()"> 加载更多 </a>
+                            </div>
+                        </if>
                     </div>
                     <!--历史订单end-->
 
                     <!--我的收藏start-->
-                    <div class="account-wrap cart-box" id="heart" style="display: none;">
-                        <form class="gray-control">
-                            <div class="row">
-                                <div class="form-group col-sm-6">
-                                    <label> *  </label>
-                                    <input type="text" class="form-control" required="">
-                                </div>
-                                <!--后期改为span标签显示-->
-                                <div class="form-group col-sm-6">
-                                    <label> *  </label>
-                                    <input type="text" class="form-control" required="">
-                                </div>
-                                <div class="pt-15 col-sm-12">
-                                    <button type="submit" class="theme-btn btn-black"> <b> 更新 </b> </button>
+                    <div class="cart-box" id="heart" style="display: none;">
+                        <div class="row">
+                            <volist name="Heart" id="val">
+                            <div class="col-lg-3 col-md-4 col-sm-6">
+                                <div class="item" gid="{$val['i']}">
+                                    <div class="product-box">
+                                        <div class="product-media" style="height: 250px;">
+                                            <img class="prod-img" alt="" src="{$val['si']}">
+                                            <img class="shape" alt="" src="/Public/Home/img/icons/shap-small.png">
+                                            <if condition=" $val['is_act'] == 1 " >
+                                            <span class="prod-tag tag-1">新品</span>
+                                            <span class="prod-tag tag-2">热销</span>
+                                            </if>
+                                            <div class="prod-icons">
+                                                <a href="javascript:void(0);" class="fa fa-heartbeat"></a>
+                                                <a href="javascript:void(0);" class="fa fa-shopping-basket"></a>
+                                                <a href="#product-preview" gid="1" data-toggle="modal" class="fa fa-expand"></a>
+                                            </div>
+                                        </div>
+                                        <div class="product-caption">
+                                            <h3 class="product-title">
+                                                <a href="/Index/shopSingle/id/{$val['i']}">
+                                                    <span class="light-font">  </span>
+                                                    <strong>{$val['an']}</strong>
+                                                </a>
+                                            </h3>
+                                            <div class="price">
+                                                <strong class="clr-txt">${$val['gp']} </strong> <del class="light-font">${$val['gb']} </del>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </form>
+                            </volist>
+                        </div>
+                        <if condition=" $HeartCount lt 10">
+                            <div class="text-center text-center-span">
+                                <span></span>
+                            </div>
+                        <else/>
+                            <div class="text-center text-center-heart">
+                                <a href="javascript:void(0);" class="theme-btn-sm-3 btn" onclick="load_heart()"> 加载更多 </a>
+                            </div>
+                        </if>
+
                     </div>
                     <!--我的收藏end-->
 
@@ -422,6 +489,8 @@
 </main>
 <!-- /WRAPPER -->
 
+<include file="Common/product"/>
+
 <!-- JS Global -->
 <script src="__PUBLIC__/Home/js/plugin/jquery-2.2.4.min.js"></script>
 <script src="__PUBLIC__/Home/js/plugin/bootstrap.min.js"></script>
@@ -436,7 +505,7 @@
 <script src="__PUBLIC__/Home/js/myAccount.js"></script>
 <script src="__PUBLIC__/Home/js/birthday.js"></script>
 <script src="__PUBLIC__/Home/js/gt.js"></script>
-
+<script src="/Public/H5/js/allcity.js"></script>
 </body>
 </html>
 

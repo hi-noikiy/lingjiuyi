@@ -175,18 +175,18 @@ class PayController extends CommonController {
 //                       <sign>$sign</sign>
 //                       </xml>";//拼接成XML 格式
             $post_data = "<xml>
-	<appid>wx02f1ef39672b54ca</appid>
-	<body>零玖一2018011715161748203750</body>
-	<mch_id>1327248801</mch_id>
-	<nonce_str>4a4fd08391865a1e012f912ae8cdeb6c</nonce_str>
-	<notify_url>http://sj.v-town.cc/pages/recharge.html</notify_url>
-	<out_trade_no>2018011715161748203750</out_trade_no>
-	<scene_info>{\"h5_info\":{\"type\":\"Wap\",\"wap_url\":\"http://www.123.com\",\"wap_name\":\"test\"}}</scene_info>
-	<spbill_create_ip>124.202.218.226</spbill_create_ip>
-	<total_fee>89900</total_fee>
-	<trade_type>MWEB</trade_type>
-	<sign>90570D24D5D2AD27BD28DE769ECFAE3C</sign>
-</xml>";//拼接成XML 格式
+                            <appid>wx02f1ef39672b54ca</appid>
+                            <body>零玖一2018011715161748203750</body>
+                            <mch_id>1327248801</mch_id>
+                            <nonce_str>4a4fd08391865a1e012f912ae8cdeb6c</nonce_str>
+                            <notify_url>http://sj.v-town.cc/pages/recharge.html</notify_url>
+                            <out_trade_no>2018011715161748203750</out_trade_no>
+                            <scene_info>{\"h5_info\":{\"type\":\"Wap\",\"wap_url\":\"http://www.123.com\",\"wap_name\":\"test\"}}</scene_info>
+                            <spbill_create_ip>124.202.218.226</spbill_create_ip>
+                            <total_fee>89900</total_fee>
+                            <trade_type>MWEB</trade_type>
+                            <sign>90570D24D5D2AD27BD28DE769ECFAE3C</sign>
+                        </xml>";//拼接成XML 格式
 
             $url = "https://api.mch.weixin.qq.com/pay/unifiedorder";//微信传参地址
             $dataxml = http_post($url,$post_data); //后台POST微信传参地址  同时取得微信返回的参数，http_post方法请看下文
@@ -253,9 +253,9 @@ class PayController extends CommonController {
 
         /**************************请求参数**************************/
         $payment_type = "1";                        //支付类型 //必填，不能修改
-        $notify_url = C('ALIPAY.notify_url');       //服务器异步通知页面路径
-        $return_url = C('ALIPAY.return_url');       //页面跳转同步通知页面路径
-        $seller_email = C('ALIPAY.seller_email');   //卖家支付宝帐户必填
+        $notify_url = C('ALIPAY_CONFIG.notify_url');       //服务器异步通知页面路径
+        $return_url = C('ALIPAY_CONFIG.return_url');       //页面跳转同步通知页面路径
+        $seller_email = C('ALIPAY_CONFIG.seller_email');   //卖家支付宝帐户必填
         $out_trade_no = $_POST['trade_no'];         //商户订单号 通过支付页面的表单进行传递，注意要唯一！
         $subject = $_POST['ordsubject'];            //订单名称 //必填 通过支付页面的表单进行传递
         $total_fee = $_POST['ordtotal_fee'];        //付款金额  //必填 通过支付页面的表单进行传递
@@ -331,7 +331,7 @@ class PayController extends CommonController {
                 echo "success";        //请不要修改或删除
             }else {
                 echo "trade_status=".$_GET['trade_status'];
-                $this->redirect(C('alipay.errorpage'));//跳转到配置项中配置的支付失败页面；
+                $this->redirect(C('ALIPAY_CONFIG.errorpage'));//跳转到配置项中配置的支付失败页面；
             }
 
         //}else {
@@ -360,10 +360,10 @@ class PayController extends CommonController {
                 $data['order_status'] = 1;//订单状态：1,待发货
                 $data['pay_status']   = 1;//支付状态：1已付款
                 D('Order') ->where("order_sn = $out_trade_no") -> save($data);
-                $this->redirect(C('alipay.successpage'));//跳转到配置项中配置的支付成功页面；
+                $this->redirect(C('ALIPAY_CONFIG.successpage'));//跳转到配置项中配置的支付成功页面；
             }else {
                 echo "trade_status=".$_GET['trade_status'];
-                $this->redirect(C('alipay.errorpage'));//跳转到配置项中配置的支付失败页面；
+                $this->redirect(C('ALIPAY_CONFIG.errorpage'));//跳转到配置项中配置的支付失败页面；
             }
         //}else {
             //验证失败

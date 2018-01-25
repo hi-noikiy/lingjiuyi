@@ -97,20 +97,18 @@ function getToken(){
 
 
 /**
- * @param $email String 收件人
- * @param $subject String 邮件主题
- * @param $body String 邮件内容
- * @return bool|string
- * 作者:周雨婷
- * 时间:
+ * @param $email 收件人
+ * @param $body 收件内容
+ * @return bool|string 是否发送成功
+ * @throws phpmailerException
+ * 作者: 周雨婷
+ * 时间: 2018-01-24
  * 描述：发送邮件
  */
-function sendmail($email,$id,$email_code){
+function sendmail($email,$body){
 
     $subject = '零玖一商城激活';
 
-    $url ="http://www.lingjiuyi.cn/Home/User/jihuo/id/{$id}/code/{$email_code}";
-    $body = "点击一下连接进行激活:<br /><a href='{$url}'>{$url}</a>;<br/>如果点击无法跳转,请复制以上链接直接在浏览器打开.";
     require_once './Application/Tools/PHPMailer/PHPMailerAutoload.php';
 
     $mail = new \PHPMailer();
