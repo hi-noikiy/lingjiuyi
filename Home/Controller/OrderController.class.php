@@ -165,5 +165,78 @@ class OrderController extends CommonController
 
     }
 
+    //取消订单
+    public function edit_MyOrder(){
+        !IS_POST && !IS_AJAX ? $this -> ajaxReturnData(0,'请求方式错误') : true;
+        $this -> check_login();
+
+        I('post.order_id','','intval') ? $id  = I('post.order_id','','intval') : $this -> ajaxReturnData(0,'订单编号错误');
+        I('post.type','','intval') ? $type = I('post.type','','intval') : $this -> ajaxReturnData(0,'类型错误');
+        //当前订单状态
+        $order = D('Order') -> find($id);
+        empty($order) ? $this -> ajaxReturnData(0,'没有此订单！') : true;
+
+        $data['id'] = $order['id'];
+
+        $uid = session('userinfo.id');
+        $uid == $order['user_id'] ? true : $this -> ajaxReturnData('订单编号和用户不一致！');//验证当前登录用户是否是订单用户
+
+        if($type == 5){
+            //申请退款
+            if($order['pay_status'] == 0 && $order['order_status'] == 0){
+                $data['pay_status']   = 2;
+                $data['order_status'] = 10;//未付款，直接取消订单即可
+            }elseif($order['pay_status'] == 1 && $order['order_status'] == 1){
+                $data['order_status'] = 5;//已付款，需要退钱,请求后台管理员退钱
+            }elseif($order['pay_status'] == 1 && $order['order_status'] == 2){
+                $data['order_status'] = 6;//退货退款
+            }else{
+                $this -> ajaxReturnData(0,'*订单状态错误*！');
+            }
+            $res = D('Order') -> save($data);
+            $res !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'取消订单失败！');
+        }elseif($type == 3){
+            //确认收货
+            if($order['pay_status'] == 1 && $order['order_status'] == 2){
+                $data['order_status'] = 3;
+            }else{
+                $this -> ajaxReturnData(0,'&订单状态错误&！');
+            }
+        }
+
+    }
+
+    //提醒发货
+    public function ajax_deliver(){
+        !IS_GET && !IS_AJAX ? $this -> ajaxReturnData(0,'请求方式错误') : true;
+        $this -> check_login();
+
+        I('get.id','','intval') ? $id = I('get.id','','intval') : $this -> ajaxReturnData(0,'参数错误');
+        $order_id = D('Order') -> find($id);
+        $time     = time();
+        $filename = 'Public/deliver.txt';
+        $res      = file_put_contents($filename,$order_id.":".$time.";\r\n",FILE_APPEND);
+
+        $res == false ? $this -> ajaxReturnData(0,'发送错误！') : $this -> ajaxReturnData();
+    }
+
+    //查看物流
+    public function ajax_logistics(){
+        !IS_POST && !IS_AJAX ? $this -> ajaxReturnData(0,'请求方式错误') : true;
+        $this -> check_login();
+
+        I('get.id','','intval') ? $id = I('get.id','','intval') : $this -> ajaxReturnData(0,'参数错误');
+        $data     = D('Order') -> field('shipping_type,express_sn') -> where("id = $id") -> find();
+        $params   = array(
+            'id'  => C('WULIU_KEY'),
+            'com' => cshipping_type($data['shipping_type']),
+            'nu'  => $data['express_sn']
+        );
+        $express  = curl_request('http://api.kuaidi.com/openapi.html?id='.$params['id'].'&com='.$params['com'].'&nu='.$params['nu']);
+        $res      = json_decode($express,true);
+        $res['success'] ? $this -> ajaxReturnData(10000,'success',$res['data']) : $this -> ajaxReturnData(0,'当前没有物流信息，请稍后再试！');
+    }
+
+
 
 }

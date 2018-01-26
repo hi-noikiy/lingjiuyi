@@ -11,4 +11,18 @@ class SettingModel extends Model {
         array('content','require','存放内容为必填！'),
     );
 
+    /**
+     * 获取配置信息写入缓存
+     */
+    public function setting_cache()
+    {
+        $setting = array();
+        $res     = $this->getField('name,content');
+        foreach ($res as $key => $val) {
+            $setting['zhouyuting_' . $key] = unserialize($val) ? unserialize($val) : $val;
+        }
+        F('setting', $setting);
+        return $setting;
+    }
+
 }

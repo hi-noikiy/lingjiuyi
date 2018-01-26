@@ -330,7 +330,7 @@
                             </div>
                             <div class="divider-full-1"></div>
                             <volist name="Order" id="val">
-                                <div class="col-sm-12 order_box" order_id="{$val['id']}">
+                                <div class="col-sm-12 order_box" order_id="{$val['id']}" status="{$val['order_status']}">
                                     <div class="col-sm-12">
                                         <h6>订单编号：{$val['order_sn']}
                                             <strong class="fsz-12 gray-color" style="float: right;color: red;">{$val['status']}&emsp;&emsp;&emsp;&emsp;</strong>
@@ -364,18 +364,18 @@
                                             <a href="javascript:void(0);" class="theme-btn-sm-2 btn" onclick="pay(this);">付款</a>&emsp;
                                             <a href="javascript:void(0);" class="theme-btn-sm-3 btn" onclick="cancel_order(this);">取消订单</a>&emsp;
                                         <elseif condition="$val['order_status'] == 1 "/>
-                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn">提醒卖家发货</a>&emsp;
+                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn" onclick="remind_deliverGoods(this);">提醒卖家发货</a>&emsp;
                                             <a href="javascript:void(0);" class="theme-btn-sm-3 btn" onclick="cancel_order(this);">取消订单</a>&emsp;
                                         <elseif condition="$val['order_status'] == 2 "/>
                                             <a href="javascript:void(0);" class="theme-btn-sm-2 btn" onclick="show_logistics(this)">查看物流</a>&emsp;
                                             <a href="javascript:void(0);" class="theme-btn-sm-3 btn" onclick="confirm_goods(this);">确认收货</a>&emsp;
-                                            <a href="javascript:void(0);" class="theme-btn-sm-3 btn" onclick="cancel_order(this);">取消订单</a>&emsp;
+                                            <a href="javascript:void(0);" class="theme-btn-sm-3 btn" onclick="cancel_order(this);">申请退货退款</a>&emsp;
                                         <elseif condition="$val['order_status'] == 3 "/>
-                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn">评价</a>&emsp;
-                                        <elseif condition="$val['order_status'] == 7 "/>
-                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn">填写退货信息</a>&emsp;
+                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn" onclick="comment(this);">评价</a>&emsp;
                                         <elseif condition="$val['order_status'] == 4 "/>
-
+                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn" onclick="again_comment(this);">追加评论</a>&emsp;
+                                        <elseif condition="$val['order_status'] == 7 "/>
+                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn" onclick="return_info(this);">填写退货信息</a>&emsp;
                                         </if>&emsp;&emsp;
                                     </div>
                                 </div>

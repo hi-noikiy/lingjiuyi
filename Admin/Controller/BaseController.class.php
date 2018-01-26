@@ -9,6 +9,12 @@ class BaseController extends Controller {
         if(!session('?username')) {
             $this->redirect('Admin/Public/login');
         }
+        //初始化网站配置
+        if (false === $setting = F('setting')) {
+            $setting = D('Setting') -> setting_cache();
+        }
+        C($setting);
+
         //检测是否拥有当前页面的访问权限
         $this->checkauth();
     }

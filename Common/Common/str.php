@@ -169,7 +169,7 @@ function order_status($status){
         case 9:
             return '退货成功，等待退款中...';
         case 10:
-            return '退款成功';
+            return '取消订单成功';
     }
 
 }
