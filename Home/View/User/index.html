@@ -224,7 +224,9 @@
                                         </div>
                                 </div>
                                 <div class="pt-15 col-sm-12">
+                                    <if condition="$User['email'] != '' ||  $User['phone'] != ''">
                                     <button type="button" id="save_pass" class="theme-btn-sm-2 btn"> <b> 更新 </b> </button>
+                                    </if>
                                 </div>
                             </div>
                         </form>
@@ -360,15 +362,20 @@
                                     <div class="col-sm-12" style="text-align: right;">
                                         <if condition="$val['order_status'] == 0 ">
                                             <a href="javascript:void(0);" class="theme-btn-sm-2 btn" onclick="pay(this);">付款</a>&emsp;
-                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn">取消订单</a>&emsp;
+                                            <a href="javascript:void(0);" class="theme-btn-sm-3 btn" onclick="cancel_order(this);">取消订单</a>&emsp;
                                         <elseif condition="$val['order_status'] == 1 "/>
                                             <a href="javascript:void(0);" class="theme-btn-sm-2 btn">提醒卖家发货</a>&emsp;
+                                            <a href="javascript:void(0);" class="theme-btn-sm-3 btn" onclick="cancel_order(this);">取消订单</a>&emsp;
                                         <elseif condition="$val['order_status'] == 2 "/>
-                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn">查看物流</a>&emsp;
+                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn" onclick="show_logistics(this)">查看物流</a>&emsp;
+                                            <a href="javascript:void(0);" class="theme-btn-sm-3 btn" onclick="confirm_goods(this);">确认收货</a>&emsp;
+                                            <a href="javascript:void(0);" class="theme-btn-sm-3 btn" onclick="cancel_order(this);">取消订单</a>&emsp;
                                         <elseif condition="$val['order_status'] == 3 "/>
                                             <a href="javascript:void(0);" class="theme-btn-sm-2 btn">评价</a>&emsp;
+                                        <elseif condition="$val['order_status'] == 7 "/>
+                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn">填写退货信息</a>&emsp;
                                         <elseif condition="$val['order_status'] == 4 "/>
-                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn">追加评价</a>&emsp;
+
                                         </if>&emsp;&emsp;
                                     </div>
                                 </div>
@@ -393,7 +400,7 @@
                             <div class="col-lg-3 col-md-4 col-sm-6">
                                 <div class="item" gid="{$val['i']}">
                                     <div class="product-box">
-                                        <div class="product-media" style="height: 250px;">
+                                        <div class="product-media" style="height: 200px;">
                                             <img class="prod-img" alt="" src="{$val['si']}">
                                             <img class="shape" alt="" src="/Public/Home/img/icons/shap-small.png">
                                             <if condition=" $val['is_act'] == 1 " >
@@ -441,13 +448,12 @@
                             <div class="row">
                                 <div class="col-sm-6">
                                     <div class="form-group subscribe-group">
-                                        <label class="upper-text"> Subscribe: </label>
-                                        <label class="radio-inline"><input type="radio" value="" name="subscribe"> <span class="square-box"></span> <span>Yes</span> </label>
-                                        <label class="radio-inline"><input type="radio" value="" name="subscribe"> <span class="square-box"></span> <span>No</span> </label>
+                                        <label class="upper-text"> 订阅: </label>
+                                        <label class="radio-inline"><input type="radio" value="1" name="subscribe" <if condition=" $User['is_subscribe'] == 1">checked</if>> <span class="square-box"></span> <span>Yes</span> </label>
+                                        <label class="radio-inline"><input type="radio" value="0" name="subscribe" <if condition=" $User['is_subscribe'] == 0">checked</if>> <span class="square-box"></span> <span>No</span> </label>
                                     </div>
                                 </div>
                                 <div class="pt-15 col-sm-12">
-                                    <button type="submit" class="theme-btn btn-black"> <b> Update </b> </button>
                                 </div>
                             </div>
                         </form>

@@ -106,6 +106,7 @@ class UserController extends CommonController{
                 $Order[$key]['Order_goods'][$k]['simg']  = $v['goods_small_img'];
                 $Order[$key]['Order_goods'][$k]['price'] = $v['goods_price'];
                 $Order[$key]['Order_goods'][$k]['name']  = $v['goods_name'];
+                $Order[$key]['Order_goods'][$k]['num']   = $v['number'];
             }
         }
         empty($Order) ? $this -> ajaxReturnData(0,'没有更多了') : $this -> ajaxReturnData(10000,'success',$Order);
@@ -346,6 +347,13 @@ class UserController extends CommonController{
         $this -> check_login();
         $data['id'] = session('userinfo.id');
 
+        $subscribe = I('post.subscribe','','intval');//接收订阅参数
+        if($subscribe === 0 || $subscribe === 1){
+            $data['is_subscribe'] = $subscribe;//判断订阅参数是否正确,如果正确则只是修改订阅信息
+            $res = M('User') -> save($data);
+            $res !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'修改订阅失败！');
+        }
+
         I('post.username','','string') ? $data['username']  = I('post.username','','string')  : $this -> ajaxReturnData(0,'用户名不能为空');
         I('post.gender','','string')   ? $data['gender']    = I('post.gender','','string')    : $this -> ajaxReturnData(0,'性别不能为空');
         I('post.year','','string')     ? $data['birthday']  = I('post.year','','string').'-'  : $this -> ajaxReturnData(0,'出生年份不能为空');
@@ -356,6 +364,7 @@ class UserController extends CommonController{
         I('post.weixin','','string')   ? $data['weixin']    = I('post.weixin','','string') : false;
         I('post.qq','','string')       ? $data['qq']        = I('post.qq','','string')     : false;
         I('post.weibo','','string')    ? $data['weibo']     = I('post.weibo','','string')  : false;
+
 
         isset($data['email']) && (filter_var($data['email'], FILTER_VALIDATE_EMAIL) == false) ? $this -> ajaxReturnData(0,'邮箱格式不正确') : true;
         isset($data['phone']) && (preg_match('/^\d{11}$/', $data['phone']) == false) ? $this -> ajaxReturnData(0,'手机号码格式不正确') : true;

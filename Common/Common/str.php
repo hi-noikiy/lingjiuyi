@@ -157,17 +157,19 @@ function order_status($status){
         case 3:
             return '已收货';
         case 4:
-            return '已评价';
+            return '已完成';
         case 5:
-            return '取消订单';
+            return '申请退款中';
         case 6:
             return '申请退货/退款中';
         case 7:
-            return '退货成功';
+            return '可退货';
         case 8:
-            return '退款成功';
+            return '等待卖家确认收货';
         case 9:
-            return '申请退款中';
+            return '退货成功，等待退款中...';
+        case 10:
+            return '退款成功';
     }
 
 }

@@ -140,19 +140,21 @@ class PublicController extends Controller{
 		$res_save !== false ? true : $this -> ajaxReturnData(0,'保存邮箱验证码失败！');
 		if($type == 'jihuo'){
 			//商城激活模板
+			$subject = '零玖一商城激活';
 			$body = "<html><head><title>零玖一</title></head><body>
 					<div style='width:90%;padding:30px;'><p>尊敬的用户：</p><p>您好，感谢您注册零玖一！</p>
 					<p>您的激活验证码为：<span style='color:blue'>{$data['email_code']}</span>，30分钟内此验证码有效！</p>
 					<p>如您未做出此操作，可能是他人误填，请忽略此邮件。</p><p>本邮件为系统发送，请勿回复。</p></div></body></html>";
 		}elseif($type == 'repass'){
 			//重置密码模板
+			$subject = '零玖一商城修改密码';
 			$body = "<html><head><title>零玖一</title></head><body>
 					<div style='width:90%;padding:30px;'><p>尊敬的用户：</p>
 					<p>我们已经收到您修改密码的请求，您的修改密码验证码为：<span style='color:blue'>{$data['email_code']}</span>
 					，30分钟内此验证码有效！</p>
 					<p>如您未做出此操作，可能是他人误填，请忽略此邮件。</p><p>本邮件为系统发送，请勿回复。</p></div></body></html>";
 		}
-		$res = sendmail($email,$body);//发送邮件
+		$res = sendmail($email,$subject,$body);//发送邮件
 		session('sendtime',time());//设置过期时间
 		$res !== true ? $this -> ajaxReturnData(0,'发送失败',$res) : $this -> ajaxReturnData();
 

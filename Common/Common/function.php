@@ -98,6 +98,7 @@ function getToken(){
 
 /**
  * @param $email 收件人
+ * @param $subject 邮件标题
  * @param $body 收件内容
  * @return bool|string 是否发送成功
  * @throws phpmailerException
@@ -105,10 +106,7 @@ function getToken(){
  * 时间: 2018-01-24
  * 描述：发送邮件
  */
-function sendmail($email,$body){
-
-    $subject = '零玖一商城激活';
-
+function sendmail($email,$subject,$body){
     require_once './Application/Tools/PHPMailer/PHPMailerAutoload.php';
 
     $mail = new \PHPMailer();

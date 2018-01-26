@@ -36,8 +36,8 @@ class ApiController extends Controller{
             //添加用户信息
             $gender = $user_message['gender'] == 'f' ? '女' : ($user_message['gender'] == 'm' ? '男' : '保密');
             $user = array(
-                'username'        => $user_message['screen_name'],       //用户名称
-                'password'        => encrypt_pwd('123456'),              //初始密码
+                'username'        => 'user'.time(),       //用户名称
+                'password'        => encrypt_pwd('123456abc'),              //初始密码
                 'last_login_time' => time(),
                 'create_time'     => time(),
                 'weibo'           => $user_message['screen_name'],       //用户名称
@@ -48,7 +48,7 @@ class ApiController extends Controller{
             $res = D('User') -> add($user);
             $userinfo = D('User') -> find($res);
             session('userinfo',$userinfo);
-            $msg = $res ? '登录成功！初始密码为123456' : '创建账号失败！';
+            $msg = $res ? '登录成功！初始密码为123456abc' : '创建账号失败！';
         }
         if(!session('?userinfo')){
             $msg = '登录失败';
