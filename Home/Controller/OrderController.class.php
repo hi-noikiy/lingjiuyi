@@ -199,6 +199,8 @@ class OrderController extends CommonController
             //确认收货
             if($order['pay_status'] == 1 && $order['order_status'] == 2){
                 $data['order_status'] = 3;
+                $res = D('Order') -> save($data);
+                $res !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'取消订单失败！');
             }else{
                 $this -> ajaxReturnData(0,'&订单状态错误&！');
             }
@@ -235,6 +237,20 @@ class OrderController extends CommonController
         $express  = curl_request('http://api.kuaidi.com/openapi.html?id='.$params['id'].'&com='.$params['com'].'&nu='.$params['nu']);
         $res      = json_decode($express,true);
         $res['success'] ? $this -> ajaxReturnData(10000,'success',$res['data']) : $this -> ajaxReturnData(0,'当前没有物流信息，请稍后再试！');
+    }
+
+    //获取需要评论的商品信息
+    public function get_comment_goods(){
+        I('get.id','','intval') ? $id = I('get.id','','intval') : $this -> ajaxReturnData(0,'参数错误！');
+        $goods = D('Order') -> alias('a') -> field('a.user_id uid,b.id order_goods_id,b.goods_id gid,c.goods_small_img img') -> where("a.id = $id") -> join('zhouyuting_order_goods b on a.id = b.order_id') -> join('zhouyuting_goods c on b.goods_id = c.goods_id') -> select();
+        $goods[0]['uid'] == session('userinfo.id') ? true : $this -> ajaxReturnData(0,'用户与订单不符！');
+        empty($goods) ? $this -> ajaxReturnData(0,'没有订单！') : $this -> ajaxReturnData(10000,'success',$goods);
+    }
+
+    //添加商品评论
+    public function add_comment(){
+        var_dump($_POST);
+        var_dump($_FILES);
     }
 
 

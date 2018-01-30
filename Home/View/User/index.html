@@ -373,7 +373,7 @@
                                         <elseif condition="$val['order_status'] == 3 "/>
                                             <a href="javascript:void(0);" class="theme-btn-sm-2 btn" onclick="comment(this);">评价</a>&emsp;
                                         <elseif condition="$val['order_status'] == 4 "/>
-                                            <a href="javascript:void(0);" class="theme-btn-sm-2 btn" onclick="again_comment(this);">追加评论</a>&emsp;
+                                            <!--<a href="javascript:void(0);" class="theme-btn-sm-2 btn" onclick="again_comment(this);">追加评论</a>&emsp;-->
                                         <elseif condition="$val['order_status'] == 7 "/>
                                             <a href="javascript:void(0);" class="theme-btn-sm-2 btn" onclick="return_info(this);">填写退货信息</a>&emsp;
                                         </if>&emsp;&emsp;
@@ -497,6 +497,46 @@
 
 <include file="Common/product"/>
 
+<!--COMMENT START-->
+<div class="add-your-review" style="display: none;">
+    <div class="your-review-comment" style="padding: 20px;">
+        <h3 class="fsz-20 pb-15 text-center"><span class="light-font">填写你的</span> <strong>订单评论 </strong>  </h3>
+        <div class="divider-full-1"></div>
+        <!--评论商品-->
+    </div>
+    <div class="divider-full-1"></div>
+    <div class="form-group col-sm-12">
+        <div class="form-group col-sm-12">
+            <div class="rating w_star">
+                <span class="fsz-12 gray-color"> 物流服务 :  </span>
+                <span class="star"></span>
+                <span class="star"></span>
+                <span class="star"></span>
+                <span class="star"></span>
+                <span class="star"></span>
+            </div>
+            <div class="rating f_star">
+                <span class="fsz-12 gray-color"> 服务态度 :  </span>
+                <span class="star"></span>
+                <span class="star"></span>
+                <span class="star"></span>
+                <span class="star"></span>
+                <span class="star"></span>
+            </div>
+        </div>
+        <div class="form-group col-sm-12">
+            <div class="gouxuan"></div><span style="line-height: 25px;">匿名</span>
+            <div  style="float: right;">
+                你写的评论会以匿名的形式展现
+            </div>
+        </div>
+        <div class="form-group col-sm-12 text-center ptb-15">
+            <button class="theme-btn" type="button" onclick="save_comment(this);"> <strong> 提交评论 </strong> </button>
+        </div>
+    </div>
+</div>
+<!--COMMENT END-->
+
 <!-- JS Global -->
 <script src="__PUBLIC__/Home/js/plugin/jquery-2.2.4.min.js"></script>
 <script src="__PUBLIC__/Home/js/plugin/bootstrap.min.js"></script>
@@ -512,6 +552,7 @@
 <script src="__PUBLIC__/Home/js/birthday.js"></script>
 <script src="__PUBLIC__/Home/js/gt.js"></script>
 <script src="/Public/H5/js/allcity.js"></script>
+<script src="/Public/Plugins/ajaxfileuploader/ajaxfileupload.js"></script>
 </body>
 </html>
 
