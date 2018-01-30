@@ -288,3 +288,17 @@ function request_by_curl($remote_server,$post_string,$upToken) {
     return $data;
 }
 
+/**
+ * @param $string
+ * @return bool
+ * 作者:周雨婷
+ * 时间:2018-01-30
+ * 描述：简单过滤敏感词汇
+ */
+function filter_vocabulary($string,$allergicWord){
+    $arrayWord    = explode(',',$allergicWord);
+    $badword1     = array_combine($arrayWord,array_fill(0,count($arrayWord),'*'));
+    $result       = strtr($string, $badword1);
+    return $result;
+}
+

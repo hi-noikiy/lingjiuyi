@@ -35,6 +35,12 @@
                 $adminmodel = D('Admin');
                 //调用模型里面的login方法
                 if($adminmodel->login($username,$password)) {
+                    //初始化网站配置
+                    $setting = F('setting');
+                    if (false === $setting) {
+                        $setting = D('Setting') -> setting_cache();
+                    }
+                    C($setting);
                     $this->success('登录成功',U('Index/index'));exit;
                 } else {
                     $this->error('用户名或密码错误');

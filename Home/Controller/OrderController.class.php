@@ -2,6 +2,8 @@
 namespace Home\Controller;
 use Think\Controller;
 use Think\Model;
+require_once './Application/Tools/Qiniu/autoload.php';
+use Qiniu\Auth;
 class OrderController extends CommonController
 {
 
@@ -241,6 +243,9 @@ class OrderController extends CommonController
 
     //获取需要评论的商品信息
     public function get_comment_goods(){
+        !IS_GET && !IS_AJAX ? $this -> ajaxReturnData(0,'请求方式错误') : true;
+        $this -> check_login();
+
         I('get.id','','intval') ? $id = I('get.id','','intval') : $this -> ajaxReturnData(0,'参数错误！');
         $goods = D('Order') -> alias('a') -> field('a.user_id uid,b.id order_goods_id,b.goods_id gid,c.goods_small_img img') -> where("a.id = $id") -> join('zhouyuting_order_goods b on a.id = b.order_id') -> join('zhouyuting_goods c on b.goods_id = c.goods_id') -> select();
         $goods[0]['uid'] == session('userinfo.id') ? true : $this -> ajaxReturnData(0,'用户与订单不符！');
@@ -249,8 +254,85 @@ class OrderController extends CommonController
 
     //添加商品评论
     public function add_comment(){
-        var_dump($_POST);
-        var_dump($_FILES);
+        !IS_POST && !IS_AJAX ? $this -> ajaxReturnData(0,'请求方式错误') : true;
+        $this -> check_login();
+
+        I('post.order_goods_id','','string') ? $order_gids = explode('+',I('post.order_goods_id','','string')) : $this -> ajaxReturnData(0,'订单编号错误');
+        I('post.goods_id','','string')       ? $goods_ids  = explode('+',I('post.goods_id','','string'))       : $this -> ajaxReturnData(0,'商品编号错误');
+        I('post.g_level','','string')        ? $g_levels   = explode('+',I('post.g_level','','string'))        : $this -> ajaxReturnData(0,'商品评论星级错误');
+        I('post.content','','string')        ? $contents   = explode('+',I('post.content','','string'))        : $this -> ajaxReturnData(0,'评论内容错误');
+        I('post.level','','string')          ? $levels     = explode('+',I('post.level','','string'))          : $this -> ajaxReturnData(0,'评论星级错误');
+        I('post.w_level','','string')        ? $w_level    = I('post.w_level','','string') : $this -> ajaxReturnData(0,'物流评价错误');
+        I('post.f_level','','string')        ? $f_level    = I('post.f_level','','string') : $this -> ajaxReturnData(0,'服务评价错误');
+        count($order_gids) != count($goods_ids) || count($order_gids) != count($g_levels) || count($order_gids) != count($contents) || count($order_gids) != count($levels) ? $this -> ajaxReturnData(0,'参数错误') : true;
+        $where = array(
+            'a.user_id'  => session('userinfo.id'),
+            'b.id'       => ['in',implode(',',$order_gids)],
+            'b.goods_id' => ['in',implode(',',$goods_ids)],
+        );
+        $Order = D('Order') -> alias('a') -> field('a.id') -> where($where) -> join('zhouyuting_order_goods b on a.id = b.order_id') -> select();//验证订单号和商品号
+
+        empty($Order) ? $this -> ajaxReturnData(0,'订单信息不匹配') : true;
+        foreach($_FILES as $key => $value){
+            if(empty($value['name'])){
+                unset($_FILES[$key]);
+            }
+        }
+        unset($where,$key,$value);
+        if(!empty($_FILES)){
+            //如果存在图片
+            $setting   = C('UPLOAD_QINIU');
+            $Upload  = new \Think\Upload($setting);
+            $info    = $Upload -> upload($_FILES);
+            empty($info) ? $this -> ajaxReturnData(0,'上传图片失败！') : true;
+            $preKey = session('preKey');
+            foreach($info as $key => $value){  //拼接图片数据
+                if(isset($preKey)){  //如果存在，则比较
+                    if($preKey == substr($key,strpos($key,'_'),2)){  //如果相等，则添加
+                        $img[substr($key,0,strpos($key,'_') + 2)][] = $value['url'];
+                    }else{
+                        $img[substr($key,0,strpos($key,'_') + 2)][] = $value['url'];
+                        session('preKey',substr($key,strpos($key,'_'),2));
+                    }
+                }else{
+                    $img[substr($key,0,strpos($key,'_') + 2)][] = $value['url'];
+                    session('preKey',substr($key,strpos($key,'_'),2));
+                }
+            }
+            unset($key,$value);
+            session('preKey',null);//删除preKey
+            $i = 0;
+            foreach($img as $key => $value){
+                foreach($value as $k => $v){
+                    $cimg[$i] = implode(',',$value);
+                }
+                $i ++;
+            }
+            unset($key,$value,$k,$v);
+        }
+
+
+        $word = $this -> setting_cache();//获取敏感词汇
+        //循环数据
+        foreach($order_gids as $key => $value){
+            $data[] = array(
+                'order_goods_id'  => $value,
+                'goods_id'        => $goods_ids[$key],
+                'user_id'         => session('userinfo.id'),
+                'comment_content' => remove_xss(filter_vocabulary($contents[$key],$word['zhouyuting_filter_vocabulary'])),
+                'comment_img'     => $cimg[$key] ? $cimg[$key] : '',
+                'level'           => $levels[$key],
+                'g_starlevel'     => $g_levels[$key],
+                'w_starlevel'     => $w_level,
+                'f_starlevel'     => $f_level,
+                'is_anonymous'    => I('post.is_n','','intval'),
+                'add_time'        => time(),
+            );
+        }
+        $res = D('Comment') -> addAll($data);//添加评论
+        $string = '';
+        D('Order') -> where("id = $Order") -> setField('order_status',4);//修改订单状态
+        $res ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'添加失败！');
     }
 
 

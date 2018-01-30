@@ -16,13 +16,22 @@ class CommonController extends Controller{
 
     public function _initialize(){
         session_start();
-
     }
 
     public function check_login(){
         if(!session('?userinfo')){
             $this -> ajaxReturnData(10002,'请先登录！');
         }
+    }
+
+    public function setting_cache()
+    {
+        $setting = array();
+        $res     = D('Setting') -> getField('name,content');
+        foreach ($res as $key => $val) {
+            $setting['zhouyuting_' . $key] = unserialize($val) ? unserialize($val) : $val;
+        }
+        return $setting;
     }
 
 }
