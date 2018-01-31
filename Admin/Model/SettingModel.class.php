@@ -22,7 +22,6 @@ class SettingModel extends Model {
             $setting['zhouyuting_' . $key] = unserialize($val) ? unserialize($val) : $val;
         }
         F('setting', $setting);
-        return $setting;
     }
 
 }
