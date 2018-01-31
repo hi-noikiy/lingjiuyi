@@ -118,10 +118,7 @@ ORDER BY a.click_num DESC");
         }
     }
 
-    public function aboutUs(){
-        $this -> display();
-    }
-
+    //加入我们
     public function contact(){
         $this -> display();
     }
@@ -147,6 +144,12 @@ ORDER BY a.click_num DESC");
 
         $this -> ajaxReturn(compact('pic_img','new_attrs','number'));
 
+    }
+
+    //底部数据
+    public function get_footer(){
+        $setting = D('Setting') -> field('`desc` show_name,content,type') -> where("is_show = 1") -> select();//基本设置
+        empty($setting) ? $this -> ajaxReturnData(0,'没有数据') : $this -> ajaxReturnData(10000,'success',$setting);
     }
 
 
