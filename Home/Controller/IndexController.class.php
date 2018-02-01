@@ -8,7 +8,7 @@ class IndexController extends CommonController {
 
         //首页右上角分类
         if(!session('?cates')){
-            $cates = D('Category') -> field('id,pid,cate_name') -> select();
+            $cates = D('Category') -> field('id,pid,cate_name') -> where("`is_show` = 1") -> select();
             $_SESSION['cates'] = $cates;
         }
 
@@ -73,8 +73,8 @@ ORDER BY a.click_num DESC");
             $pagesize = 20;//每页显示商品数量
             $start    = ($p - 1) * $pagesize;//开始行数
 
-            $min      = I('post.min','','intval');//最低价格
-            $max      = I('post.max','','intval');//最高价格
+            $min      = I('post.min','','intval') || (I('post.min','','intval') == 0) ? I('post.min','','intval') : 0;//最低价格
+            $max      = I('post.max','','intval') || (I('post.max','','intval') == 0) ? I('post.max','','intval') : 100000;//最高价格
             $cate     = I('post.cates','','intval');//分类
             if(!empty($cate)){
                 $cates    = D('Category') -> alias('a') -> field('c.id') -> where("a.id = $cate") -> join('zhouyuting_category b on a.id = b.pid') -> join('zhouyuting_category c on b.id = c.pid') -> select();
@@ -150,6 +150,47 @@ ORDER BY a.click_num DESC");
     public function get_footer(){
         $setting = D('Setting') -> field('`desc` show_name,content,type') -> where("is_show = 1") -> select();//基本设置
         empty($setting) ? $this -> ajaxReturnData(0,'没有数据') : $this -> ajaxReturnData(10000,'success',$setting);
+    }
+
+    //分类商品
+    public function cate(){
+        if(IS_AJAX){
+            $p        = I('post.p','','intval') ? I('post.p','','intval') : 1;//页码
+
+            $pagesize = 20;//每页显示商品数量
+            $start    = ($p - 1) * $pagesize;//开始行数
+
+            $min      = I('post.min','','intval') || (I('post.min','','intval') == 0) ? I('post.min','','intval') : 0;//最低价格
+            $max      = I('post.max','','intval') || (I('post.max','','intval') == 0) ? I('post.max','','intval') : 100000;//最高价格
+            $cate     = I('post.cates','','intval') ? I('post.cates','','intval') : (I('get.id','','intval') ? I('get.id','','intval') : 0);//分类
+
+            empty($cate) ? $this -> ajaxReturnData(0,'分类不存在!') : $where = "`cate_id` = $cate AND";
+            $where .= "`goods_price` BETWEEN $min AND $max";
+            $order = I('post.sorts');//排序
+            $price = I('post.prices');//价格排序
+            if((!empty($order) || $order == '0') && empty($price)){
+                $order = ($order == 'a') ? 'sale_num desc' : ($order == 'b' ? 'click_num desc' : ($order == 'c' ? 'comment_num desc' : 'goods_id asc'));//根据参数拼接排序规则
+            }else{
+                $order = $price; //按照价格排序
+                $order = $order == 'ltoh' ? 'goods_price asc' : 'goods_price desc' ;
+            }
+
+
+            $fields = 'goods_id i,goods_name n,goods_bigprice bp,goods_price p,goods_big_img bi,is_act';
+            $count  = D('Goods') -> where($where) -> count();
+            $list = D('Goods') -> field($fields) -> where($where) -> limit($start,$pagesize) -> order($order) -> select();
+            empty($list) && ($p === 1) ? $this -> ajaxReturnData(0,'到底了！',compact('count','p','pagesize')) : true;
+            empty($list) ? $this->ajaxReturnData(10001,'没有搜索到您想要的商品！',compact('list','count','p','pagesize')) : $this->ajaxReturnData(10000,'success',compact('list','count','p','pagesize','start'));
+
+        }else{
+            $cate_id = I('get.id','','intval') ? I('get.id','','intval') : 0;
+            $pid = D('Category') -> where("id = $cate_id") -> getField('pid');//pid
+            if(!empty($pid)){
+                $category = D('Category') -> field('id,cate_name cn') -> where("pid = $pid")-> select();
+                $this -> assign('cate',$category);
+            }
+            $this -> display();
+        }
     }
 
 
