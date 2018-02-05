@@ -359,15 +359,17 @@ class UserController extends CommonController{
         I('post.year','','string')     ? $data['birthday']  = I('post.year','','string').'-'  : $this -> ajaxReturnData(0,'出生年份不能为空');
         I('post.month','','string')    ? $data['birthday'] .= I('post.month','','string').'-' : $this -> ajaxReturnData(0,'出生月份不能为空');
         I('post.day','','string')      ? $data['birthday'] .= I('post.day','','string')    : $this -> ajaxReturnData(0,'出生日期不能为空');
-        I('post.email','','string')    ? $data['email']     = I('post.email','','string')  : false;
-        I('post.phone','','string')    ? $data['phone']     = I('post.phone','','string')  : false;
-        I('post.weixin','','string')   ? $data['weixin']    = I('post.weixin','','string') : false;
-        I('post.qq','','string')       ? $data['qq']        = I('post.qq','','string')     : false;
-        I('post.weibo','','string')    ? $data['weibo']     = I('post.weibo','','string')  : false;
+        $data['email']     = I('post.email','','string')  ? I('post.email','','string')  : '';
+        $data['phone']     = I('post.phone','','string')  ? I('post.phone','','string')  : '';
+        $data['weixin']    = I('post.weixin','','string') ? I('post.weixin','','string') : '';
+        $data['qq']        = I('post.qq','','string')     ? I('post.qq','','string')     : '';
+        $data['weibo']     = I('post.weibo','','string')  ? I('post.weibo','','string')  : '';
+        if(empty($data['email'])){
+            $data['is_subscribe'] = 0;//如果修改个人信息时邮箱为空，则取消订阅
+        }
 
-
-        isset($data['email']) && (filter_var($data['email'], FILTER_VALIDATE_EMAIL) == false) ? $this -> ajaxReturnData(0,'邮箱格式不正确') : true;
-        isset($data['phone']) && (preg_match('/^\d{11}$/', $data['phone']) == false) ? $this -> ajaxReturnData(0,'手机号码格式不正确') : true;
+        !empty($data['email']) && (filter_var($data['email'], FILTER_VALIDATE_EMAIL) == false) ? $this -> ajaxReturnData(0,'邮箱格式不正确') : true;
+        !empty($data['phone']) && (preg_match('/^\d{11}$/', $data['phone']) == false) ? $this -> ajaxReturnData(0,'手机号码格式不正确') : true;
 
         $map['id'] = ['NEQ', $data['id']];
         $userinfo = D('User') -> field('username,phone,email') -> where($map) -> select();
@@ -384,9 +386,9 @@ class UserController extends CommonController{
         }
         unset($key,$value);
 
-        isset($data['username']) && (array_key_exists($data['username'], $user['username']) == true) ? $this -> ajaxReturnData(0,'用户名已经存在') : true;
-        isset($data['email'])    && (array_key_exists($data['email'], $user['email']) == true) ? $this -> ajaxReturnData(0,'邮箱已经存在') : true;
-        isset($data['phone'])    && (array_key_exists($data['phone'], $user['phone']) == true) ? $this -> ajaxReturnData(0,'手机号已经存在') : true;
+        !empty($data['username']) && (array_key_exists($data['username'], $user['username']) == true) ? $this -> ajaxReturnData(0,'用户名已经存在') : true;
+        !empty($data['email'])    && (array_key_exists($data['email'], $user['email']) == true) ? $this -> ajaxReturnData(0,'邮箱已经存在') : true;
+        !empty($data['phone'])    && (array_key_exists($data['phone'], $user['phone']) == true) ? $this -> ajaxReturnData(0,'手机号已经存在') : true;
 
         $res = D('User') -> save($data);
         $res !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'修改失败');

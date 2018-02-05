@@ -494,7 +494,7 @@
             <section class="subscribe-wrap sec-space light-bg">
                 <img alt="" src="__PUBLIC__/Home/img/extra/sec-img-7.jpg" class="right-bg-img" style="width:340px;opacity: 0.7;border-radius:50px"/>
                 <img alt="" src="__PUBLIC__/Home/img/extra/sec-img-8.jpg" class="left-bg-img" style="width:340px;opacity: 0.7;border-radius:50px"/>
-
+                <if condition=" Think.session.userinfo.is_subscribe == 0">
                 <div class="container"> 
                     <div class="row"> 
                         <div class="col-md-4"> 
@@ -513,6 +513,7 @@
                         </div>
                     </div>
                 </div>
+                </if>
             </section>
             <!-- Subscribe Newsletter Ends -->
 

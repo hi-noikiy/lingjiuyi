@@ -463,14 +463,6 @@
     $('#submit').click(function(){
 
         var res = true;
-        $("input[type=text]").each(function(i){
-            if($(this).val() ==""){
-                res = false;
-                layer.msg('商品属性不能为空哦！', {icon: 5});
-                return false;
-            }
-        });
-        if(!res)return false;
         $('.input-file').each(function(){
             if($(this).val() == ''){
                 res = false;

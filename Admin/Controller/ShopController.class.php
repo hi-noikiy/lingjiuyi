@@ -22,16 +22,19 @@ class ShopController extends BaseController
             $data = I('post.');
             if(isset($data['shop_logo'])){
                 $shop_logo     = D('Shop') -> where(['id' => $data['id']]) -> getField('shop_logo');//删除原图片
-                $setting       = C('UPLOAD_QINIU');
-                $key           = substr($shop_logo,strrpos($shop_logo,'/') + 1);
-                $bucket        = $setting['driverConfig']['bucket'];//资源所在空间
-                $secretKey     = $setting['driverConfig']['secretKey'];//资源所在空间
-                $accessKey     = $setting['driverConfig']['accessKey'];//资源所在空间
-                $auth          = new Auth($accessKey,$secretKey);
-                $config        = new \Qiniu\Config();
-                $bucketManager = new BucketManager($auth, $config);
-                $err = $bucketManager -> delete($bucket, $key);
-                $err ? $this -> ajaxReturnData(0,'删除源文件失败') : true;
+                if(!empty($shop_logo)){
+                    $setting       = C('UPLOAD_QINIU');
+                    $key           = substr($shop_logo,strrpos($shop_logo,'/') + 1);
+                    $bucket        = $setting['driverConfig']['bucket'];//资源所在空间
+                    $secretKey     = $setting['driverConfig']['secretKey'];//资源所在空间
+                    $accessKey     = $setting['driverConfig']['accessKey'];//资源所在空间
+                    $auth          = new Auth($accessKey,$secretKey);
+                    $config        = new \Qiniu\Config();
+                    $bucketManager = new BucketManager($auth, $config);
+                    $err = $bucketManager -> delete($bucket, $key);
+                    $err ? $this -> ajaxReturnData(0,'删除源文件失败') : true;
+                }
+
             }
 
             $res = D('Shop') -> save($data);

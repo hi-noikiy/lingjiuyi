@@ -37,10 +37,13 @@ class GoodsController extends CommonController {
         IS_AJAX && IS_GET ? true : $this -> ajaxReturnData(0,'访问方式错误');
         $goods_id = I('get.gid','','intval');
         $where = "goods_id = $goods_id";
-        $fileds = 'a.*,b.username,b.header_img';
+        $fileds = 'a.*,b.username name,b.header_img';
         $comment = D('Comment') -> field($fileds) -> alias('a') -> where($where) -> join('zhouyuting_user b on a.user_id = b.id') -> select();
         foreach($comment as $key => $value){
             $comment[$key]['add_time'] = date('Y/m/d');
+            if($comment[$key]['is_anonymous'] == 1){
+                $comment[$key]['name'] = substr($value['name'],0,3).'****';
+            }
         }
         empty($comment) ? $this -> ajaxReturnData(0,'暂无评论') : $this -> ajaxReturnData(10000,'success',$comment);
     }

@@ -16,11 +16,11 @@ class ShopController extends CommonController{
     public function get_goods(){
         I('get.cate_id','','intval') ? $cate_id  =  I('get.cate_id','','intval') : false;//分类id
         I('get.p','','intval') ? $p  =  I('get.p','','intval') : false;//当前页
-        isset($cate_id) ? $where['a.id'] = $cate_id : $this -> ajaxReturnData(0,'参数错误');
+        isset($cate_id) ? $where['a.shop_cate_id'] = $cate_id : $this -> ajaxReturnData(0,'参数错误');
         $pagesize = 10;
         $start = ($p - 1) * $pagesize;
         $field = "b.goods_id i,b.goods_name gn,b.goods_price gp,b.goods_big_img gb,b.goods_create_time add_time,is_act,click_num,goods_sales,b.goods_desc gd";
-        $goods = D('Shop_cate') -> alias('a') -> field($field) -> where($where) -> join('zhouyuting_goods b on a.goods_id = b.goods_id') -> limit($start,$pagesize) -> select();
+        $goods = D('Shop_cate_goods') -> alias('a') -> field($field) -> where($where) -> join('zhouyuting_goods b on a.goods_id = b.goods_id') -> limit($start,$pagesize) -> select();
         foreach($goods as $key => $value){
             $goods[$key]['add_time'] = date('Y/m/d',$goods[$key]['add_time']);
         }

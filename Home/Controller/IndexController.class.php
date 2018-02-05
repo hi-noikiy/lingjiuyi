@@ -18,7 +18,7 @@ class IndexController extends CommonController {
         $addA     = ',b.id cid,b.cate_name cn';
         $g = $fields.$addA;
         $three_goods    = $gmodel -> query("SELECT $g FROM zhouyuting_goods AS a LEFT JOIN zhouyuting_category AS b ON a.cate_id=b.id
-WHERE 20 > ( SELECT COUNT(*) FROM zhouyuting_goods WHERE cate_id=a.cate_id AND goods_id > a.goods_id ) AND cate_id in (321,242,213,186)
+WHERE 20 > ( SELECT COUNT(*) FROM zhouyuting_goods WHERE cate_id=a.cate_id AND goods_id > a.goods_id ) AND cate_id in (252,253,254,256)
 ORDER BY a.click_num DESC");
         $cate_goods       = change_array($three_goods,'cid');
 

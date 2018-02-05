@@ -60,10 +60,13 @@ class GoodsController extends BaseController{
 				$i = 0;
 				foreach($_POST['attr_value'] as $k => $v){
 					foreach($v as $key => $value){
-						$attr[$i]['goods_id']  = $id;
-						$attr[$i]['attr_id']    = $k;
-						$attr[$i]['attr_value'] = $value;
-						$i++;
+						if(!empty($value)){
+							//如果商品属性值不为空则添加属性
+							$attr[$i]['goods_id']  = $id;
+							$attr[$i]['attr_id']    = $k;
+							$attr[$i]['attr_value'] = $value;
+							$i++;
+						}
 					}
 				}
 				unset($k,$v);

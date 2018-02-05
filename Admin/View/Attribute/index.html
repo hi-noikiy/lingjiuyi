@@ -79,7 +79,7 @@
                     </div>
 
                     <div style="height: 20px;" id="biaoshi"></div>
-                    <table class="table dataTables-example" style="text-align: center;border-collapse:collapse;">
+                    <table class="table dataTables-example" style="border-collapse:collapse;">
                         <thead>
                         <tr>
                             <th>编号</th>
@@ -178,6 +178,15 @@
                         html += "&nbsp;<a href='javascript:void(0);' onclick='editAttribute(this,"+ id + ")' class='up btn btn-default btn-xs'><i class='fa fa-arrow-up'></i>编辑</a>";
                         html += "&nbsp;<a href='javascript:void(0);' onclick='delAttribute("+ id + ")' class='down btn btn-default btn-xs'><i class='fa fa-arrow-down'></i>删除</a>";
                         return html;
+                    }
+                },
+                {
+                    "bSortable": false,//禁止排序
+                    "targets":-2,
+                    "render":function(data,type,row,meta) {
+                        var attr_values = row.attr_values;
+                        var reg = new RegExp("(\\S{" + 20 + "})","g");
+                        return attr_values.replace(reg,"$1<br/>");
                     }
                 },
                 {

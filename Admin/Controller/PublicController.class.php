@@ -53,6 +53,15 @@
             $this->success('退出成功','login');
         }
 
+        public function get_qiniuTocken(){
+            $accessKey = "6R9rx5zfafyr5kgeYYskF111GB8Zs2QHlsRfTlyq";
+            $secretKey = "XGcurjXepkLZrcjYLeO6C2QConfwacBCUmO9yXLh";
+            $bucket    = "doudou";
+            $auth      = new Auth($accessKey, $secretKey);
+            $upToken   = $auth->uploadToken($bucket, null, 3600); //获取token
+            return $upToken;
+        }
+
         public function upload_img(){
 
             $type      = $_POST['type'] ? $_POST['type'] : false;

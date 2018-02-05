@@ -229,16 +229,51 @@ class OrderController extends CommonController
         !IS_POST && !IS_AJAX ? $this -> ajaxReturnData(0,'请求方式错误') : true;
         $this -> check_login();
 
-        I('get.id','','intval') ? $id = I('get.id','','intval') : $this -> ajaxReturnData(0,'参数错误');
-        $data     = D('Order') -> field('shipping_type,express_sn') -> where("id = $id") -> find();
+        I('get.id','','intval')   ? $id = I('get.id','','intval') : $this -> ajaxReturnData(0,'参数错误');
+        I('get.type','','string') ? $type = I('get.type','','string') : $this -> ajaxReturnData(0,'参数错误');
+        $data     = D('Order') -> field('shipping_type,express_sn,return_express_name,return_express_sn') -> where("id = $id") -> find();
+        if($type == 'return'){
+            $com = $data['return_express_name'];
+            $nu  = $data['return_express_sn'];
+        }elseif($type == 'no_return'){
+            $com = cshipping_type($data['shipping_type']);
+            $nu  = $data['express_sn'];
+        }else{
+            $this -> ajaxReturnData(0,'参数错误');
+        }
         $params   = array(
             'id'  => C('WULIU_KEY'),
-            'com' => cshipping_type($data['shipping_type']),
-            'nu'  => $data['express_sn']
+            'com' => $com,
+            'nu'  => $nu
+        );
+        $express  = curl_request('http://api.kuaidi.com/openapi.html?id='.$params['id'].'&com='.$params['com'].'&nu='.$params['nu']);
+        $res      = json_decode($express,true);// bool(false)
+        $res['success'] ? $this -> ajaxReturnData(10000,'success',$res['data']) : $this -> ajaxReturnData(0,'当前没有物流信息，请稍后再试！');
+    }
+
+    //填写退货信息
+    public function add_return_goods(){
+        !IS_POST && !IS_AJAX ? $this -> ajaxReturnData(0,'请求方式错误') : true;
+        $this -> check_login();
+
+        I('post.id','','intval')    ? $data['id'] = I('post.id','','intval') : $this -> ajaxReturnData(0,'参数错误');
+        I('post.wuliu','','string') ? $data['return_express_name'] = I('post.wuliu','','string') : $this -> ajaxReturnData(0,'参数错误');
+        I('post.sn','','string')    ? $data['return_express_sn'] = I('post.sn','','string') : $this -> ajaxReturnData(0,'参数错误');
+        $params   = array(
+            'id'  => C('WULIU_KEY'),
+            'com' => $data['return_express_name'],
+            'nu'  => $data['return_express_sn']
         );
         $express  = curl_request('http://api.kuaidi.com/openapi.html?id='.$params['id'].'&com='.$params['com'].'&nu='.$params['nu']);
         $res      = json_decode($express,true);
-        $res['success'] ? $this -> ajaxReturnData(10000,'success',$res['data']) : $this -> ajaxReturnData(0,'当前没有物流信息，请稍后再试！');
+        $res['success'] == false ? $this -> ajaxReturnData(0,$res['reason']) : true;
+        $res['status'] == 5 ? $this -> ajaxReturnData(0,'快递邮寄过程中出现问题') : true;
+        $res['status'] == 6 ? $this -> ajaxReturnData(0,'收件人已签收，请核对快递单号是否正确') : true;
+        $res['status'] == 7 ? $this -> ajaxReturnData(0,'快递因用户拒签、超区等原因退回，而且发件人已经签收') : true;
+        $data['order_status'] = 8; //退货成功，等待卖家确认收货
+        $result = D('Order') -> save($data);
+        $result !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'退货失败');
+
     }
 
     //获取需要评论的商品信息
