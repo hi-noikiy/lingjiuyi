@@ -104,7 +104,7 @@
                     "render":function(data,type,row,meta) {
                         var html = '';
                         if(row.cate_img != null){
-                            html += '<img src="'+row.cate_img+'" style="max-width:100px;_width:expression(this.width > 150 ? 150px : this.width);" class="J_preview" data-bimg="'+row.cate_img+'"/>';
+                            html += '<img class="show_img" src="'+row.cate_img+'" style="max-width:100px;_width:expression(this.width > 150 ? 150px : this.width);" class="J_preview" data-bimg="'+row.cate_img+'"/>';
                         }
                         return html;
                     }
@@ -201,7 +201,7 @@
                             '</div>'+
 
                             '<div class="row cl">'+
-                            '<label class="form-label col-xs-4 col-sm-3">分类图片：</label>'+
+                            '<label class="form-label col-xs-4 col-sm-3">分类图片(h5)：</label>'+
                             '<div class="formControls col-xs-8 col-sm-9">';
                     if(cate_one.cate_img != null && cate_one.cate_img != ''){
                         localStorage.img = cate_one.cate_img;
@@ -212,7 +212,22 @@
                             '<input type="file" multiple name="upload_img" id="upload_img" class="input-file"/>'+
                             '<i class="fa fa-cloud-upload"></i> 浏览文件'+
                             '</a>'+
-                            '<br/><span>注意：一天只能更换一次图片！</span>'+
+                            '<br/><span>注意：一天只能更换一次图片！分辨率需大于750 X 250，尺寸比例需3:1</span>'+
+                            '</div>'+
+                            '</div>'+
+                            '<div class="row cl">'+
+                            '<label class="form-label col-xs-4 col-sm-3">分类图片(web)：</label>'+
+                            '<div class="formControls col-xs-8 col-sm-9">';
+                    if(cate_one.cate_small_img != null && cate_one.cate_small_img != ''){
+                        localStorage.img2 = cate_one.cate_small_img;
+                        html += '<img id="imgHead2" src="'+ cate_one.cate_small_img +'" alt="暂无图片" style="width: 150px;"/>';
+                    }
+
+                    html += '<a href="javascript:void(0);" class="btn btn-primary upload-btn">'+
+                            '<input type="file" multiple name="upload_img2" id="upload_img2" class="input-file"/>'+
+                            '<i class="fa fa-cloud-upload"></i> 浏览文件'+
+                            '</a>'+
+                            '<br/><span>注意：一天只能更换一次图片！分辨率需大于250 X 250，尺寸比例需1:1</span>'+
                             '</div>'+
                             '</div>'+
                             '<div class="row cl">'+
@@ -299,20 +314,14 @@
 
                             //上传图片
                             $(document).on('change','#upload_img',function(){
-                                // 获取文件路径
                                 var filePath = $("input[name='upload_img']").val();
-                                // 获取“.”位置
                                 var extStart = filePath.lastIndexOf(".");
-                                // 获取文件格式后缀，并全部大写
                                 var ext = filePath.substring(extStart, filePath.length).toUpperCase();
-
-                                // 判断文件格式
                                 if (ext != ".BMP" && ext != ".PNG" && ext != ".JPG" && ext != ".JPEG") {
                                     layer.msg('图片仅限于.gif .png .jpg .jpeg文件。', {time: 5000, icon:6});
                                     return false;
                                 }
                                 else {
-                                    // 使用ajaxfileupload上传文件
                                     $.ajaxFileUpload({
                                         type:"POST",
                                         url :"__MODULE__/Public/upload_img",
@@ -324,6 +333,36 @@
                                                 layer.msg(data.msg, {icon: 6});
                                                 $("#imgHead").attr("src",data.info);
                                                 localStorage.img = data.info;
+                                            } else{
+                                                layer.msg(data.msg, {icon: 5});
+                                            }
+                                        },
+                                        error  : function(){
+                                            layer.msg('上传图片出错啦！！！', {icon: 5});
+                                        }
+                                    });
+                                }
+                            });
+                            $(document).on('change','#upload_img2',function(){
+                                var filePath = $("input[name='upload_img2']").val();
+                                var extStart = filePath.lastIndexOf(".");
+                                var ext = filePath.substring(extStart, filePath.length).toUpperCase();
+                                if (ext != ".BMP" && ext != ".PNG" && ext != ".JPG" && ext != ".JPEG") {
+                                    layer.msg('图片仅限于.gif .png .jpg .jpeg文件。', {time: 5000, icon:6});
+                                    return false;
+                                }
+                                else {
+                                    $.ajaxFileUpload({
+                                        type:"POST",
+                                        url :"__MODULE__/Public/upload_img",
+                                        secureuri:false,
+                                        fileElementId:"upload_img2",//文件选择框的id属性
+                                        dataType:'json',
+                                        success: function (data) {
+                                            if (data.code == 10000) {
+                                                layer.msg(data.msg, {icon: 6});
+                                                $("#imgHead2").attr("src",data.info);
+                                                localStorage.img2 = data.info;
                                             } else{
                                                 layer.msg(data.msg, {icon: 5});
                                             }
@@ -349,12 +388,13 @@
 
                             $(document).on('click','.layui-layer-btn0',function(){
                                 var cate_img  = localStorage.img;
+                                var cate_small_img  = localStorage.img2;
                                 //console.log('分类id'+id+',分类名称'+cate_name+',是否显示',is_show + ',图片',cate_img + ',分类pid',pid);
                                 //将修改的数据保存
                                 $.ajax({
                                     type : 'POST',
                                     url  : '__CONTROLLER__/edit',
-                                    data : {id:id,cate_name:cate_name,is_show:is_show,pid:pid,cate_img:cate_img},
+                                    data : {id:id,cate_name:cate_name,is_show:is_show,pid:pid,cate_img:cate_img,cate_small_img:cate_small_img},
                                     dataType : 'json',
                                     success  : function(data){
                                         layer.msg(data.msg, {icon: 6});
@@ -381,6 +421,22 @@
     function delArticle(id) {
         alert(id);
     }
+
+    $(function(){
+        $(document).on('mouseover','.show_img',function(){
+            var _this = $(this);
+            var show_img = '<img src="'+_this[0].src+'" style="width:600px;"/>';
+            layer.tips(show_img, _this, {
+                tips: [1, '#fff'],
+                maxWidth:400,
+                time: 4000
+            });
+        });
+        //鼠标移开关闭
+        $(document).on('mouseout','.show_img',function(){
+            layer.closeAll();
+        });
+    });
 
 
 

@@ -32,6 +32,7 @@
                             <th>编号</th>
                             <th>店铺名称</th>
                             <th>置顶商铺</th>
+                            <th>店铺头像</th>
                             <th>店铺logo(h5)</th>
                             <th>店铺logo(web)</th>
                             <th>店铺简介</th>
@@ -67,6 +68,7 @@
                 { "data": "id" },
                 { "data": "shop_name" },
                 { "data": "is_top" },
+                { "data": "shop_header_img" },
                 { "data": "shop_logo" },
                 { "data": "shop_logo_web" },
                 { "data": "shop_desc" },
@@ -101,6 +103,17 @@
                     "bSortable": false,
                     "render":function(data,type,row,meta) {
                         var html = '';
+                        if(row.shop_header_img != null){
+                            html += '<img class="" src="'+row.shop_header_img+'" style="width:50px;"/>';
+                        }
+                        return html;
+                    }
+                },
+                {
+                    "targets":4,
+                    "bSortable": false,
+                    "render":function(data,type,row,meta) {
+                        var html = '';
                         if(row.shop_logo != null){
                             html += '<img class="show_img" src="'+row.shop_logo+'" style="width:150px;"/>';
                         }
@@ -108,7 +121,7 @@
                     }
                 },
                 {
-                    "targets":4,
+                    "targets":5,
                     "bSortable": false,
                     "render":function(data,type,row,meta) {
                         var html = '';
@@ -160,24 +173,32 @@
                 }
                 html += '>非置顶商铺</option></select></td>';
             }else if(j == 3){
-                html += '<td><div style="position: relative;"><input id="shop_logo" name="shop_logo" type="file" class="fileInput">';
+                html += '<td><div style="position: relative;"><input id="shop_header_img" name="shop_header_img" type="file" class="fileInput"';
                 if($(this).find('img').attr('src') == '' || $(this).find('img').attr('src') == undefined){
-                    html += '<button class="btn btn-primary btn-xs" >上传图片</button>'
+                    html += 'style="width:70px;height:30px;" ><button class="btn btn-primary btn-xs" >上传图片</button>'
                 }else{
-                    html += $(this).html();
+                    html +=  '>'+ $(this).html();
                 }
                 html +='</div></td>'
             }else if(j == 4){
-                html += '<td><div style="position: relative;"><input id="shop_logo_web" name="shop_logo_web" type="file" class="fileInput">';
+                html += '<td><div style="position: relative;"><input id="shop_logo" name="shop_logo" type="file" class="fileInput"';
                 if($(this).find('img').attr('src') == '' || $(this).find('img').attr('src') == undefined){
-                    html += '<button class="btn btn-primary btn-xs" >上传图片</button>'
+                    html += 'style="width:70px;height:30px;" ><button class="btn btn-primary btn-xs" >上传图片</button>'
                 }else{
-                    html += $(this).html();
+                    html += '>'+ $(this).html();
                 }
                 html +='</div></td>'
             }else if(j == 5){
-                html += '<td><input type="text" name="shop_desc" class="form-control" style="width: 200px;" value="'+$(this).text()+'"></td>';
+                html += '<td><div style="position: relative;"><input id="shop_logo_web" name="shop_logo_web" type="file" class="fileInput"';
+                if($(this).find('img').attr('src') == '' || $(this).find('img').attr('src') == undefined){
+                    html += 'style="width:70px;height:30px;" ><button class="btn btn-primary btn-xs" >上传图片</button>'
+                }else{
+                    html += '>'+ $(this).html();
+                }
+                html +='</div></td>'
             }else if(j == 6){
+                html += '<td><input type="text" name="shop_desc" class="form-control" style="width: 200px;" value="'+$(this).text()+'"></td>';
+            }else if(j == 7){
                 html += '<td class="sorting_1"><button class="btn btn-white btn-xs" onclick="save_data('+id+')">保存</button>&emsp;<button class="btn bt-info btn-xs">取消</button></td>';
             }else{
                 html += '<td>'+$(this).text()+'</td>';
@@ -206,12 +227,16 @@
                             var type = '';
                             if(name == 'shop_logo'){
                                 $('#shop_logo').closest('div').find('img').attr('src',data.info);
-                                $(_this_tr).find('img:eq(0)').attr('src',data.info);
+                                $(_this_tr).find('img:eq(1)').attr('src',data.info);
                                 type = 'shop_logo_img';
                             }else if(name == 'shop_logo_web'){
                                 $('#shop_logo_web').closest('div').find('img').attr('src',data.info);
-                                $(_this_tr).find('img:eq(1)').attr('src',data.info);
+                                $(_this_tr).find('img:eq(2)').attr('src',data.info);
                                 type = 'shop_logo_web_img';
+                            }else if(name == 'shop_header_img'){
+                                $('#shop_header_img').closest('div').find('img').attr('src',data.info);
+                                $(_this_tr).find('img:eq(0)').attr('src',data.info);
+                                type = 'shop_header_img';
                             }
                             var path = data.info;
                             save_data(id,type,path);
@@ -236,6 +261,8 @@
             data = {id:id,shop_logo:val};
         }else if(type == 'shop_logo_web_img'){
             data = {id:id,shop_logo_web:val};
+        }else if(type == 'shop_header_img'){
+            data = {id:id,shop_header_img:val};
         }else{
             var shop_name = $('input[name="shop_name"]').val();
             var is_top    = $('select[name="is_top"]').val();

@@ -1,41 +1,59 @@
 <body class="graybg" style="position:static; height:100%; margin:0; background: #f5f5f5">
 <div class="content clearfix"  id="wrapper">
-    <div class="listwrap clearfix iclist">
 
-    </div>
 </div>
 </body>
 <script>
     $(function(){
-
-        //滑动banner
-        var tbannerF='<div class="container-fluid oh">'+
-                ' <div class="row" style="margin-bottom:5px;">'+
-                ' <div class="swiper-container" >' +
-                '<div class="swiper-wrapper"></div>' +
-                '<div class="swiper-pagination"></div>'+
-                '</div>'+
-                '</div>'+
-                '</div>';
-
         $.ajax({
             type: 'GET',
-            url:'__CONTROLLER__/ajax_index',
+            url:'/Index/ajax_index',
             dataType: 'json',
             success: function(data){
                 //console.log(data.code);
-                if(data.code == 10000){
-                    //顶部滑动banner
-                    var tbanner='';
-                    for(var i=0;i<data.info.shoplist.length;i++){
-                        tbanner+= '<div class="swiper-slide">'+
-                                ' <a href="'+data.info.shoplist[i].id+'" class="cut-img">'+
-                                '<img src="'+data.info.shoplist[i].shop_logo+'" width="100%"/>'+
-                                ' </a>'+
-                                ' </div>';
 
+                if(data.code == 10000){
+                    var html_swiper = '';
+                    var html_col_2 = '';
+                    var sbanner = '';
+                    html_swiper +=  '<div class="container-fluid oh">'+
+                            ' <div class="row" style="margin-bottom:5px;">'+
+                            ' <div class="swiper-container" >' +
+                            '<div class="swiper-wrapper">';
+                    for(var i = 0;i < data.info.shoplist.length;i++){
+                        //顶部滑动banner
+                        html_swiper +=  '<div class="swiper-slide">'+
+                                        '<a href="' + data.info.shoplist[i].id + '" class="cut-img">'+
+                                        '<img src="'+ data.info.shoplist[i].shop_logo +'" width="100%"/>'+
+                                        '</a>'+
+                                        '</div>';
                     }
-                    $('.swiper-wrapper').html(tbanner);
+                    html_swiper +=  '</div>' +
+                                    '<div class="swiper-pagination"></div>'+
+                                    '</div>'+
+                                    '</div>'+
+                                    '</div>';
+
+                    html_col_2 +=  '<div class="row index-rec-cate bgwhite">';
+                    for(var j = 0;j< data.info.shoplist.length; j++){
+                    //填充分类小图标
+                    html_col_2 +=   '<div class="col-xs-2 item">'+
+                                    '<a href="'+data.info.shoplist[j].id+'"><span class="img"><img src="'+data.info.shoplist[j].shop_header_img+'" width="40" /></span></a>'+
+                                    '</div>';
+                    }
+                    html_col_2 += '</div>';
+
+                    sbanner += '<div class="sbanner">';
+                    //中部商品banner
+                    for(var k = 0; k < data.info.catelist.length; k++){
+                        sbanner += '<a href="__MODULE__/Cate/index/id/'+data.info.catelist[k].id+'" class="sbanner" > <img src="'+data.info.catelist[k].cate_img+'"> </a>';
+                    }
+                    sbanner += '</div>';
+
+                    $('#wrapper').append(html_swiper);
+                    $('#wrapper').append(html_col_2);
+                    $('#wrapper').append(sbanner);
+
                     var tbswiper = new Swiper('.swiper-container', {
                         pagination: '.swiper-pagination',
                         loop:false,
@@ -45,27 +63,6 @@
                         spaceBetween: 30,
                         autoplay: 3000
                     });
-
-                    //填充分类小图标
-                    var fenlhtml=''
-                    for(var i=0;i<data.info.typelist.length;i++){
-                        fenlhtml +='<div class="col-xs-2 item">'+
-                                ' <a href="'+data.info.typelist[i].id+'">'+
-                                ' <span class="img">' +
-                                '<img src="'+data.info.typelist[i].type_img+'" width="40" /></span>'+
-                                '<span class="txt">'+data.info.typelist[i].type_name+'</span>'+
-                                '</a>'+
-                                ' </div>';
-                    }
-                    $('.index-rec-cate').html(fenlhtml);
-
-                    //中部商品banner
-                    var sbanner=''
-                    for(var i=0;i<data.info.catelist.length;i++){
-                        sbanner+= '<a href="__MODULE__/Cate/index/id/'+data.info.catelist[i].id+'" class="sbanner" > <img src="'+data.info.catelist[i].cate_img+'"> </a>'
-                    }
-                    $('.sbanner').html(sbanner);
-
                 }else{
 
                 }
@@ -74,88 +71,45 @@
 
             }
         });
-        var gotpage=1;
-        var tehui='';
-        Refresh();
-        refresher.init({
-            id: "wrapper",
-            pullDownAction: Refresh,
-            pullUpAction: Load
-        });
-        //特惠精品加载
-        function Load(){
-            $.ajax({
-                type: 'GET',
-                url:'__CONTROLLER__/ajax_index/p/' + gotpage,
-                dataType: 'json',
-                success: function(data){
-                    gotpage++;
-                    ajax(data,true);
-                    $('.pullUp').css('margin-bottom','50px')
-                    if(data.info.userlikeinfo != undefined){
-                        $('.pullUpLabel').html('到底了');
-                        $('.checklast:last').attr('none',true);
-                    }else{
-                        $('.pullUpLabel').html('查看更多');
+
+        $.ajax({
+            type : 'GET',
+            url  : '/Index/ajax_goods',
+            data : {p:1},
+            dataType : 'json',
+            success  : function(data){
+                console.log(data);
+                if(data.code == 10000){
+                    var tehui = '<div class="col-xs-12 bgwhite">' +
+                                '<h5 class=" fs-14 pr"><i class="cube">&nbsp;</i> <span class="bgwhite pr z1">&nbsp;特惠精品</span>' +
+                                '</h5>' +
+                                '</div>' +
+                                '<div class="listwrap clearfix iclist">';
+                    for(var i=0;i<data.info.userlikelist.length;i++){
+                        tehui+='<div class="col-xs-6 goods mleft" style="width:45%">'+
+                                ' <a href="__MODULE__/Goods/goods/gid/'+data.info.userlikelist[i].goods_id+'">'+
+                                ' <div class="img cut-img" style="position:relative;">'+
+                                ' <img src="'+data.info.userlikelist[i].goods_small_img+'"/>'+
+                                ' </div>'+
+                                ' <span class="title">'+data.info.userlikelist[i].goods_name+'</span>'+
+                                '<p class="zprice clearfix">'+
+                                '<font color="#ccc" class="col-xs-7">'+data.info.userlikelist[i].goods_sn+
+                                '</font> <span class="price col-xs-5">￥'+data.info.userlikelist[i].goods_price+'</span><br>'+
+                                ' </p>'+
+                                ' </a>'+
+                                '</div>';
                     }
-                },
-                error: function(xhr, type){
-                    // 即使加载出错，也得重置
+                    tehui += '</div>';
+                    $('#wrapper').append(tehui);
+                }else{
+
                 }
-            });
-        }
-        //特惠精品刷新
-        function Refresh() {
-            gotpage = 1;
-            $.ajax({
-                type: 'GET',
-                url:'__CONTROLLER__/ajax_index',
-                dataType: 'json',
-                success: function(data){
-                    gotpage++;
-                    ajax(data,false);
-                    $('.scroller').css('transform','translate(0px,5px)');
-                },
-                error: function(xhr, type){
-                    // 即使加载出错，也得重置
-                }
-            });
-        }
-        //特惠商品填充
-        function ajax(data,load){
-            var tehui='';
-            for(var i=0;i<data.info.userlikelist.length;i++){
-                tehui+='<div class="col-xs-6 goods mleft" style="width:45%">'+
-                        ' <a href="__MODULE__/Goods/goods/gid/'+data.info.userlikelist[i].goods_id+'">'+
-                        ' <div class="img cut-img" style="position:relative;">'+
-                        ' <img src="'+data.info.userlikelist[i].goods_small_img+'"/>'+
-                        ' </div>'+
-                        ' <span class="title">'+data.info.userlikelist[i].goods_name+'</span>'+
-                        '<p class="zprice clearfix">'+
-                        '<font color="#ccc" class="col-xs-7">'+data.info.userlikelist[i].goods_sn+
-                        '</font> <span class="price col-xs-5">￥'+data.info.userlikelist[i].goods_price+'</span><br>'+
-                        ' </p>'+
-                        ' </a>'+
-                        '</div>';
+            },
+            error : function(xhr){
+
             }
-            $('.listwrap').append(tehui);
-            wrapper.refresh();
-        }
-
-        //插入除特惠外的其他
-        $('.listwrap').before(tbannerF);//插入头部轮播
-        $('.listwrap').before('<div class="row index-rec-cate bgwhite"></div>');//插入分类
-        $('.listwrap').before(' <div class="sbanner"></div>')//插入商品sbanner
-        setTimeout(function(){
-            $('.listwrap').before(' <div class="col-xs-12 bgwhite"><h5 class=" fs-14 pr"><i class="cube">&nbsp;</i> <span class="bgwhite pr z1">&nbsp;特惠精品</span></h5></div>')//插入商品sbanner
-
-        },1500);
-
-
-        $(document).on('click','.goods a', function(){
-            localStorage.goodid=$(this).attr('gid');
-            location.href=hreflink+'/pages/goods_detial.html';
         });
+
     });
 
     function a(){
@@ -164,7 +118,7 @@
         var value = array[Math.round(Math.random()*(array.length-1))];  //随机抽取一个值
         layer.open({
             content: value
-            ,style: 'border:none; background-color:rgba(144,184,48,0.8); color:#fff;'
+            ,style: 'border:none; background-color:rgba(0,0,0,0.8); color:#fff;'
             ,anim:false
             ,skin: 'msg'
             ,time: 3 //2秒后自动关闭

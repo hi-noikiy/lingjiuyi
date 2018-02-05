@@ -48,6 +48,7 @@ class ShopController extends BaseController
             if(!empty($shop_cate)){
                 $res ? true : $this -> error('添加店铺失败！');
                 $shop_cate = explode(',',$shop_cate);
+                $addShopCate = [];
                 foreach($shop_cate as $key => $value){
                     $addShopCate[$key]['shop_id'] = $res;
                     $addShopCate[$key]['shop_cate_name'] = $value;
@@ -63,28 +64,35 @@ class ShopController extends BaseController
         }
     }
 
+    //删除图片
+    public function delete_img($logo){
+        $setting       = C('UPLOAD_QINIU');
+        $key           = substr($logo,strrpos($logo,'/') + 1);
+        $bucket        = $setting['driverConfig']['bucket'];//资源所在空间
+        $secretKey     = $setting['driverConfig']['secretKey'];//资源所在空间
+        $accessKey     = $setting['driverConfig']['accessKey'];//资源所在空间
+        $auth          = new Auth($accessKey,$secretKey);
+        $config        = new \Qiniu\Config();
+        $bucketManager = new BucketManager($auth, $config);
+        $err = $bucketManager -> delete($bucket, $key);
+        $err ? $this -> ajaxReturnData(0,'删除源文件失败') : true;
+    }
+
     public function edit(){
         if(IS_POST){
             $data = I('post.');
             if(isset($data['shop_logo'])){
                 $shop_logo     = D('Shop') -> where(['id' => $data['id']]) -> getField('shop_logo');//删除原图片
-            }elseif(isset($data['shop_logo_web'])){
+                !empty($shop_logo) ? $this -> delete_img($shop_logo) : true;
+            }
+            if(isset($data['shop_logo_web'])){
                 $shop_logo_web     = D('Shop') -> where(['id' => $data['id']]) -> getField('shop_logo_web');//删除原图片
+                !empty($shop_logo_web) ? $this -> delete_img($shop_logo_web) : true;
             }
-            if(!empty($shop_logo) || !empty($shop_logo_web)){
-                $logo = empty($shop_logo) ? $shop_logo_web : $shop_logo;
-                $setting       = C('UPLOAD_QINIU');
-                $key           = substr($logo,strrpos($logo,'/') + 1);
-                $bucket        = $setting['driverConfig']['bucket'];//资源所在空间
-                $secretKey     = $setting['driverConfig']['secretKey'];//资源所在空间
-                $accessKey     = $setting['driverConfig']['accessKey'];//资源所在空间
-                $auth          = new Auth($accessKey,$secretKey);
-                $config        = new \Qiniu\Config();
-                $bucketManager = new BucketManager($auth, $config);
-                $err = $bucketManager -> delete($bucket, $key);
-                $err ? $this -> ajaxReturnData(0,'删除源文件失败') : true;
+            if(isset($data['shop_header_img'])){
+                $shop_header_img     = D('Shop') -> where(['id' => $data['id']]) -> getField('shop_header_img');//删除原图片
+                !empty($shop_header_img) ? $this -> delete_img($shop_header_img) : true;
             }
-
             $res = D('Shop') -> save($data);
             $res !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'修改失败！');
 

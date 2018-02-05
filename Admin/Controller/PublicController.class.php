@@ -124,7 +124,10 @@
                 }else{
                     $data['msg']  = '上传图片成功！';
                     $data['code'] = 10000;
-                    $data['info'] = $info['upload_img']['url'] ? $info['upload_img']['url'] : ($info['shop_logo']['url'] ? $info['shop_logo']['url'] : $info['shop_logo_web']['url']);
+                    $data['info'] = $info['upload_img']['url'] ? $info['upload_img']['url'] :
+                        ($info['shop_logo']['url'] ? $info['shop_logo']['url'] :
+                            ($info['shop_logo_web']['url'] ? $info['shop_logo_web']['url'] :
+                                ($info['upload_img2']['url'] ? $info['upload_img2']['url'] : $info['shop_header_img']['url'])));
                 }
             }
 
