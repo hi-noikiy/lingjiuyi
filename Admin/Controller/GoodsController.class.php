@@ -25,7 +25,7 @@ class GoodsController extends BaseController{
 			//查询商品数据
 			//实例化模型
 			$model = D('Goods');
-			$fields = 'a.goods_id,a.goods_name,a.goods_bigprice,a.goods_price,a.goods_number,a.goods_small_img,a.is_act,a.goods_big_img,b.shop_name,c.cate_name';
+			$fields = 'a.goods_id,a.goods_name,a.goods_bigprice,a.goods_price,a.goods_number,a.goods_small_img,a.is_act,a.goods_big_img,a.is_normal,b.shop_name,c.cate_name';
 			//使用select查询数据 加上limit条件
 			$goods = $model -> alias('a') -> field($fields) -> join('zhouyuting_shop b on a.shop_id = b.id') -> join('zhouyuting_category c on a.cate_id = c.id') -> select();
 			$data  = ['data' => $goods];
@@ -48,14 +48,26 @@ class GoodsController extends BaseController{
 			$data['goods_introduce']   = remove_xss($_POST['goods_introduce']);
 			$data['goods_smallprice']  = $_POST['goods_smallprice'];
 			$data['goods_create_time'] = time();
+			$data['shop_id']           = $_POST['shop_id'];
 			$data['cate_id']           = $_POST['cate_id'];
 			$data['is_act']            = $_POST['act'];
 			$data['attr_value']        = $_POST['attr_value'] ? $_POST['attr_value'] : '';
 			$id = D('Goods') -> add($data);//添加商品信息
 			$id ? true : $this -> error('添加商品数据失败！');
 
+			$shop_cate_id = I('post.shop_cate_id') ? I('post.shop_cate_id') : 0;
+			if(!empty($shop_cate_id)){
+				//如果存在商铺分类主键
+				$sCate = array(
+					'shop_cate_id' => $shop_cate_id,
+					'goods_id'     => $id,
+				);
+				$resShopCate = D('Shop_cate_goods') -> add($sCate);
+				$resShopCate ? true : $this -> error('商铺分类添加失败！');
+			}
 
 			if(!empty($data['attr_value'])){
+				//如果存在商品属性值
 				$attr = [];
 				$i = 0;
 				foreach($_POST['attr_value'] as $k => $v){
@@ -76,6 +88,7 @@ class GoodsController extends BaseController{
 			}
 
 			if(!empty($_FILES['goods_small_img']) && $_FILES['goods_small_img']['error'] == 0){
+				//如果存在商品logo
 				$str1  = 'imageView2/0/q/75|watermark/2/text/bGluZ2ppdXlp/font/dmVyZGFuYQ==/fontsize/';
 				$str2 = '/fill/IzMyQjJFNA==/dissolve/100/gravity/SouthEast/dx/10/dy/10|imageslim';//水印样式
 				$file['goods_small_img'] = $_FILES['goods_small_img'];
@@ -136,7 +149,9 @@ class GoodsController extends BaseController{
 		}else{
 			//展示页面
 			$cates = D('Category') -> where("pid = 0") -> select();
+			$shops = D('Shop') -> field('id,shop_name') -> select();
 			$this -> assign('cates',$cates);
+			$this -> assign('shops',$shops);
 			$this -> display();
 		}
 
@@ -156,6 +171,7 @@ class GoodsController extends BaseController{
 			$data['min_video']       = I('post.video')    ? I('post.video') : false;
 			$data['goods_introduce'] = I('post.goods_introduce') ? I('post.goods_introduce') : false;
 			$data['goods_id']        = I('post.goods_id') ? I('post.goods_id') : false;
+			$data['is_normal']       = I('post.is_normal','','intval') || I('post.is_normal','','intval') == 0 ? I('post.is_normal','','intval') : false;
 
 			if($data['pics_origin']){
 				//如果存在相册，添加相册图片
@@ -202,6 +218,7 @@ class GoodsController extends BaseController{
 				$data['goods_smallprice'] = I('post.goods_smallprice');
 				$data['is_act']           = I('post.act','','intval');
 				$data['cate_id']          = I('post.cate_id','','intval');
+				$data['is_normal']          = I('post.is_normal','','intval');
 				empty($data['cate_id']) ? $this -> error('分类id选择错误！') : true;
 
 				$res = D('Goods') -> save($data);
@@ -227,6 +244,10 @@ class GoodsController extends BaseController{
 				$attr_res ? $this -> success('修改商品信息成功！')  : $this -> error('修改商品属性错误！') ;
 
 
+			}elseif($data['is_normal'] === 0 || $data['is_normal'] === 1){
+				$data['goods_id'] = $id;
+				$res = D('Goods') -> save($data);
+				$res != false ? $this -> ajaxReturnData(10000) : $this -> ajaxReturnData(0,'修改失败');
 			}
 
 		}else{
@@ -418,6 +439,13 @@ class GoodsController extends BaseController{
 			'attrs' => $attrs
 		);
 		$this->ajaxReturn($return);
+	}
+
+	//获取商铺分类
+	public function getcate(){
+		I('get.shop_id','','intval') ? $shop_id = I('get.shop_id','','intval') : $this -> ajaxReturnData(0,'参数错误');
+		$shop_cate = D('Shop_cate') -> where("`shop_id` = $shop_id") -> select();
+		empty($shop_cate) ? $this -> ajaxReturnData(0,'没有商铺分类') : $this -> ajaxReturnSuccess($shop_cate);
 	}
 
 

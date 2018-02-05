@@ -185,7 +185,7 @@
                     "targets":-2,
                     "render":function(data,type,row,meta) {
                         var attr_values = row.attr_values;
-                        var reg = new RegExp("(\\S{" + 20 + "})","g");
+                        var reg = new RegExp("(\\S{" + 10 + "})","g");
                         return attr_values.replace(reg,"$1<br/>");
                     }
                 },

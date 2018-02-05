@@ -32,6 +32,7 @@
                             <th>所属店铺</th>
                             <th>所属分类id</th>
                             <th>活动商品</th>
+                            <th>是否上架</th>
                             <th>操作</th>
                             <th>大图</th>
                         </tr>
@@ -78,6 +79,7 @@
                 { "data": "shop_name"},
                 { "data": "cate_name"},
                 { "data": "is_act"},
+                { "data": "is_normal"},
                 { "data": null},
                 { "data": "goods_big_img"}
             ],
@@ -86,7 +88,8 @@
                     "targets":-1,
                     "visible": false,
                     "searchable": false
-                }, {
+                },
+                {
                     "targets":-2,
                     "bSortable": false,
                     "render":function(data,type,row,meta) {
@@ -97,8 +100,30 @@
                         html += "&nbsp;<a href='javascript:void(0);' onclick='show_sales(this,"+ id + ")' class='down btn btn-default btn-xs'><i class='fa fa-arrow-down'></i>查看销售量</a>";
                         return html;
                     }
-                },{
+                },
+                {
                     "targets":-3,
+                    "bSortable": false,
+                    "render":function(data,type,row,meta) {
+                        var id = row.goods_id;
+                        var is_normal = row.is_normal;
+                        var html = '<div class="switch">'+
+                                '<div class="onoffswitch" onclick="editNormal(this,'+id+')">'+
+                                '<input type="checkbox"';
+                        if(is_normal == 1){
+                            html += ' checked="" ';
+                        }
+                        html += 'class="onoffswitch-checkbox" name="edit_is_normal" />'+
+                                '<label class="onoffswitch-label" for="example1">'+
+                                '<span class="onoffswitch-inner"></span> <span class="onoffswitch-switch"></span>'+
+                                '</label>'+
+                                '</div>'+
+                                '</div>';
+                        return html;
+                    }
+                },
+                {
+                    "targets":-4,
                     "render":function(data,type,row,meta) {
                         var id = row.is_act;
                         var html = '';
@@ -223,7 +248,7 @@
             $('#new_html').remove();
 
             $(_this_tr).addClass('newone');
-            var _row_tr  = '<tr id="new_html" class="newtwo"><td colspan="10">' +
+            var _row_tr  = '<tr id="new_html" class="newtwo"><td colspan="11">' +
                     '<div class="row" style="padding-bottom: 10px;padding-top: 10px;">'+
                     '<div class="col-sm-2 m-b-xs">'+
                     '年&emsp;'+
@@ -451,6 +476,38 @@
             error : function(){
 
             }
+        });
+    }
+    //修改是否上架
+    function editNormal(_this,id){
+        var status = $(_this).find('input[name=edit_is_normal]').attr('checked'),is_normal;
+        console.log(status);
+        if(status == 'checked'){
+            is_normal = 0;
+        }else if(status == undefined){
+            is_normal = 1;
+        }
+        $.ajax({
+            type : 'post',
+            url  : '__CONTROLLER__/edit',
+            data : {id:id,is_normal:is_normal},
+            dataType : 'json',
+            success  : function(data){
+                if(data.code == 10000){
+                    layer.msg('修改成功！', {time: 5000, icon:6});
+                    if(status == 'checked'){
+                        $(_this).find('input[name=edit_is_normal]').removeAttr('checked');
+                        $(_this).find('input[name=edit_is_normal]').removeProp('checked',false);
+                    }else if(status == undefined){
+                        $(_this).find('input[name=edit_is_normal]').prop('checked',true);
+                        $(_this).find('input[name=edit_is_normal]').attr('checked','');
+                    }
+
+                }else{
+                    layer.msg(data.msg);
+                }
+            },
+            error : function(){}
         });
     }
 

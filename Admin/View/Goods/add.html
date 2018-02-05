@@ -203,6 +203,17 @@
                                     </div>
                                 </div>
                                 <div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3">所属商铺：</label>
+                                    <div class="col-xs-4 col-sm-3">
+                                        <select class="select" size="1" name="shop_id">
+                                            <option value="0">==请选择==</option>
+                                            <volist name="shops" id="val">
+                                                <option value="{$val.id}">{$val.shop_name}</option>
+                                            </volist>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="row cl">
                                     <label class="form-label col-xs-4 col-sm-3">所属分类：</label>
                                     <div class="col-xs-4 col-sm-3">
                                         <select class="dfinput select" size="1" name="cate_id">
@@ -452,28 +463,67 @@
             }
         }
 
-    });
-    //删除相册
-    $(document).on('click','#del_pics',function(){
-        var _this = this;
-        $(this).closest('.row').remove();//移除图片一行
-        $('#goods_pics').closest('.row').remove();
-    });
-    //验证表单数据
-    $('#submit').click(function(){
 
-        var res = true;
-        $('.input-file').each(function(){
-            if($(this).val() == ''){
-                res = false;
-                layer.msg('基本信息中的商品logo为必填哦！相册中点击上传图片之后必须上传图片，不能为空哦！', {icon: 5});
-                return false;
+
+        //删除相册
+        $(document).on('click','#del_pics',function(){
+            var _this = this;
+            $(this).closest('.row').remove();//移除图片一行
+            $('#goods_pics').closest('.row').remove();
+        });
+        //验证表单数据
+        $('#submit').click(function(){
+
+            var res = true;
+            $('.input-file').each(function(){
+                if($(this).val() == ''){
+                    res = false;
+                    layer.msg('基本信息中的商品logo为必填哦！相册中点击上传图片之后必须上传图片，不能为空哦！', {icon: 5});
+                    return false;
+                }
+            });
+            if(!res)return false;
+            $('#form_add').submit();
+
+        });
+        //点击商铺时
+        $("select[name='shop_id']").change(function(){
+            var _this = $(this);
+            var shop_id = $(_this).val();
+            if(shop_id == 0){
+                $(this).find("select[name='shop_cate_id']").remove();
+            }else{
+                //获取商铺分类
+                $.ajax({
+                    type : 'get',
+                    url  : '/Goods/getcate',
+                    data : {shop_id:shop_id},
+                    dataType : 'json',
+                    success  : function(data){
+                        if(data.code == 10000){
+                            var html = '<div class="row cl">'+
+                                    '<label class="form-label col-xs-4 col-sm-3">店铺分类：</label>'+
+                                    '<div class="col-xs-4 col-sm-3">'+
+                                    '<select class="select" size="1" name="shop_cate_id">';
+                            for(var i = 0; i < data.info.length; i++){
+                                html += '<option value="'+ data.info[i].id +'">'+ data.info[i].shop_cate_name +'</option>';
+                            }
+                                html += '</select>'+
+                                    '</div>'+
+                                    '</div>';
+                            $(_this).closest('.row').after(html);
+                        }else{
+                            $(this).find("select[name='shop_cate_id']").remove();
+                            layer.msg(data.msg);
+                        }
+                    }
+                });
             }
         });
-        if(!res)return false;
-        $('#form_add').submit();
 
     });
+
+
 
 
 
