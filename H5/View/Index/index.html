@@ -7,52 +7,35 @@
     $(function(){
         $.ajax({
             type: 'GET',
-            url:'/Index/ajax_index',
+            url:'/Index/get_banner',
             dataType: 'json',
             success: function(data){
-                //console.log(data.code);
-
                 if(data.code == 10000){
-                    var html_swiper = '';
-                    var html_col_2 = '';
-                    var sbanner = '';
-                    html_swiper +=  '<div class="container-fluid oh">'+
-                            ' <div class="row" style="margin-bottom:5px;">'+
-                            ' <div class="swiper-container" >' +
-                            '<div class="swiper-wrapper">';
-                    for(var i = 0;i < data.info.shoplist.length;i++){
-                        //顶部滑动banner
-                        html_swiper +=  '<div class="swiper-slide">'+
-                                        '<a href="' + data.info.shoplist[i].id + '" class="cut-img">'+
-                                        '<img src="'+ data.info.shoplist[i].shop_logo +'" width="100%"/>'+
-                                        '</a>'+
-                                        '</div>';
-                    }
+                var html_swiper =    '<div class="container-fluid oh"><div class="row" style="margin-bottom:5px;">'+
+                                     '<div class="swiper-container" ><div class="swiper-wrapper">';
+                for(var i = 0;i < data.info.length;i++){
+                    //顶部滑动banner
+                    html_swiper +=  '<div class="swiper-slide">'+
+                                    '<a href="' + data.info[i].id + '" class="cut-img"><img src="'+ data.info[i].shop_logo +'" width="100%"/></a>'+
+                                    '</div>';
+                }
                     html_swiper +=  '</div>' +
                                     '<div class="swiper-pagination"></div>'+
                                     '</div>'+
                                     '</div>'+
                                     '</div>';
 
-                    html_col_2 +=  '<div class="row index-rec-cate bgwhite">';
-                    for(var j = 0;j< data.info.shoplist.length; j++){
+                    var html_col_2 =  '<div class="row index-rec-cate bgwhite">';
+                    for(var j = 0;j< data.info.length; j++){
                     //填充分类小图标
                     html_col_2 +=   '<div class="col-xs-2 item">'+
-                                    '<a href="'+data.info.shoplist[j].id+'"><span class="img"><img src="'+data.info.shoplist[j].shop_header_img+'" width="40" /></span></a>'+
+                                    '<a href="'+data.info[j].id+'"><span class="img"><img src="'+data.info[j].shop_header_img+'" width="40" /></span></a>'+
                                     '</div>';
                     }
                     html_col_2 += '</div>';
 
-                    sbanner += '<div class="sbanner">';
-                    //中部商品banner
-                    for(var k = 0; k < data.info.catelist.length; k++){
-                        sbanner += '<a href="__MODULE__/Cate/index/id/'+data.info.catelist[k].id+'" class="sbanner" > <img src="'+data.info.catelist[k].cate_img+'"> </a>';
-                    }
-                    sbanner += '</div>';
-
                     $('#wrapper').append(html_swiper);
                     $('#wrapper').append(html_col_2);
-                    $('#wrapper').append(sbanner);
 
                     var tbswiper = new Swiper('.swiper-container', {
                         pagination: '.swiper-pagination',
@@ -71,6 +54,25 @@
 
             }
         });
+        $.ajax({
+            type : 'GET',
+            url  : '/Index/get_cate_banner',
+            data : {p:1},
+            dataType : 'json',
+            success  : function(data){
+                if(data.code == 10000){
+                    var sbanner = '<div class="sbanner">';
+                    //中部商品banner
+                    for(var k = 0; k < data.info.length; k++){
+                        sbanner += '<a href="__MODULE__/Cate/index/id/'+data.info[k].id+'" class="sbanner" > <img src="'+data.info[k].cate_img+'"> </a>';
+                    }
+                    sbanner += '</div>';
+                    $('#wrapper').append(sbanner);
+                }else{}
+            },error : function(xhr){
+
+            }
+        });
 
         $.ajax({
             type : 'GET',
@@ -78,7 +80,6 @@
             data : {p:1},
             dataType : 'json',
             success  : function(data){
-                console.log(data);
                 if(data.code == 10000){
                     var tehui = '<div class="col-xs-12 bgwhite">' +
                                 '<h5 class=" fs-14 pr"><i class="cube">&nbsp;</i> <span class="bgwhite pr z1">&nbsp;特惠精品</span>' +
@@ -118,7 +119,7 @@
         var value = array[Math.round(Math.random()*(array.length-1))];  //随机抽取一个值
         layer.open({
             content: value
-            ,style: 'border:none; background-color:rgba(0,0,0,0.8); color:#fff;'
+            ,style: 'border:none; background-color:rgba(255,255,255,0.5); color:#92d2a7;'
             ,anim:false
             ,skin: 'msg'
             ,time: 3 //2秒后自动关闭

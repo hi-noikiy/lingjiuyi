@@ -125,13 +125,20 @@
                 {
                     "targets":-4,
                     "render":function(data,type,row,meta) {
-                        var id = row.is_act;
-                        var html = '';
-                        if(id == 0){
-                            html += "<span style='color:#fb2424'><i class='fa fa-tag' aria-hidden='true'></i>YES</span>";
-                        }else if(id == 1){
-                            html += "<span>NO</span>";
+                        var id = row.goods_id;
+                        var is_act = row.is_act;
+                        var html = '<div class="switch">'+
+                                '<div class="onoffswitch" onclick="editAct(this,'+id+')">'+
+                                '<input type="checkbox"';
+                        if(is_act == 1){
+                            html += ' checked="" ';
                         }
+                        html += 'class="onoffswitch-checkbox" name="edit_is_act" />'+
+                                '<label class="onoffswitch-label" for="example1">'+
+                                '<span class="onoffswitch-inner"></span> <span class="onoffswitch-switch"></span>'+
+                                '</label>'+
+                                '</div>'+
+                                '</div>';
                         return html;
                     }
                 },
@@ -501,6 +508,38 @@
                     }else if(status == undefined){
                         $(_this).find('input[name=edit_is_normal]').prop('checked',true);
                         $(_this).find('input[name=edit_is_normal]').attr('checked','');
+                    }
+
+                }else{
+                    layer.msg(data.msg);
+                }
+            },
+            error : function(){}
+        });
+    }
+    //修改是否活动
+    function editAct(_this,id){
+        var status = $(_this).find('input[name=edit_is_act]').attr('checked'),is_act;
+        console.log(status);
+        if(status == 'checked'){
+            is_act = 0;
+        }else if(status == undefined){
+            is_act = 1;
+        }
+        $.ajax({
+            type : 'post',
+            url  : '__CONTROLLER__/edit',
+            data : {id:id,is_act:is_act},
+            dataType : 'json',
+            success  : function(data){
+                if(data.code == 10000){
+                    layer.msg('修改成功！', {time: 5000, icon:6});
+                    if(status == 'checked'){
+                        $(_this).find('input[name=edit_is_act]').removeAttr('checked');
+                        $(_this).find('input[name=edit_is_act]').removeProp('checked',false);
+                    }else if(status == undefined){
+                        $(_this).find('input[name=edit_is_act]').prop('checked',true);
+                        $(_this).find('input[name=edit_is_act]').attr('checked','');
                     }
 
                 }else{

@@ -9,11 +9,13 @@ class UserController extends CommonController {
 
     //登录展示页面
     public function login(){
+        layout(false);
         $this -> display();
     }
 
     //注册页面
     public function register(){
+        layout(false);
         $this -> display();
     }
 

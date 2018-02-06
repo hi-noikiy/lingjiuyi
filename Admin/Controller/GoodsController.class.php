@@ -172,6 +172,7 @@ class GoodsController extends BaseController{
 			$data['goods_introduce'] = I('post.goods_introduce') ? I('post.goods_introduce') : false;
 			$data['goods_id']        = I('post.goods_id') ? I('post.goods_id') : false;
 			$data['is_normal']       = I('post.is_normal','','intval') || I('post.is_normal','','intval') == 0 ? I('post.is_normal','','intval') : false;
+			$data['is_act']          = I('post.is_act','','intval')    || I('post.is_act','','intval') == 0    ? I('post.is_act','','intval')    : false;
 
 			if($data['pics_origin']){
 				//如果存在相册，添加相册图片
@@ -245,6 +246,10 @@ class GoodsController extends BaseController{
 
 
 			}elseif($data['is_normal'] === 0 || $data['is_normal'] === 1){
+				$data['goods_id'] = $id;
+				$res = D('Goods') -> save($data);
+				$res != false ? $this -> ajaxReturnData(10000) : $this -> ajaxReturnData(0,'修改失败');
+			}elseif($data['is_act'] === 0 || $data['is_act'] === 1){
 				$data['goods_id'] = $id;
 				$res = D('Goods') -> save($data);
 				$res != false ? $this -> ajaxReturnData(10000) : $this -> ajaxReturnData(0,'修改失败');

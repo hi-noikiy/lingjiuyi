@@ -12,28 +12,16 @@ class IndexController extends CommonController {
         $this ->display();
     }
 
+    //顶部滑动banner 和店铺小图标
+    public function get_banner(){
+        $shoplist = M('Shop')-> field('id,shop_logo,shop_header_img') -> where(array('is_top' => 1)) -> select();
+        empty($shoplist) ? $this -> ajaxReturnData(0,'无banner') : $this -> ajaxReturnSuccess($shoplist);
+    }
 
-    public function ajax_index(){
-
-        //首页顶部展示的置顶的商品信息
-        $shoplist = M('Shop')
-            -> field('id,shop_logo,shop_header_img')
-            -> where(array('is_top' => 1))
-            -> select();
-        //首页中部分类大图标信息
-        $catelist = M('Category')
-            -> field('id,cate_img')
-            -> where(array('pid' => 0))
-            -> select();
-
-        //设置返回数据格式
-        $data = array(
-            'code' => 10000,
-            'msg'  => 'success',
-            'info' => compact('shoplist','catelist')
-        );
-        //返回数据
-        $this->ajaxReturn($data);
+    //获取分类cate_banner
+    public function get_cate_banner(){
+        $catelist = M('Category') -> field('id,cate_img') -> where(array('pid' => 0)) -> select();
+        empty($catelist) ? $this -> ajaxReturnData(0,'无分类banner') : $this -> ajaxReturnSuccess($catelist);
     }
 
     public function ajax_goods(){
@@ -42,9 +30,7 @@ class IndexController extends CommonController {
         $uid = session('userinfo.uid') ? session('userinfo.uid') : 0;//测试数据，暂时使用，后期修改
         if($uid){
             //如果存在用户，获取用户喜欢表中的关键字
-            $keywords = M('User')
-                -> where(array('user_id' => $uid))
-                -> getField('search_keywords');
+            $keywords = M('User') -> where(array('user_id' => $uid)) -> getField('search_keywords');
             //表中用户喜欢关键字为一整个字符串，拆分成数组
             $keywords = explode(',',$keywords);
             //定义查询条件
@@ -69,34 +55,18 @@ class IndexController extends CommonController {
         $p = $_GET['p'] ? $_GET['p'] : 1;//当前页码
         $firstRow = $page -> firstRow;//起始行数
         $totalPages = $page -> totalPages;// 分页总页面数
-        //如果当前页大于总页码
-        if($p > $totalPages){
-            //返回信息
-            $userlikeinfo = '已经是最后一页了';
-            $userlikelist = '';
-        }else{
-            //根据关键字查询商品表中的标题
-            $userlikelist = M('goods')
-                -> field('goods_id,goods_name,goods_price,goods_small_img,goods_sn')
-                -> where($where)
-                -> limit($firstRow,$pagesize)
-                -> select();
-            $pagesize = ($count < $pagesize) ? $count : $pagesize;
-            $pager = array(
-                'nowPage'    => (int)$p,
-                'pagesize'   => (int)$pagesize,
-                'totalPages' => $totalPages
-            );
-        }
 
-        //设置返回数据格式
-        $data = array(
-            'code' => 10000,
-            'msg'  => 'success',
-            'info' => compact('userlikelist','pager','userlikeinfo')
+        $userlikelist = M('goods') -> field('goods_id,goods_name,goods_price,goods_small_img,goods_sn') -> where($where) -> limit($firstRow,$pagesize) -> select();
+
+        //根据关键字查询商品表中的标题
+        $pagesize = ($count < $pagesize) ? $count : $pagesize;
+        $pager = array(
+            'nowPage'    => (int)$p,
+            'pagesize'   => (int)$pagesize,
+            'totalPages' => $totalPages
         );
-        //返回数据
-        $this->ajaxReturn($data);
+
+        empty($userlikelist) ? $this -> ajaxReturnData(0,'无数据') : $this -> ajaxReturnSuccess(compact('userlikelist','pager'));
     }
 
 

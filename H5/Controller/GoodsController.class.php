@@ -50,14 +50,8 @@ class GoodsController extends CommonController {
             'totalPages' => $totalPages
         );
 
-        //设置返回数据格式
-        $data = array(
-            'code' => 10000,
-            'msg'  => 'success',
-            'info' => compact('goodslist','page')
-        );
-        //返回数据
-        $this->ajaxReturn($data);
+        empty($goodslist) ? $this -> ajaxReturnData(0,'无数据') : $this -> ajaxReturnSuccess(compact('goodslist','page'));
+
     }
 
     //ajax商品详情页

@@ -1,33 +1,44 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, width=device-width">
+    <meta name="format-detection" content="telephone=no, email=no"/>
+    <title>零玖一</title>
+    <link href="__PUBLIC__/H5/css/style/style.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/style/bootstrap.min.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/style/base.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/layer.css" type="text/css" rel="stylesheet"/>
+    <link href="__PUBLIC__/H5/css/logo.css" type="text/css" rel="stylesheet"/>
 
-<script src="__PUBLIC__/H5/js/base/layer.js" type="text/javascript"></script>
-<style type="text/css">
-.form-list .name {
-    padding-left: 15px;
-}
-</style>
-<div class="container">
+    <script src="__PUBLIC__/H5/js/base/layer.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/H5/js/base/jquery.min.js" type="text/javascript"></script>
+    <style>
+        .form-list .name {
+            padding-left: 15px;
+        }
+    </style>
+
+</head>
+<body class="graybg" style="position:static; height:100%; margin:0; background: #f5f5f5">
+<div class="login">
     <div class="row">
-        <div class="col-xs-12 tc mt20 mb20">
-            <img src="__PUBLIC__/H5/css/images/logo.png" class="pc-20"/>
-        </div>
+    <div class="col-xs-12 tc mt20 mb20">
+    <img src="__PUBLIC__/H5/css/images/logo.jpg" class="pc-20"/>
     </div>
-    <div class="row form-list bgwhite">
-        <div class="col-xs-3 name">手机号</div>
-        <div class="col-xs-9 input-text">
-            <input type="text" id="J_username" name="username" placeholder="手机号/用户名/邮箱" />
-        </div>
-        <div class="col-xs-3 name">登录密码</div>
-        <div class="col-xs-9 input-text">
-            <input type="password" id="J_password" name="password" placeholder="请输入登录密码" >
-        </div>
     </div>
-    <div class="row form-list">
-        <div class="col-xs-12 mt20"> <button class="submit-btn" >登录</button></div>
-        <div class="col-xs-12 mt10">
-            <a href="__CONTROLLER__/register" class="fl fs-12">快速注册！</a>
-            <a href="forget_pass.html" class="fr fs-12">忘记密码？</a>
+    <div class="login-form">
+        <div class="login-inp">
+            <label>登录</label>
+            <input type="text" id="J_username" name="username" placeholder="手机号/用户名/邮箱">
         </div>
+        <div class="login-inp">
+            <label>密码</label>
+            <input type="password" id="J_password" name="password" placeholder="请输入登录密码">
+        </div>
+        <div class="login-inp"><a href="javascript:void(0);" class="submit-btn">立即登录</a></div>
     </div>
+    <div class="login-txt"><a href="/User/register">立即注册</a>|<a href="/User/forget_pass">忘记密码？</a></div>
 </div>
 <script>
     $(function(){
@@ -81,3 +92,5 @@
         })
     });
 </script>
+</body>
+</html>
