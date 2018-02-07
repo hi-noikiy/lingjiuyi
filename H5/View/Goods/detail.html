@@ -18,12 +18,12 @@
     .item-content{margin-bottom:40px;}
     .swiper-pagination-bullet-active {
         opacity: 1;
-        background: #90b830;
+        background: #92d2a7;
     }
     .choice-attr .attr-list .list button.ac {
         color: #fff;
-        background: #90b830;
-        border-color: #90b830;
+        background: #92d2a7;
+        border-color: #92d2a7;
     }
     .choice-attr .attr-list .list button {
         display: inline-block;
@@ -96,7 +96,7 @@
                 });
                 //商品属性
                 var gintro='<div class="col-xs-12">'+
-                        ' <p class="title"  num="'+data.info.good.goods_number+'" gsrc="'+data.info.good+'">'+data.info.good.goods_name+'</p>'+
+                        ' <p class="title"  num="'+data.info.good.goods_number+'" gsrc="'+data.info.good.goods_small_img+'">'+data.info.good.goods_name+'</p>'+
                         '<p class="price">'+
                         '<span class="green fs-16 fl">￥'+data.info.good.goods_price+'</span>'+
                         '<span class="grey sthrough fs-12 fl mt5 ml5 mr5">市场价￥'+data.info.good.goods_bigprice+'</span>'+
@@ -106,10 +106,9 @@
 
                 //商品详情
                 var gdetail='';
-                //for(var i=0;i<data.info.good.length;i++ ){
-                    //gdetail+='<img src="'+data.info.good.goods_introduce+'">';
-                //}
-                gdetail+=data.info.good.goods_introduce;
+                for(var i = 0; i < data.info.good.goods_introduce.length; i++ ){
+                    gdetail+='<img src="'+ data.info.good.goods_introduce[i] +'" style="margin: 0;padding: 0;">';
+                }
                 $('.item-content').html(gdetail);
             },
             error: function(xhr, type){

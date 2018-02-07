@@ -10,6 +10,7 @@ class GoodsController extends CommonController {
         $goods_id = I('get.id','','intval');
         $where = "goods_id = $goods_id";
         $goods = D('Goods') -> where($where) -> relation(true) -> find();
+        $goods['goods_introduce'] = explode(',',$goods['goods_introduce']);
         $goods['Heart'] = count($goods['Heart']);//收藏数
         $goods['Comment_num'] = D('Comment') -> where($where) -> count('goods_id');//评论数
 

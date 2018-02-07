@@ -127,7 +127,9 @@
                     $data['info'] = $info['upload_img']['url'] ? $info['upload_img']['url'] :
                         ($info['shop_logo']['url'] ? $info['shop_logo']['url'] :
                             ($info['shop_logo_web']['url'] ? $info['shop_logo_web']['url'] :
-                                ($info['upload_img2']['url'] ? $info['upload_img2']['url'] : $info['shop_header_img']['url'])));
+                                ($info['upload_img2']['url'] ? $info['upload_img2']['url'] :
+                                    ($info['shop_header_img']['url'] ? $info['shop_header_img']['url'] :
+                                        ($info['goods_pics']['url'] ? $info['goods_pics']['url'] : $info['goods_introduce']['url'])))));
                 }
             }
 

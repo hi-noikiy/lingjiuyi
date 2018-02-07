@@ -113,6 +113,14 @@
         border-radius: 3px;
         overflow: hidden;
     }
+    .fileInput{
+        height:100px;
+        width: 100px;
+        position:absolute;
+        opacity: 0;
+        filter:alpha(opacity=0);
+        cursor:pointer;
+    }
 </style>
 <body class="gray-bg">
 <div class="wrapper wrapper-content animated fadeInRight">
@@ -136,7 +144,7 @@
                                         <span>提示：请上传像素大于800px的图片，图片尺寸需要1:1,否则将自动剪裁成1:1</span>
                                     </div>
                                     <volist name="gpics" id="val">
-                                    <div class="row cl" id="goods_pics">
+                                    <div class="row cl" >
                                         <label class="form-label col-xs-4 col-sm-3"></label>
                                         <div class="formControls col-xs-6 col-sm-8">
                                         <img src="{$val.pics_mid}" class="show_img" alt="暂无图片" style="width: 100px;padding-bottom: 10px;">
@@ -287,12 +295,32 @@
                                 <form action="" method="post" class="form form-horizontal" id="demoform-3">
                                     <div class="row cl">
                                         <label class="form-label col-xs-4 col-sm-3">商品详情：</label>
-                                        <div class="formControls col-xs-6 col-sm-8">
-                                            <input type="hidden" name="id" value="{$goods.goods_id}">
-                                            <textarea id="ueditor" class="textarea" placeholder="说点什么..." style="width: 800px;height:400px;" name="goods_introduce">{$goods.goods_introduce}</textarea>
+                                        <div class="formControls col-xs-8 col-sm-9">
+                                            <volist name="goods['goods_introduce']" key="key" id="val">
+                                                <if condition=" $val != '' ">
+                                                    <div class="row cl" >
+                                                        <label class="form-label col-xs-4 col-sm-3"></label>
+                                                        <div class="formControls col-xs-6 col-sm-8">
+                                                            <img src="{$val}" class="show_img" alt="暂无图片" style="width: 100px;padding-bottom: 10px;">
+                                                            <div style="display: none;"><img src="{$val}" style="width: 400px;"/></div>
+                                                            <span class="btn-upload form-group">
+                                                            <a href="javascript:void(0);" id="del_i_img" i_id="{$key}" class="btn btn-primary upload-btn">
+                                                                <i class="fa fa-minus-square" aria-hidden="true"></i> 删除图片
+                                                            </a>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </if>
+                                            </volist>
+                                            <div class="row cl">
+                                                <label class="form-label col-xs-4 col-sm-3"></label>
+                                                <div class="col-xs-6 col-sm-8">
+                                                    <input type="file" class="fileInput" id="goods_introduce" name="goods_introduce" style="width: 100px;height: 100px;">
+                                                    <div class="xiangce" title="添加图片"></div>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div style="text-align:center;"><button class="btn btn-primary" id="submit2">提交</button></div>
                                 </form>
                             </div>
                         </div>
@@ -390,9 +418,44 @@
             $(tabCon).eq(index).show();
         });
     };
-    var ue = UE.getEditor('ueditor', {
-        autoHeight: false
-    });
+    function editGoods(id,pics,video){
+        $.ajax({
+            type : 'post',
+            url  : '__CONTROLLER__/edit',
+            data : {id:id,pics:pics,video:video},
+            dataType : 'json',
+            success  : function(data){
+                if(data.code == 10000){
+                    if(data.msg == '上传图片成功！'){
+                        console.log(data.info);
+                        $('#upload_pics').closest('.row').prev('.row').find('.formControls').find('a').attr('pic_id',data.info);
+                    }
+                    layer.msg(data.msg, {icon: 6});
+                }else{
+                    layer.msg(data.msg, {icon: 5});
+                }
+            },
+            error : function(){
+                layer.msg('网络繁忙，请稍后再试！', {icon: 5});
+            }
+        });
+    }
+    //保存商品详情
+    function save_goods_introduce(id,url){
+        $.ajax({
+            type : 'post',
+            url  : '/Goods/edit_introduce',
+            data : {id:id,url:url},
+            dataType : 'json',
+            success  : function(data){
+                if(data.code == 10000){
+                    layer.msg('上传图片成功！');
+                }else{
+                    layer.msg(data.msg);
+                }
+            },error : function(){}
+        });
+    }
     $(function(){
         $.Huitab("#tab_demo .tabBar span","#tab_demo .tabCon","current","click","1");
         //获取商品分类
@@ -498,14 +561,9 @@
 
         //上传相册图片
         $(document).on('change','#upload_pics',function(){
-            // 获取文件路径
             var filePath = $("input[name='goods_pics']").val();
-            // 获取“.”位置
             var extStart = filePath.lastIndexOf(".");
-            // 获取文件格式后缀，并全部大写
             var ext = filePath.substring(extStart, filePath.length).toUpperCase();
-
-            // 判断文件格式
             if (ext != ".BMP" && ext != ".PNG" && ext != ".JPG" && ext != ".JPEG") {
                 layer.open({
                     content: "图片仅限于.gif .png .jpg .jpeg文件。"
@@ -530,13 +588,13 @@
                                     '<div class="formControls col-xs-6 col-sm-8">'+
                                     '<img src="' + data.info + '" alt="暂无图片" style="width: 100px;padding-bottom: 10px;">'+
                                     '<span class="btn-upload form-group">'+
-                                    '<a href="javascript:void(0);" id="del_pics" pic_id="{$val.id}" class="btn btn-primary upload-btn">'+
+                                    '<a href="javascript:void(0);" id="del_pics" class="btn btn-primary upload-btn">'+
                                     '<i class="fa fa-minus-square" aria-hidden="true"></i> 删除图片'+
                                     '</a>'+
                                     '</span>'+
                                     '</div>'+
                                     '</div>';
-                            $('#goods_pics').appendTo(html);
+                            $('#upload_pics').closest('.row').before(html);
                             var href  = window.location.href;
                             var id    = href.substring(href.lastIndexOf("/") + 1, href.length);
                             var url   = data.info;
@@ -559,14 +617,9 @@
 
         //上传视频
         $(document).on('change','#upload_video',function(){
-            // 获取文件路径
             var filePath = $("input[name='upload_video']").val();
-            // 获取“.”位置
             var extStart = filePath.lastIndexOf(".");
-            // 获取文件格式后缀，并全部大写
             var ext = filePath.substring(extStart, filePath.length).toUpperCase();
-
-            // 判断文件格式
             if (ext != ".FLA" && ext != ".AVI" && ext != ".WMV" && ext != ".ASF" && ext != ".DAT" && ext != "VOB" && ext != "MPG" && ext != "MPEG" && ext != "3GP" && ext != "3G2" && ext != "MKV" && ext != "RM" && ext != "RMVB" &&  ext != "MOV" && ext != "OGG" && ext != "OGV" && ext != ".MP4") {
                 layer.open({
                     content: "请参考提示的格式上传视频！"
@@ -669,26 +722,83 @@
         $(document).on('mouseout','.show_img',function(){
             layer.closeAll();
         });
+        //添加商品详情图片
+        $(document).on('change','#goods_introduce',function(){
+            var filePath = $("input[name='goods_introduce']").val();
+            var extStart = filePath.lastIndexOf(".");
+            var ext = filePath.substring(extStart, filePath.length).toUpperCase();
+            if (ext != ".BMP" && ext != ".PNG" && ext != ".JPG" && ext != ".JPEG") {
+                layer.open({
+                    content: "图片仅限于.gif .png .jpg .jpeg文件。"
+                    ,skin: 'msg'
+                    ,time: 1 //2秒后自动关闭
+                });
+                return false;
+            }
+            else {
+                // 使用ajaxfileupload上传文件
+                $.ajaxFileUpload({
+                    type:"POST",
+                    url :"__MODULE__/Public/upload_img",
+                    secureuri:false,
+                    fileElementId:"goods_introduce",//文件选择框的id属性
+                    dataType: 'json',   //json
+                    success: function (data) {
 
-    });
-    function editGoods(id,pics,video){
-        $.ajax({
-            type : 'post',
-            url  : '__CONTROLLER__/edit',
-            data : {id:id,pics:pics,video:video},
-            dataType : 'json',
-            success  : function(data){
-                if(data.code == 10000){
-                    layer.msg(data.msg, {icon: 6});
-                }else{
-                    layer.msg(data.msg, {icon: 5});
-                }
-            },
-            error : function(){
-                layer.msg('上传视频出错啦！！！', {icon: 5});
+                        if (data.code == 10000) {
+                            var html = '<div class="row cl" >'+
+                                    '<label class="form-label col-xs-4 col-sm-3"></label>'+
+                                    '<div class="formControls col-xs-6 col-sm-8">'+
+                                    '<img src="' + data.info + '" alt="暂无图片" class="show_img" style="width: 100px;padding-bottom: 10px;">'+
+                                    '<span class="btn-upload form-group">'+
+                                    '</span>'+
+                                    '</div>'+
+                                    '</div>';
+                            $('#goods_introduce').closest('.row').before(html);
+                            var href  = window.location.href;
+                            var id    = href.substring(href.lastIndexOf("/") + 1, href.length);
+                            var url   = data.info;
+                            save_goods_introduce(id,url);
+                        } else{
+                            layer.open({
+                                content: data.msg
+                                ,skin: 'msg'
+                                ,time: 1 //2秒后自动关闭
+                            })
+                        }
+                    },
+                    error: function(xhr, type){
+                        // 即使加载出错，也得重置
+                    }
+                });
             }
         });
-    }
+        //删除商品详情图片
+        $(document).on('click','#del_i_img',function(){
+            var href  = window.location.href;
+            var id    = href.substring(href.lastIndexOf("/") + 1, href.length);
+            var key = $(this).attr('i_id');
+            $.ajax({
+                type : 'post',
+                data : {id:id,key:key},
+                url  : '__CONTROLLER__/del_img',
+                dataType : 'json',
+                success  : function(data){
+                    if(data.code == 10000){
+                        layer.msg('删除成功！');
+                    }else{
+                        layer.msg(data.msg);
+                    }
+
+                },
+                error : function(xhr){
+
+                }
+            });
+        });
+
+    });
+
 
 
 

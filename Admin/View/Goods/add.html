@@ -112,6 +112,15 @@
         border-radius: 3px;
         overflow: hidden;
     }
+    .fileInput{
+        height:100px;
+        width: 100px;
+        position:absolute;
+        opacity: 0;
+        filter:alpha(opacity=0);
+        cursor:pointer;
+    }
+
 </style>
 <body class="gray-bg">
 <div class="wrapper wrapper-content animated fadeInRight">
@@ -230,8 +239,13 @@
                             <div class="codeView docs-example form form-horizontal" style="padding-bottom: 40px;">
                                 <div class="row cl">
                                     <label class="form-label col-xs-4 col-sm-3">商品详情：</label>
+                                    <div class="col-xs-6 col-sm-8"></div>
+                                </div>
+                                <div class="row cl">
+                                    <label class="form-label col-xs-4 col-sm-3"></label>
                                     <div class="col-xs-6 col-sm-8">
-                                        <textarea id="ueditor" class="textarea" placeholder="说点什么..." style="width: 800px;height:400px;" name="goods_introduce"></textarea>
+                                        <input type="file" class="fileInput" id="goods_introduce" name="goods_introduce[]" style="width: 100px;height: 100px;">
+                                        <div class="xiangce" title="添加图片"></div>
                                     </div>
                                 </div>
                             </div>
@@ -281,9 +295,7 @@
             $(tabCon).eq(index).show();
         });
     };
-    var ue = UE.getEditor('ueditor', {
-        autoHeight: false
-    });
+
     $(function(){
         $.Huitab("#tab_demo .tabBar span","#tab_demo .tabCon","current","click","1");
         //获取商品分类
@@ -385,6 +397,9 @@
         $(document).on('change','#goods_pics',function(){
             show_img(this,'goods_pics');
         });
+        $(document).on('change','#goods_introduce',function(){
+            show_img(this,'goods_introduce');
+        });
 
 
         $('#goods_small_img').change(function(){
@@ -447,6 +462,27 @@
                         $(_this).closest('.row').before(html);
                         $(_this).closest('.row').hide();
 
+                    }else if(name == 'goods_introduce'){
+                        html += '<div class="row cl">'+
+                                '<label class="form-label col-xs-4 col-sm-3"></label>'+
+                                '<div class="formControls col-xs-6 col-sm-8">'+
+                                '<img src="'+ e.target.result +'" alt="暂无图片" style="width: 100px;padding-bottom: 10px;">'+
+                                '<span class="btn-upload form-group">'+
+                                '<a href="javascript:void(0);" id="del_i_img" class="btn btn-primary upload-btn">'+
+                                '<i class="fa fa-minus-square" aria-hidden="true"></i> 删除图片'+
+                                '</a>'+
+                                '</span>'+
+                                '</div>'+
+                                '</div>'+
+                                '<div class="row cl">'+
+                                '<label class="form-label col-xs-4 col-sm-3"></label>'+
+                                '<div class="col-xs-6 col-sm-8">'+
+                                '<input type="file" class="fileInput" id="goods_introduce" name="goods_introduce[]" style="width: 100px;height: 100px;">'+
+                                '<div class="xiangce" title="添加图片"></div>'+
+                                '</div>'+
+                                '</div>';
+                        $(_this).closest('.row').after(html);
+                        $(_this).closest('.row').hide();
                     }else{
                         //商品图片添加
                         html += '<img src="'+ e.target.result +'" alt="暂无图片" style="width: 100px;">';
@@ -467,9 +503,13 @@
 
         //删除相册
         $(document).on('click','#del_pics',function(){
-            var _this = this;
             $(this).closest('.row').remove();//移除图片一行
             $('#goods_pics').closest('.row').remove();
+        });
+        //删除商品详情图片
+        $(document).on('click','#del_i_img',function(){
+            $(this).closest('.row').prev('.row').remove();
+            $(this).closest('.row').remove();
         });
         //验证表单数据
         $('#submit').click(function(){

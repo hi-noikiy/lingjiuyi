@@ -42,12 +42,12 @@ class ActivityController extends CommonController {
         $topiclist = M('Goods') -> field($fields) -> where(['is_act' => 1]) -> limit($firstRow,$pagesize) -> order($order) -> select();
 
         $pagesize = ($count < $pagesize) ? $count : $pagesize;
-        $page = array(
+        $pager = array(
             'nowPage' => (int)$p,//当前页
             'pagesize'   => (int)$pagesize,
             'totalPages' => $totalPages
         );
-        empty($topiclist) ? $this -> ajaxReturnData(0,'无数据') : $this -> ajaxReturnSuccess(compact('topiclist','page'));
+        empty($topiclist) ? $this -> ajaxReturnData(0,'无数据') : $this -> ajaxReturnSuccess(compact('topiclist','pager'));
 
     }
 }

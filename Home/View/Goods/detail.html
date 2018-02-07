@@ -41,9 +41,6 @@
     <!-- CONTENT AREA -->
 
     <!-- Main Header Start -->
-    <if condition=" $Think.session.userinfo == '' ">
-    <include file="Common/top" />
-    </if>
     <header class="main-header white-bg">
         <include file="Common/header" />
     </header>
@@ -253,7 +250,13 @@
                                 <span class="divider-2 crl-bg"></span>-->
 
                                 <div class="block-inline pera">
-                                    <p>{$goods['goods_introduce']} </p>
+                                    <p>
+                                        <volist name="goods['goods_introduce']" id="img">
+                                        <if condition=" $img != '' ">
+                                        <p><img src="{$img}" alt="图片" /></p>
+                                        </if>
+                                        </volist>
+                                    </p>
                                 </div>
 
                             </div>

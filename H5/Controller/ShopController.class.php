@@ -4,35 +4,26 @@ namespace H5\Controller;
 //2、引入核心控制器
 use Think\Controller;
 use Think\Page;
+
 //3、定义News控制器
-class CateController extends CommonController {
+class ShopController extends CommonController{
     public function index(){
         $this -> display();
     }
 
-    //获取分类图片
     public function get_banner(){
-        I('get.id','','intval') ? $cate_id = I('get.id','','intval') : $this -> ajaxReturnData(0,'参数错误');
-        $img = M('Category') -> where("id = $cate_id") -> getField('cate_img');
+        I('get.id','','intval') ? $id = I('get.id','','intval') : $this -> ajaxReturnData(0,'参数错误');
+        $img = M('Shop') -> where("id = $id") -> getField('shop_logo');
         empty($img) ? $this -> ajaxReturnData(0,'无图片') : $this -> ajaxReturnSuccess($img);
     }
 
-    //获取列表
     public function get_list(){
-
-        I('get.id','','intval') ? $cate_id = I('get.id','','intval') : $this -> ajaxReturnData(0,'参数错误');
-        $category = D('Category') -> alias('a') -> field('c.id,c.pid') -> where(array( 'a.id' =>$cate_id)) -> join('zhouyuting_category b on a.id = b.pid') -> join('zhouyuting_category c on b.id = c.pid') -> select();//接收大类，查询pid下的小类id
-        $cateids = [];
-        foreach ($category as $key =>$value) {
-            //将数组拼接成想要的形式
-            $cateids['ids']     .= $value['id'].',';
-        }
-        $cateids['ids'] = rtrim($cateids['ids'],',');//凭借所有子类的id
+        I('get.id','','intval') ? $shop_id = I('get.id','','intval') : $this -> ajaxReturnData(0,'参数错误');
 
         $p = I('get.p','','intval') ? I('get.p','','intval') : 1;
         $fields = 'goods_id,goods_name,goods_price,goods_small_img';
         $where = array(
-            'cate_id' => ['in',$cateids['ids']],
+            'shop_id'   => $shop_id,
             'is_normal' => 1,
         );
 
@@ -56,5 +47,4 @@ class CateController extends CommonController {
         );
         empty($goodslist) ? $this -> ajaxReturnData(0,'无数据') : $this -> ajaxReturnSuccess(compact('goodslist','page'));
     }
-
 }

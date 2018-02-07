@@ -14,17 +14,17 @@ class IndexController extends CommonController {
 
     //顶部滑动banner 和店铺小图标
     public function get_banner(){
-        $shoplist = M('Shop')-> field('id,shop_logo,shop_header_img') -> where(array('is_top' => 1)) -> select();
+        $shoplist = M('Shop')-> field('id,shop_logo,shop_header_img') -> where("is_top = 1") -> select();
         empty($shoplist) ? $this -> ajaxReturnData(0,'无banner') : $this -> ajaxReturnSuccess($shoplist);
     }
 
     //获取分类cate_banner
     public function get_cate_banner(){
-        $catelist = M('Category') -> field('id,cate_img') -> where(array('pid' => 0)) -> select();
+        $catelist = M('Category') -> field('id,cate_img') -> where("pid = 0 AND is_show = 1") -> select();
         empty($catelist) ? $this -> ajaxReturnData(0,'无分类banner') : $this -> ajaxReturnSuccess($catelist);
     }
 
-    public function ajax_goods(){
+    public function get_goods(){
         //首页底部显示用户猜你喜欢商品的数据信息
         //判断用户是否登录
         $uid = session('userinfo.uid') ? session('userinfo.uid') : 0;//测试数据，暂时使用，后期修改

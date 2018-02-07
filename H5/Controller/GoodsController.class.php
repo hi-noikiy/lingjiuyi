@@ -44,13 +44,13 @@ class GoodsController extends CommonController {
         $goodslist = M('Goods') -> field($fields) -> where($where) -> limit($firstRow,$pagesize) -> order($order) -> select();
 
         $pagesize = ($count < $pagesize) ? $count : $pagesize;
-        $page = array(
+        $pager = array(
             'nowPage' => (int)$p,//当前页
             'pagesize'   => (int)$pagesize,
             'totalPages' => $totalPages
         );
 
-        empty($goodslist) ? $this -> ajaxReturnData(0,'无数据') : $this -> ajaxReturnSuccess(compact('goodslist','page'));
+        empty($goodslist) ? $this -> ajaxReturnData(0,'无数据') : $this -> ajaxReturnSuccess(compact('goodslist','pager'));
 
     }
 
@@ -63,20 +63,10 @@ class GoodsController extends CommonController {
         }else{
             $field = 'goods_id,goods_name,goods_bigprice,goods_price,goods_number,goods_introduce,goods_small_img';
             $model = M('Goods');
-            $good = $model
-                -> field($field)
-                -> where(array('goods_id' => $id))
-                -> find();
-            $pics_big = M('Goodspics')
-                -> field('pics_big')
-                -> where(array('goods_id' => $id))
-                -> select();
-            $goodsattrs = M('Goods_attr')
-                -> alias('a')
-                -> field('a.id,a.attr_value,b.attr_name')
-                -> where(array('a.goods_id' => $id,'b.attr_type' => 1))
-                -> join('zhouyuting_attribute b on a.attr_id = b.attr_id')
-                -> select();
+            $good = $model -> field($field) -> where(array('goods_id' => $id)) -> find();
+            $good['goods_introduce'] = explode(',',$good['goods_introduce']);
+            $pics_big = M('Goodspics') -> field('pics_big') -> where(array('goods_id' => $id)) -> select();
+            $goodsattrs = M('Goods_attr') -> alias('a') -> field('a.id,a.attr_value,b.attr_name') -> where(array('a.goods_id' => $id,'b.attr_type' => 1)) -> join('zhouyuting_attribute b on a.attr_id = b.attr_id') -> select();
             foreach($goodsattrs as $k => $v){
                 $new_attr_radio[$v['attr_name']][] = $v;
             }
@@ -113,6 +103,7 @@ class GoodsController extends CommonController {
         $fields = 'goods_id,goods_name,goods_price,goods_bigprice,goods_introduce,goods_small_img,goods_number';
         $where = "goods_id = $goods_id";
         $goodsinfo = M('Goods') -> field($fields) -> where($where) -> find();
+        $goodsinfo['goods_introduce'] = explode(',',$goodsinfo['goods_introduce']);
         $goodspics = M('Goodspics') -> field('pics_sma') -> where($where) -> select();
         $goodsattrs = M('Goods_attr')
             -> alias('a')
@@ -137,7 +128,7 @@ class GoodsController extends CommonController {
 
     public function test(){
         if(IS_AJAX){
-            $data = D('type') -> select();
+            $data = D('Category') -> where("pid = 0")-> select();
             $data ? $this -> ajaxReturnSuccess($data) : $this -> ajaxReturnData(0,'没有数据');
         }else{
             $this -> display();

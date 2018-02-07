@@ -45,7 +45,6 @@ class GoodsController extends BaseController{
 			$data['goods_bigprice']    = $_POST['goods_bigprice'];
 			$data['goods_price']       = $_POST['goods_price'];
 			$data['goods_number']      = $_POST['goods_number'];
-			$data['goods_introduce']   = remove_xss($_POST['goods_introduce']);
 			$data['goods_smallprice']  = $_POST['goods_smallprice'];
 			$data['goods_create_time'] = time();
 			$data['shop_id']           = $_POST['shop_id'];
@@ -127,8 +126,9 @@ class GoodsController extends BaseController{
 							$pics[$k]['pics_mid']    =   $info[$k]['url'].'?imageMogr2/thumbnail/350x350|'.$str1.'250'.$str2;//中图
 							$pics[$k]['pics_sma']    =   $info[$k]['url'].'?imageMogr2/thumbnail/150x150|'.$str1.'150'.$str2;//小图
 						}
+						unset($k,$v);
 						$res = D('Goodspics') -> addAll($pics);
-						empty($res) ? $this -> error('添加多个图片失败！') : $this -> success('商品信息添加成功');
+						empty($res) ? $this -> error('添加多个图片失败！') : true;
 					}else{
 						$info = $Upload -> Upload($file);//单文佳上传
 						$pics['goods_id']    = $id;
@@ -137,9 +137,44 @@ class GoodsController extends BaseController{
 						$pics['pics_mid']    =   $info['url'].'?imageMogr2/thumbnail/350x350|'.$str1.'250'.$str2;//中图
 						$pics['pics_sma']    =   $info['url'].'?imageMogr2/thumbnail/150x150|'.$str1.'150'.$str2;//小图
 						$res = D('Goodspics') -> add($pics);
-						empty($res) ? $this -> error('添加单个图片失败！') : $this -> success('商品信息添加成功');
+						empty($res) ? $this -> error('添加单个图片失败！') : true;
 					}
-				}else{
+				}
+
+				if(!empty($_FILES['goods_introduce'])){
+					//商品详情
+					if(is_array($_FILES['goods_introduce']['name'])){
+						//如果相册为数组，则需要循环,转换样式
+						$files = [];
+						for($i=0;$i<count($_FILES['goods_introduce']['name']);$i++){
+							foreach($_FILES['goods_introduce'] as $key => $value){
+								foreach($value as $k => $v){
+									if(!empty($v)){
+										($k == $i) ? $files[$i][$key] = $v : true;
+									}
+								}
+							}
+
+						}
+						unset($k,$v,$key,$value);
+						$info = $Upload -> upload($files);//多文件上传
+						empty($info) ? $this -> error('商品详情多文件上传失败！') : true;
+						$g_introduce = [];
+						foreach($info as $k => $v){
+							$g_introduce['goods_id']    = $id;
+							$g_introduce['goods_introduce'] .= $info[$k]['url'].',';//原图
+						}
+						unset($k,$v);
+						$res = D('Goods') -> save($g_introduce);
+						empty($res) ? $this -> error('商品详情添加多个图片失败！') : true;
+					}else{
+						$info = $Upload -> Upload($file);//单文佳上传
+						$g_introduce['goods_id']    = $id;
+						$g_introduce['goods_introduce'] = $info['url'];//原图
+						$res = D('Goods') -> save($g_introduce);
+						empty($res) ? $this -> error('商品详情添加单个图片失败！') : true;
+					}
+
 					$this -> success('商品信息添加成功');
 				}
 			}else{
@@ -171,18 +206,20 @@ class GoodsController extends BaseController{
 			$data['min_video']       = I('post.video')    ? I('post.video') : false;
 			$data['goods_introduce'] = I('post.goods_introduce') ? I('post.goods_introduce') : false;
 			$data['goods_id']        = I('post.goods_id') ? I('post.goods_id') : false;
-			$data['is_normal']       = I('post.is_normal','','intval') || I('post.is_normal','','intval') == 0 ? I('post.is_normal','','intval') : false;
-			$data['is_act']          = I('post.is_act','','intval')    || I('post.is_act','','intval') == 0    ? I('post.is_act','','intval')    : false;
+			$noe['is_normal']       = I('post.is_normal','','intval') || I('post.is_normal','','intval') == 0 ? I('post.is_normal','','intval') : false;
+			$noe['is_act']          = I('post.is_act','','intval')    || I('post.is_act','','intval') == 0    ? I('post.is_act','','intval')    : false;
 
 			if($data['pics_origin']){
 				//如果存在相册，添加相册图片
 				$str1  = 'imageView2/0/q/75|watermark/2/text/bGluZ2ppdXlp/font/dmVyZGFuYQ==/fontsize/';
 				$str2  = '/fill/IzMyQjJFNA==/dissolve/100/gravity/SouthEast/dx/10/dy/10|imageslim';//水印样式
 				$img['goods_id']      = I('post.id','','intval');
-				$img['pics_origin']   = $data['pics_origin'].'?'.$str1.'250'.$str2;//大图; //原图
+				$img['pics_origin']   = $data['pics_origin'];//大图; //原图
 				$img['pics_big']      = $data['pics_origin'].'?imageMogr2/thumbnail/800x800>|'.$str1.'250'.$str2;//大图
 				$img['pics_mid']      = $data['pics_origin'].'?imageMogr2/thumbnail/350x350>|'.$str1.'250'.$str2;//大图
 				$img['pics_sma']      = $data['pics_origin'].'?imageMogr2/thumbnail/150x150>|'.$str1.'150'.$str2;//缩略图
+				$res = D('Goodspics') -> add($img);
+				$res ? $this -> ajaxReturnData(10000,'上传图片成功！',$res) : $this -> ajaxReturnData(0,'上传图片失败！');
 
 			}elseif($data['min_video']){
 				//删除原来的视频文件
@@ -245,13 +282,13 @@ class GoodsController extends BaseController{
 				$attr_res ? $this -> success('修改商品信息成功！')  : $this -> error('修改商品属性错误！') ;
 
 
-			}elseif($data['is_normal'] === 0 || $data['is_normal'] === 1){
-				$data['goods_id'] = $id;
-				$res = D('Goods') -> save($data);
+			}elseif($noe['is_normal'] === 0 || $noe['is_normal'] === 1){
+				$noe['goods_id'] = $id;
+				$res = D('Goods') -> save($noe);
 				$res != false ? $this -> ajaxReturnData(10000) : $this -> ajaxReturnData(0,'修改失败');
-			}elseif($data['is_act'] === 0 || $data['is_act'] === 1){
-				$data['goods_id'] = $id;
-				$res = D('Goods') -> save($data);
+			}elseif($noe['is_act'] === 0 || $noe['is_act'] === 1){
+				$noe['goods_id'] = $id;
+				$res = D('Goods') -> save($noe);
 				$res != false ? $this -> ajaxReturnData(10000) : $this -> ajaxReturnData(0,'修改失败');
 			}
 
@@ -268,6 +305,7 @@ class GoodsController extends BaseController{
 					-> join('zhouyuting_category c on b.pid = c.id')
 					-> join('zhouyuting_category d on c.pid = d.id')
 					-> find();//商品基本信息
+			$goods['goods_introduce'] = explode(',',$goods['goods_introduce']);
 
 			$gattr = D('Goods_attr') -> where($where) -> order('id asc') -> select();//商品属性
 			$new_gattr = array();
@@ -402,7 +440,7 @@ class GoodsController extends BaseController{
 			$res   = D('Goods') -> delete($goods_id);//删除商品信息
 			$pics  = D('Goodspics') -> where($where) -> select();//查询相册
 			if(empty($pics)){
-				$res ? $this -> ajaxReturnSuccess() : $this -> ajaxReturnData(0,'删除商品失败');//如果相册为空则返回成功信息
+				$res ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'删除商品失败');//如果相册为空则返回成功信息
 			}else{
 				//删除相册
 				$res ? true : $this -> ajaxReturnData(0,'删除商品失败');
@@ -414,12 +452,14 @@ class GoodsController extends BaseController{
 					$resimg !== false ? true : $this -> ajaxReturnData(0,'删除商品相册失败');
 				}
 				$res = D('Goodspics') -> where($where) ->delete();
-				$res ? $this -> ajaxReturnSuccess() : $this -> ajaxReturnData(0,'删除相册数据失败！');
+				$res ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'删除相册数据失败！');
 			}
 
 
 		}elseif($id){
 			//删除商品相册图片后期修改
+			$res = D('Goodspics') -> delete($id);
+			$res ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'删除图片失败！');
 		}else{
 			$this -> ajaxReturnData(0,'参数错误');
 		}
@@ -451,6 +491,31 @@ class GoodsController extends BaseController{
 		I('get.shop_id','','intval') ? $shop_id = I('get.shop_id','','intval') : $this -> ajaxReturnData(0,'参数错误');
 		$shop_cate = D('Shop_cate') -> where("`shop_id` = $shop_id") -> select();
 		empty($shop_cate) ? $this -> ajaxReturnData(0,'没有商铺分类') : $this -> ajaxReturnSuccess($shop_cate);
+	}
+
+	//修改商品详情图片
+	public function edit_introduce(){
+		I('post.id','','intval')  ? $data['goods_id'] = I('post.id','','intval') : $this -> ajaxReturnData(0,'参数错误');
+		I('post.url','','string') ? $url = I('post.url','','string') : $this -> ajaxReturnData(0,'参数错误');
+		$goods_introduce = D('Goods') -> where(['goods_id' => $data['goods_id']]) -> getField('goods_introduce');
+		$data['goods_introduce'] = $goods_introduce . ',' . $url;
+		$res = D('Goods') -> save($data);
+		$res !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'添加图片失败');
+	}
+	//删除商品详情的图片
+	public function del_img(){
+		I('post.id','','intval')  ? $data['goods_id'] = I('post.id','','intval') : $this -> ajaxReturnData(0,'参数错误');
+		I('post.key','','intval') ? $del_key = I('post.key','','intval') : $this -> ajaxReturnData(0,'参数错误');
+		$goods_introduce = D('Goods') -> where(['goods_id' => $data['goods_id']]) -> getField('goods_introduce');
+		$goods_introduce = explode(',',$goods_introduce);
+		foreach($goods_introduce as $key => $value){
+			if(empty($value) ||  $key == $del_key){
+				unset($goods_introduce[$key]);
+			}
+		}
+		$data['goods_introduce'] = implode(',',$goods_introduce);
+		$res = D('Goods') -> save($data);
+		$res !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'删除图片失败');
 	}
 
 
