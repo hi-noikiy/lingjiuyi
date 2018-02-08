@@ -3,7 +3,10 @@
 namespace H5\Controller;
 //2、引入核心控制器
 use Think\Controller;
-
+use Think\Upload;
+require_once './Application/Tools/Qiniu/autoload.php';
+use Qiniu\Auth;
+use Qiniu\Storage\BucketManager;
 //3、定义News控制器
 class UserController extends CommonController {
 
@@ -27,6 +30,33 @@ class UserController extends CommonController {
 
     //用户首页
     public function my(){
+        $type = I('post.type','','string');
+        if(IS_POST && $type === 'upload_header_img'){
+            //上传头像
+            $setting   = C('UPLOAD_QINIU');
+            $Upload  = new \Think\Upload($setting);
+            $info    = $Upload -> upload($_FILES);//上传
+            $data['id']      = session('userinfo.id');
+            $data['header_img']  = $info['basicInfoHead']['url'];
+
+            $header_img           = D('User') -> where(['id' => $data['id']]) -> getField('header_img');//获取原图片
+            $key                  = substr($header_img,strrpos($header_img,'/') + 1);
+            if(!empty($header_img)){
+                //如果原图片不为空
+                $accessKey = $setting['driverConfig']['accessKey'];
+                $secretKey = $setting['driverConfig']['secretKey'];
+                $bucket    = $setting['driverConfig']['bucket'];
+                $auth      = new Auth($accessKey, $secretKey);
+                $config    = new \Qiniu\Config();
+                $bucketManager = new BucketManager($auth, $config);
+                $err = $bucketManager -> delete($bucket, $key);//删除源文件
+                $err ? $this -> ajaxReturnData(0,'删除源文件失败') : true;
+            }
+
+            $res = D('User') -> save($data);
+            session('userinfo.header_img',$data['header_img']);
+            $res !== false ? $this -> ajaxReturnSuccess($data['header_img']) : $this -> ajaxReturnData(0,'保存头像失败');
+        }
         $this -> display();
     }
 
@@ -57,6 +87,7 @@ class UserController extends CommonController {
 
     //我的地址
     public function address(){
+        layout(false);
         $this -> display();
     }
 

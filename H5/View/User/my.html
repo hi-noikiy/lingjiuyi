@@ -1,5 +1,5 @@
 
-    <script src="__PUBLIC__/H5/js/base/ajaxfileupload.js" type="text/javascript"></script>
+    <script src="__PUBLIC__/Plugins/ajaxfileuploader/ajaxfileupload.js" type="text/javascript"></script>
     <script src="__PUBLIC__/H5/js/base/resize.js" type="text/javascript"></script>
     <div class="content clearfix"  id="wrapper" style="display: none;">
         <div id="scroller">
@@ -115,17 +115,21 @@ $(function(){
         dataType: 'json',
         success: function(data){
             if(data.code==10000){
-                Himg='<div class="col-xs-2 tc mb5 ">'+
+                var default_img = "http://owtcx73yl.bkt.clouddn.com/admin_header_img.jpg";
+                if(data.info.user.header_img != ''){
+                    default_img = data.info.user.header_img;
+                }
+
+                Himg = '<div class="col-xs-2 tc mb5 ">'+
                         '<div class="avatar" >' +
-                            '<img id="imgHead" src="' + data.info.user.header_img +
-                            '"  class=" uploadBasicInfoHead" >' +
+                        '<img id="imgHead" src="' + default_img + '"  class=" uploadBasicInfoHead" >' +
                         '</div>'+
                         '<input type="file" onchange="uploadHead()" id="basicInfoHead" style="display:none;"  name="basicInfoHead" />   '+
-                    '</div>'+
-                    '<div class="col-xs-10  mb5 head">'+
+                        '</div>'+
+                        '<div class="col-xs-10  mb5 head">'+
                         '<span class="fs-15">' + data.info.user.username + '</span>'+
                         '<p class="fs-10 " style="color:#999">分享商城任意页面,邀请好友获取收益</p>'+
-                    '</div>';
+                        '</div>';
                 $('.user-header').append(Himg);
                 if(data.info.user.agent == 0){
                     $('#agent').attr('style','dasplay:show');
@@ -196,17 +200,14 @@ $(function(){
 function uploadHead(){
     $.ajaxFileUpload({
         type:"POST",
-        // url:"${pageContext.request.contextPath}/profile/uploadBasicHead",//需要链接到服务器地址
-        url:specialsrc+"/newGuoLi_y/mall/assets/uploadImage?apiTocken="+localStorage.apiTocken,
-        // data:{fieldNameHere:fieldNameHere},
+        url:'/User/my',
+        data:{type:'upload_header_img'},
         secureuri:false,
         fileElementId:"basicInfoHead",//文件选择框的id属性
         dataType: 'json',   //json
         success: function (data) {
-            if (data.status=="200") {
-
-                $("#imgHead").attr("src",data.data.fullPath);
-                $('#basicHeadUrl').val(data.imagePath);
+            if (data.code== 10000) {
+                $("#imgHead").attr("src",data.info);
             } else{
                 layer.open({
                     content: data.msg
