@@ -104,8 +104,32 @@ class UserController extends CommonController {
 
     //修改密码
     public function edit_password(){
-        layout(false);
-        $this -> display();
+        if(IS_POST && IS_AJAX){
+            I('post.type','','string') ? $type = I('post.type','','string') : $this -> ajaxReturnData(0,'参数错误');
+            if($type === 're_pass'){
+                //忘记密码
+                $check_code = $this -> check_repass_code();
+                $check_code === true ? true : $this -> ajaxReturnData(0,'手机号验证未通过！');
+                I('post.password','','string')   ? $password = I('post.password','','string')     : $this -> ajaxReturnData(0,'密码不能为空！');
+                I('post.repassword','','string') ? $repassword = I('post.repassword','','string') : $this -> ajaxReturnData(0,'确认密码不能为空！');
+                preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $password)   == false ? $this -> ajaxReturnData(0,'密码格式不正确，只能6-20位数字和字母组成') : true;
+                preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $repassword) == false ? $this -> ajaxReturnData(0,'确认密码格式不正确，只能6-20位数字和字母组成') : true;
+                $password !== $repassword ? $this -> ajaxReturnData(0,'两次密码输入不一致') : true;
+                I('post.tele','','string') ? $tele = I('post.tele','','string') : $this -> ajaxReturnData(0,'手机号不能为空');
+                $data['password'] = encrypt_pwd($password);
+                $res = D('User') -> where("`phone` = $tele") -> save($data);
+                session('repass_code_' . $tele,null);
+                $res !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'修改密码失败');
+
+            }else{
+                //修改密码
+                $this -> check_login();//验证是否登录
+            }
+
+        }else{
+            layout(false);
+            $this -> display();
+        }
     }
 
     //修改银行卡信息
@@ -151,53 +175,20 @@ class UserController extends CommonController {
 
     //ajax登录
     public function ajax_login(){
-        if(IS_POST){
-            $username = $_POST['username'];//手机号/邮箱/用户名
-            $password = $_POST['password'];//密码
-            //若果用户名或者密码为空时
-            if(empty($username)){
-                $code = 0;
-                $msg = '用户名不能为空';
-            }elseif(empty($password)){
-                $code = 0;
-                $msg = '密码不能为空';
-            } else{
-                $model     = M('user');//实例化模型
-                $where     = "username = '$username' or phone = '$username' or email = '$username'";//定义查询条件
-                $userinfo  = $model
-                    -> where($where)
-                    -> find();//查询密码
-                //如果密码为空
-                if(empty($userinfo)){
-                    //则账号不存在
-                    $code = 10001;
-                    $msg  = '账号不存在';
-                }else{
-                    //如果传入的密码不等于数据库中密码
-                    $hash = encrypt_pwd($password);
-                    if(password_verify($password,$hash) !== true){
-                        //则密码错误
-                        $code = 10001;
-                        $msg  = '密码错误';
-                    }else{
-                        $code = 10000;
-                        $msg  = 'success';
-                        session('userinfo',$userinfo);//保存用户数据
-                    }
-                }
-            }
-        }else{
-            $code = 10001;
-            $msg = '请求方式错误';
-        }
+        !IS_POST && !IS_AJAX ?  $this -> ajaxReturnData(0,'请求方式错误') : true;
+        I('post.username','','string') ? $username = I('post.username','','string') : $this -> ajaxReturnData(0,'用户名不能为空');
+        I('post.password','','string') ? $password = I('post.password','','string') : $this -> ajaxReturnData(0,'密码不能为空');
 
-        //设置返回数据格式
-        $data = array(
-            'code' => $code,
-            'msg'  => $msg,
-        );
-        //返回数据
-        $this -> ajaxReturn($data);
+        $model     = M('user');//实例化模型
+        $where     = "username = '$username' or phone = '$username' or email = '$username'";//定义查询条件
+        $userinfo  = $model -> where($where) -> find();//查询密码
+        empty($userinfo) ? $this -> ajaxReturnData(0,'账号不存在') : true;
+        if(password_verify($password,$userinfo['password']) === true){
+            session('userinfo',$userinfo);//保存用户数据
+            $this -> ajaxReturnSuccess();
+        }else{
+            $this -> ajaxReturnData(0,'密码错误');
+        }
     }
 
     //ajax退出登录
@@ -216,68 +207,76 @@ class UserController extends CommonController {
 
     //短信验证码
     public function sendCode(){
-        if(IS_POST){
-            $phone = I('post.phone');//手机号码
-            //如果手机号为空
-            if(empty($phone)){
-                //则返回错误信息
-                $code = 0;
-                $msg  = '参数错误';
-            }else{
-                //根据手机号查询数据库
-                $tele = M('User') -> where("phone = '$phone'") -> getField('id');
-                //如果存在记录，说明已经注册
-                if(isset($tele)){
-                    $code = 10001;
-                    $msg  = '手机号已经注册，是否登录？';
-                }else{
-                    $sendtime = session('sendtime') ? session('sendtime') : 0;//发送频率限制
-                    if(time() - $sendtime < 60){
-                        //发送频繁
-                        $code = 10001;
-                        $msg  = '发送太频繁，请稍后再试';
-                    }else{
-                        $code = rand(1000,9999);//验证码
-                        $content = "【零玖一】您用于注册的验证码为{$code}，如非本人操作，请忽略本短信。";//短信内容
-                        $key = '2580aa6c016f2c630f5835d0aa40edb2';//APP key
-                        $url = "https://way.jd.com/chuangxin/dxjk?mobile={$phone}&content={$content}&appkey={$key}";//请求地址
-                        $res = curl_request($url, false, array(), true);//发送请求调用接口，使用curl发送请求
-                        if(!$res){
-                            //如果请求不成功
-                            $code = 10001;
-                            $msg  = '服务器异常';
-                        }else{
-                            //转化结果为数组格式
-                            $result = json_decode($res, true);
-                            if($result['code'] == 10000){
-                                //将验证码保存到session
-                                session('register_code_' . $phone, $code);
-                                session('sendtime',time());
-                                $code = 10000;
-                                $msg  = '短信发送成功';
-                            }else{
-                                $code = 10001;
-                                $msg  = '短信发送失败';
-                            }
-                        }
+        !IS_POST && !IS_AJAX ? $this -> ajaxReturnData(0,'请求方式错误！') : true;
+        I('post.phone','','string') ? $phone = I('post.phone','','string') : $this -> ajaxReturnData(0,'手机号不能为空！');
+        I('post.type','','string')  ? $type = I('post.type','','string') : $this -> ajaxReturnData(0,'参数错误！');
 
-                    }
-                }
-            }
+        if($type == 'login_code'){
+            //注册
+            $sendtime = session('register_code_sendtime') ? session('register_code_sendtime') : 0;//发送频率限制,半小时
+            time() - $sendtime < 300 ? $this -> ajaxReturnData(0,'发送太频繁，请稍后再试') : true;
 
-
-        }else{
-            $code = 0;
-            $msg  = '请求方式错误';
+            $tele = M('User') -> where("phone = '$phone'") -> getField('id');
+            !empty($tele) ? $this -> ajaxReturnData(10001,'手机号已经注册，是否登录？') : true;//如果存在记录，说明已经注册
+        }elseif($type == 'repass_code'){
+            $sendtime = session('repass_code_sendtime') ? session('repass_code_sendtime') : 0;//发送频率限制,半小时
+            time() - $sendtime < 300 ? $this -> ajaxReturnData(0,'发送太频繁，请稍后再试') : true;
         }
 
-        //设置返回数据格式
-        $data = array(
-            'code' => $code,
-            'msg'  => $msg,
-        );
-        //返回数据
-        $this->ajaxReturn($data);
+        $code = rand(1000,9999);//验证码
+        $tpl_id = '63946';
+        $key = '2580aa6c016f2c630f5835d0aa40edb2';//APP key
+        $url = "http://v.juhe.cn/sms/send?mobile=".$phone."&tpl_id=".$tpl_id."&tpl_value=%23code%23%3d".$code."&dtype=&key=".$key;//请求地址
+        $res = curl_request($url, false, array(), true);//发送请求调用接口，使用curl发送请求
+        $result = json_decode($res, true);//转化结果为数组格式
+
+        if($result['error_code'] !== 0){
+            $this -> ajaxReturnData(0,'服务器异常');//如果请求不成功
+        }else{
+            if($type == 'login_code'){
+                session('register_code_' . $phone, $code);//将验证码保存到session
+                session('register_code_sendtime',time());
+            }elseif($type == 'repass_code'){
+                session('repass_code_' . $phone, $code);//将验证码保存到session
+                session('repass_code_sendtime',time());
+            }
+            $this -> ajaxReturnData();
+        }
+
+    }
+
+    //验证重置密码的手机验证码是否正确
+    public function check_repass_code(){
+        I('post.tele','','string') ? $tele = I('post.tele','','string') : $this -> ajaxReturnData(0,'手机号不能为空');
+        I('post.code','','string') ? $code = I('post.code','','string') : $this -> ajaxReturnData(0,'手机验证码不能为空');
+        I('post.type','','string') ? $type = I('post.type','','string') : true;
+
+        $user = D('User') -> where("`phone` = $tele") -> getField('id');
+        empty($user) ? $this -> ajaxReturnData(10001,'用户不存在,是否去注册？') : true;
+
+        $sendCode = session('repass_code_' . $tele);
+        $sendTime =  session('repass_code_sendtime');
+        if($type === 're_pass'){
+            //如果是修改密码验证
+            if($code == $sendCode){
+                if(time() - $sendTime > 300){
+                    return false;
+                }else{
+                    return true;
+                }
+            }else{
+                return false;
+            }
+
+        }else{
+            //如果只是POST请求
+            if($code == $sendCode){
+                time() - $sendTime > 300 ? $this -> ajaxReturnData(0,'验证码已过期，请重新获取！') : $this -> ajaxReturnData();
+            }else{
+                $this -> ajaxReturnData(0,'手机号与验证码不匹配！');
+            }
+        }
+
 
     }
 
@@ -648,6 +647,12 @@ class UserController extends CommonController {
         $id ? $id : $this -> ajaxReturnData(0,'参数错误！');
         $url = '/Pay/index/id/'.$id;
         $this -> ajaxReturnSuccess(compact('url'));
+    }
+
+    //忘记密码
+    public function forget_pass(){
+        layout(false);
+        $this -> display();
     }
 
 
