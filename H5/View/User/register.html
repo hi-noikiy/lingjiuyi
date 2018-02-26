@@ -35,14 +35,14 @@
             </div>
             <div class="register-inp">
                 <label>手机验证码</label>
-                <input type="password" name="code" placeholder="请输入手机验证码">
+                <input type="text" name="code" placeholder="请输入手机验证码">
             </div>
             <div class="register-inp">
                 <label>邀请码</label>
-                <input type="password" name="invite_tele" placeholder="请输入邀请码">
+                <input type="text" name="invite_tele" placeholder="请输入邀请码">
             </div>
             <div class="row" style="padding:10px 15px">
-                <div class="col-xs-18 input-text " ><input type='checkbox' class="agree diss" unchecked> 我已阅读并同意以下协议:<a href="__CONTROLLER__/reg_intro" style="color: #79d1d6;">《零玖一平台服务协议》</a></div>
+                <div class="col-xs-18 input-text " ><input type='checkbox' class="agree diss"> 我已阅读并同意以下协议:<a href="__CONTROLLER__/reg_intro" style="color: #79d1d6;">《零玖一平台服务协议》</a></div>
             </div>
             <div class="register-inp"><a href="javascript:void(0);" class="submit-btn submit-btn1" >下一步</a></div>
         </div>
@@ -64,7 +64,13 @@
     </div>
 </div>
 <script>
-
+    var href = window.location.href;
+    var tele_start = href.indexOf('/invite_tele/') + 13;
+    var invite_tele = href.slice(tele_start);
+    if(tele_start >= 13){
+        $("input[name='invite_tele']").attr('disabled',true);
+        $("input[name='invite_tele']").val(invite_tele);
+    }
 
     //300秒倒计时
     var countdown = 300;
@@ -134,9 +140,18 @@
             var username      = $("input[name='username']").val();
             var password      = $("input[name='password']").val();
             var repassword    = $("input[name='repassword']").val();
-            tele == '' ? layer.open({content: '手机号不能为空',skin: 'msg',time: 2}) : true;
-            code == '' ? layer.open({content: '手机验证码不能为空',skin: 'msg',time: 2}) : true;
-            invite_tele == '' ? layer.open({content: '邀请码不能为空',skin: 'msg',time: 2}) : true;
+            if(tele == ''){
+                layer.open({content: '手机号不能为空',skin: 'msg',time: 2}); return false;
+            }
+            if(code == ''){
+                layer.open({content: '手机验证码不能为空',skin: 'msg',time: 2}); return false;
+            }
+            if(invite_tele == ''){
+                layer.open({content: '邀请码不能为空',skin: 'msg',time: 2}); return false;
+            }
+            if($("input[type='checkbox']").attr('checked') !== 'checked'){
+                layer.open({content: '请选择同意协议',skin: 'msg',time: 2}); return false;
+            }
 
         });
     });

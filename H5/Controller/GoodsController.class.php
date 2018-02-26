@@ -137,6 +137,67 @@ class GoodsController extends CommonController {
 
     }
 
+    public function test1(){
+        layout(false);
+        $order_id = 222;
+        $price = '0.01';
+
+        $orderid = 345;
+        $host = 'http://h5.lingjiuyi.cn'; //获取域名
+
+        $url = $host.u('Goods/dopay');
+        $url2 = $host.u('Goods/showpay');
+        require_once './Application/Tools/alipay_v3/alipay.php';
+
+        $alipay = new \publicAlipayV3;
+        $alipay->setConfig();
+        $alipay->dopay($order_id,$orderid,$price,$url,$url2);
+    }
+    public function dopay(){
+        require_once './Application/Tools/alipay_v3/wap/lib/alipay_notify.class.php';
+        $alipay_config = $_POST;
+        $alipayNotify = new \AlipayNotify($alipay_config);
+        $verify_result = $alipayNotify->verifyNotify();
+        $data=array(
+            'type' => 1,
+            'uid'  => 1,
+            'prices' => '0.01',
+        );
+        D('User_recharge')->add($data);
+        session('$verify_result',$verify_result);
+        dump($verify_result);
+        die;
+        if($verify_result)
+        {
+            if(!empty($_POST['out_trade_no']))
+            {
+                $trade_status=$_POST['trade_status'];
+                if ($trade_status == 'TRADE_SUCCESS')
+                {
+
+                    dump($verify_result);die;
+                    $result = function(){};   // 你的业务逻辑，当操作成功的时候返回true
+                    if ($result)
+                    {
+                        echo "success";        //请不要修改或删除
+                    }
+                    else
+                    {
+                        echo 'fail';
+                    }
+        }
+                elseif($trade_status == 'TRADE_FINISHED')
+                {
+                    echo "success";        //请不要修改或删除
+                }
+            }
+        }
+    }
+    public function showpay(){
+        dump(session('$verify_result'));
+        http://h5.lingjiuyi.cn/Goods/showpay?is_success=T&notify_id=RqPnCoPT3K9%252Fvwbh3Ih32tTB9K5ZMDKjJAhoKz4PR%252BbZV%252FyOGBvo4cQSZuaJbQZmxuXs&notify_time=2018-02-26+10%3A05%3A30&notify_type=trade_status_sync&out_trade_no=111&payment_type=1&seller_id=2088811228311076&service=alipay.wap.create.direct.pay.by.user&subject=234&total_fee=0.01&trade_no=2018022621001004580584966354&trade_status=TRADE_SUCCESS&sign=14e017a68184f8bb75d2bc16cf0a9e72&sign_type=MD5
+    }
+
 
 
 }

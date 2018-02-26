@@ -619,18 +619,18 @@ class UserController extends CommonController {
     //ajax我的邀请码，二维码
     public function ajax_erweima(){
         //ajax获取用户基本信息
-        $uid = $_SESSION['userinfo']['id'];//获取用户id
-        empty($uid) ? $this -> ajaxReturnData(10002,'请先登录') : $uid;//如果用户信息为空
+        $phone = $_SESSION['userinfo']['phone'];//获取用户id
+        empty($phone) ? $this -> ajaxReturnData(10002,'请先登录') : $phone;//如果用户信息为空
 
-        $userimg = M('user') ->where(['id' => $uid]) -> getField('header_img');//用户头像
-        $username = $_SESSION['userinfo'];//用户名称
+        $userimg = M('user') ->where(['phone' => $phone]) -> getField('header_img');//用户头像
+        $username = $_SESSION['userinfo.username'];//用户名称
         $path = 'Public/Uploads/erweima/';//定义保存图片地址
         if(!file_exists($path))
         {
             mkdir($path, 0777, true);//如果没有则创建目录
         }
-        $filename = $path.$uid.$username['username'].'.png';//定义文件名称
-        $url = 'http://'.$_SERVER['HTTP_HOST'].'/H5/User/register?invite_uid='.$uid;//推广链接
+        $filename = $path.$phone.$username['username'].'.png';//定义文件名称
+        $url = 'http://'.$_SERVER['HTTP_HOST'].'/User/register/invite_tele/'.$phone;//推广链接
         $userimg ? makecode($url, $filename ,substr($userimg,1)) : qrcode($url, $filename);
         //如果存在用户头像，则生成带有用户头像logo的二维码,如果不存在用户头像，直接生成二维码
         $img = 'http://'.$_SERVER['SERVER_NAME'].'/'.$filename;
