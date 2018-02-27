@@ -1,0 +1,287 @@
+<include file="Common/header" />
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>基本 <small><a onclick="show_add();" href="javascript:void(0);" class="btn btn-primary btn-xs">添加接口</a></small></small></h5>
+                </div>
+                <div class="ibox-content">
+                    <table class="table dataTables-example">
+                        <thead>
+                        <tr>
+                            <th>接口名称</th>
+                            <th>接口模型</th>
+                            <th>接口控制器</th>
+                            <th>接口方法</th>
+                            <th>状态</th>
+                            <th>操作</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="layer_notice" style="display: none;">
+    <div class="ibox-content form-horizontal">
+        <form action="__CONTROLLER__/add" method="post" id="form_add">
+            <div class="form-group">
+                <label class="col-sm-2 control-label">接口名称</label>
+                <div class="col-sm-6">
+                    <input type="text" class="form-control" name="interface_name" value="">
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">接口模型</label>
+                <div class="col-sm-6">
+                    <select class="form-control m-b" name="interface_module">
+                        <option value="Home">Home</option>
+                        <option value="Admin">Admin</option>
+                        <option value="H5">H5</option>
+                        <option value="App">App</option>
+                    </select>
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">接口控制器</label>
+                <div class="col-sm-6">
+                    <input type="text" class="form-control" name="interface_controller" value="">
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group">
+                <label class="col-sm-2 control-label">接口方法</label>
+                <div class="col-sm-6">
+                    <input type="text" class="form-control" name="interface_action" value="">
+                </div>
+            </div>
+            <div class="hr-line-dashed"></div>
+            <div class="form-group">
+                <div class="col-sm-6 col-sm-offset-2">
+                    <button class="btn btn-primary" onclick="add()" type="button">保存内容</button>
+                    <button class="btn btn-white" type="reset">重置</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<!-- 全局js -->
+<script src="/Public/Admin/js/jquery.min.js?v=2.1.4"></script>
+<script src="/Public/Admin/js/bootstrap.min.js?v=3.3.6"></script>
+<script src="/Public/Plugins/jeditable/jquery.jeditable.js"></script>
+
+<!-- Data Tables -->
+<script src="/Public/Plugins/dataTables/jquery.dataTables.js"></script>
+<script src="/Public/Plugins/dataTables/dataTables.bootstrap.js"></script>
+
+<!-- 自定义js -->
+<script src="/Public/Admin/js/content.js?v=1.0.0"></script>
+<script src="/Public/Plugins/layer/layer.min.js"></script>
+
+<!-- Page-Level Scripts -->
+<script>
+    $(document).ready(function () {
+        $('.dataTables-example').dataTable({
+            "ajax": "__SELF__",
+            "columns": [
+                { "data": "interface_name" },
+                { "data": "interface_module" },
+                { "data": "interface_controller" },
+                { "data": "interface_action" },
+                { "data": "status" },
+                { "data": null },
+                { "data": "id" }
+            ],
+            "columnDefs": [
+                {
+                    "targets":-1,
+                    "visible": false,
+                    "searchable": false
+                },
+                {
+                    "targets":-2,
+                    "bSortable": false,
+                    "render":function(data,type,row,meta) {
+                        var id = row.userid;
+                        var html = '&emsp;<a href="javascript:void(0);" style="color: #1ab394"><i class="fa fa-edit" aria-hidden="true" onclick="editInterface(this,'+id+')"></i></a>&emsp;&emsp;<a href="javascript:void(0);" style="color: #1ab394"><i class="fa fa-close" aria-hidden="true" onclick="delInterface('+id+')"></i></a>';
+                        return html;
+                    }
+                }
+            ]
+        });
+    });
+    //显示添加弹窗
+    function show_add(){
+        //获取角色
+        layer.open({
+            type: 1,
+            shade: false,
+            title: '添加接口',
+            content: $('.layer_notice'),
+            area:['60%','90%'],
+            cancel: function(){
+                layer.msg('O(∩_∩)O哈哈哈哈~', {time: 5000, icon:6});
+            }
+        });
+    }
+    //保存添加内容
+    function add(){
+        var res = true;
+        $("input[type=text]").each(function(i){
+            if($(this).val() ==""){
+                res = false;
+                var _this = $(this);
+                layer.tips('必填项不能为空', _this, {tips: [2, '#1ab394'], maxWidth:400, time: 3000});
+                return false;
+            }
+        });
+        if(!res)return false;
+        $("input[type=password]").each(function(i){
+            if($(this).val() ==""){
+                res = false;
+                var _this = $(this);
+                layer.tips('密码不能为空', _this, {tips: [2, '#1ab394'], maxWidth:400, time: 3000});
+                return false;
+            }
+        });
+        if(!res)return false;
+        $("input[type=email]").each(function(i){
+            if($(this).val() ==""){
+                res = false;
+                var _this = $(this);
+                layer.tips('邮箱不能为空', _this, {tips: [2, '#1ab394'], maxWidth:400, time: 3000});
+                return false;
+            }
+        });
+        if(!res)return false;
+        $.ajax({
+            type : 'post',
+            url : '__CONTROLLER__/add',
+            data : $('#form_add').serialize(),
+            dataType : 'json',
+            success : function(data){
+                if(data.code == 10000){
+                    layer.msg('添加成功O(∩_∩)O哈哈哈哈~', {time: 5000, icon:6});
+                    self.location.reload();
+                }else{
+                    layer.msg(data.msg);
+                }
+            },
+            error : function(){}
+        });
+    }
+    //编辑
+    function editAdmin(_this,id){
+        $.ajax({
+            type : 'get',
+            url  : '__MODULE__/Role/ajax_get_role',
+            data : {id : id},
+            dataType : 'json',
+            success  : function(data){
+                if(data.code == 10000){
+                    var _this_tr = $(_this).closest('tr');
+                    $('tr').attr('style','display:show');
+                    $('#main').remove();
+                    $(_this_tr).attr('style','display:none');
+                    var html = '<tr class="newtwo" id="main" userid="'+id+'">';
+                    $(_this_tr).children('td').each(function (j) {
+                        if(j == 0){ //第一列
+                            html += '<td>' +
+                                    '<div class="input-group">'+
+                                    '<input type="text" class="form-control" value="'+$(this).text()+'" style="border: 1px solid #e5e6e7;" name="rname">'+
+                                    '<span class="input-group-btn"> <button type="button" class="btn btn-primary" onclick="save_name(this,'+id+')">保存'+
+                                    '</button> </span>'+
+                                    '</div></td>';
+                        }else if(j == 1){ //第二列
+                            html += '<td><select class="form-control m-b" name="edit_Role">';
+                            for(var i = 0; i < data.info.length; i++){
+                                if( $(this).text() == data.info[i].rolename){
+                                    html += '<option value="'+data.info[i].roleid+'" selected>'+data.info[i].rolename+'</option>';
+                                }else{
+                                    html += '<option value="'+data.info[i].roleid+'">'+data.info[i].rolename+'</option>';
+                                }
+
+                            }
+                            html += '</select></td>';
+
+                        }else if(j == 4){ //第三列
+                            html += '<td>&emsp;<button class="btn bt-info btn-xs">取消</button></td>';
+                        }else{
+                            html += '<td>'+$(this).text()+'</td>';
+                        }
+                    });
+                    html += '</tr>';
+                    $(_this_tr).after(html);
+
+
+                }else{
+                    layer.msg(data.msg);
+                }
+            },
+            error : function (xhr) {
+
+            }
+        });
+    }
+    function delAdmin(id){
+        parent.layer.confirm('确定要删除？', {
+            btn: ['没错','算了吧'], //按钮
+            shade: false //不显示遮罩
+        }, function(){
+            $.ajax({
+                type : 'post',
+                url  : '__CONTROLLER__/del',
+                data : {id:id},
+                dataType : 'json',
+                success  : function(data){
+                    if(data.code == 10000){
+                        parent.layer.msg('删除成功！你会后悔的！', {icon: 1});
+                        self.location.reload();
+                    }else{
+                        parent.layer.msg(data.msg, {shift: 6});
+                    }
+                },
+                error : function(){
+                    parent.layer.msg('服务器出错了！', {shift: 6});
+                }
+            });
+        }, function(){
+            parent.layer.msg('不删就不删', {shift: 6});
+        });
+    }
+
+    $(function(){
+        $(document).on('change',"select[name='edit_Role']",function(){
+            var userid = $(this).closest('tr').attr('userid');
+            var roleid = $(this).val();
+            $.ajax({
+                type : 'post',
+                url  : '/Admin/edit',
+                data : {userid:userid,roleid:roleid},
+                dataType : 'json',
+                success  : function(data){
+                    if(data.code == 10000){
+                        parent.layer.msg('修改成功！', {shift: 6});
+                    }else{
+                        parent.layer.msg(data.msg, {shift: 6});
+                    }
+                },
+                error : function(xhr){
+
+                }
+            })
+        })
+    });
+</script>
+
+</body>
+
+</html>

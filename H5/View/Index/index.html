@@ -1,22 +1,17 @@
-<body class="graybg" style="position:static; height:100%; margin:0; background: #f5f5f5">
-<div class="content clearfix"  id="wrapper">
+<body class="graybg" style="position:static; height:100%; margin:0;top:0; background: #f5f5f5">
+<div class="content clearfix"  id="wrapper" style="position:static;bottom:5px;top:0">
     <div id="scroller">
-        <div id="pullDown">
-            <span class="pullDownIcon"></span><span class="pullDownLabel">下拉刷新...</span>
-        </div>
+        <!--<div id="pullDown">-->
+            <!--<span class="pullDownIcon"></span><span class="pullDownLabel">下拉刷新...</span>-->
+        <!--</div>-->
         <div id="thelist"></div>
         <div id="pullUp">
-            <span class="pullUpIcon"></span><span class="pullUpLabel">上拉加载更多...</span>
+            <span class="pullUpIcon"></span><span class="pullUpLabel">点击加载更多...</span>
         </div>
     </div>
 </div>
 </body>
 <script>
-    var myScroll,
-            pullDownEl, pullDownOffset,
-            pullUpEl, pullUpOffset,
-            generatedCount = 0;
-
     function get_banner(){
         $.ajax({
             type: 'GET',
@@ -59,6 +54,7 @@
                         spaceBetween: 30,
                         autoplay: 3000
                     });
+
                 }else{
 
                 }
@@ -83,13 +79,15 @@
                     }
                     sbanner += '</div>';
                     $('#thelist').append(sbanner);
+                    get_goods(1);
                 }else{}
-                get_goods(1);
+                //get_goods(1);
             },error : function(xhr){
 
             }
         });
     }
+
     function get_goods(p){
         $.ajax({
             type : 'GET',
@@ -105,29 +103,35 @@
                                 '<h5 class=" fs-14 pr"><i class="cube">&nbsp;</i> <span class="bgwhite pr z1">&nbsp;特惠精品</span>' +
                                 '</h5>' +
                                 '</div>' ;
+                        html +='<div class="listwrap clearfix iclist" id="list" style="position: relative;">';
                     }
 
-                    html +='<div class="listwrap clearfix iclist" id="thelist">';
+
                     for(var i=0;i<data.info.userlikelist.length;i++){
-                        html += '<div class="col-xs-6 goods mleft" style="width:45%">'+
+                        html += '<div class="col-xs-6 goods mleft" style="width:45%;">'+
                                 ' <a href="__MODULE__/Goods/goods/gid/'+data.info.userlikelist[i].goods_id+'">'+
                                 ' <div class="img cut-img" style="position:relative;">'+
                                 ' <img src="'+data.info.userlikelist[i].goods_small_img+'"/>'+
                                 ' </div>'+
                                 ' <span class="title">'+data.info.userlikelist[i].goods_name+'</span>'+
-                                '<p class="zprice clearfix">'+
-                                '<font color="#ccc" class="col-xs-7">'+data.info.userlikelist[i].goods_sn+
-                                '</font> <span class="price col-xs-5">￥'+data.info.userlikelist[i].goods_price+'</span><br>'+
+                                '<p class="zprice clearfix activetext">'+
+                                '<i class="newsimg"></i><span class="price col-xs-5">￥'+data.info.userlikelist[i].goods_price+'</span><br>'+
                                 ' </p>'+
                                 ' </a>'+
                                 '</div>';
                     }
-                    html += '</div>';
-
+                    if(p == 1){
+                        html += '</div>';
+                    }
                 }else{
 
                 }
-                $('#thelist').append(html);
+                if(p == 1){
+                    $('#thelist').append(html);
+                }else{
+                    $('#list').append(html);
+                }
+
             },
             error : function(xhr){
 
@@ -150,27 +154,16 @@
     window.setInterval("a()",5000);
     get_banner();
 
-    /**
-     * 下拉刷新 （自定义实现此方法）
-     * myScroll.refresh();  // 数据加载完成后，调用界面更新方法
-     */
-    function pullDownAction () {
-        get_banner();
-        $('#thelist').empty();
-        myScroll.refresh();  //数据加载完成后，调用界面更新方法 Remember to refresh when contents are loaded (ie: on ajax completion)
-    }
-    /**
-     * 滚动翻页 （自定义实现此方法）
-     * myScroll.refresh();  // 数据加载完成后，调用界面更新方法
-     */
     var p = 2;
-    function pullUpAction () {
-        if(p <= localStorage.p){
-            get_goods(p);
-            p++;
+    $(function(){
+        $('#pullUp').click(function(){
+            if(p <= localStorage.p){
+                get_goods(p);
+                p++;
+            }else{
+                $("#pullUp").find('.pullUpLabel').html('猜中你的喜好有点难呢');
+            }
+        });
+    });
 
-        }
-        myScroll.refresh();  // 数据加载完成后，调用界面更新方法 Remember to refresh when contents are loaded (ie: on ajax completion)
-
-    }
 </script>

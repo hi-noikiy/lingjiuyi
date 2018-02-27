@@ -7,20 +7,13 @@
 <!--特惠精品-->
 <div class="content clearfix"  id="wrapper">
     <div id="scroller">
-        <div id="pullDown">
-            <span class="pullDownIcon"></span><span class="pullDownLabel">下拉刷新...</span>
-        </div>
         <div id="thelist"></div>
         <div id="pullUp">
-            <span class="pullUpIcon"></span><span class="pullUpLabel">上拉加载更多...</span>
+            <span class="pullUpIcon"></span><span class="pullUpLabel">点击加载更多...</span>
         </div>
     </div>
 </div>
 <script>
-    var myScroll,
-            pullDownEl, pullDownOffset,
-            pullUpEl, pullUpOffset,
-            generatedCount = 0;
 
     var sort = 'id';
     var rules = 'desc';
@@ -100,22 +93,6 @@
         });
     }
 
-    function pullDownAction () {
-        get_banner();
-        $('#thelist').empty();
-        myScroll.refresh();  //数据加载完成后，调用界面更新方法 Remember to refresh when contents are loaded (ie: on ajax completion)
-    }
-
-    var p = 2;
-    function pullUpAction () {
-        if(p <= localStorage.p){
-            get_list(p);
-            p++;
-
-        }
-        myScroll.refresh();  // 数据加载完成后，调用界面更新方法 Remember to refresh when contents are loaded (ie: on ajax completion)
-
-    }
     get_banner();
     $(function(){
         //排序
@@ -132,6 +109,15 @@
                 rules = 'desc';
             }
             get_list(1,sort,rules);
+        });
+        var p = 2;
+        $('#pullUp').click(function(){
+            if(p <= localStorage.p){
+                get_list(p);
+                p++;
+            }else{
+                $("#pullUp").find('.pullUpLabel').html('到底啦！');
+            }
         });
     });
 

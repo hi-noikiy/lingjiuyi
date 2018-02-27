@@ -39,4 +39,19 @@ class AdminController extends BaseController {
         $res ? $this -> ajaxReturnSuccess() : $this -> ajaxReturnData(0,'删除失败');
     }
 
+    public function edit(){
+        $userid = I('post.userid','','intval');
+        $roleid = I('post.roleid','','intval');
+        if(!empty($userid) && !empty($roleid)){
+            $data = array(
+                'userid' => $userid,
+                'roleid' => $roleid,
+            );
+            $res = D('Admin') -> save($data);
+            $res ? $this -> ajaxReturnSuccess() : $this -> ajaxReturnData(0,'修改失败');
+        }else{
+            $this -> ajaxReturnData(0,'参数错误');
+        }
+    }
+
 }

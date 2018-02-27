@@ -87,7 +87,7 @@
                 //获取所有菜单 和管理员拥有权限
                 $id = I('get.id','','intval');
                 empty($id) ? $this -> ajaxReturnData(0,'参数错误') : true;
-                    $menu_all = D('Menu') -> field('menuid,name') -> where('parentid != 0') -> select();//获取所有操作菜单
+                $menu_all = D('Menu') -> field('menuid,name') -> where('parentid != 0') -> select();//获取所有操作菜单
                 $menus = D('Privileges') -> where("roleid = $id") -> select();//获取当前管理员拥有的菜单
                 empty($menu_all) && empty($menus) ? $this -> ajaxReturnData(0,'无数据') : $this -> ajaxReturnSuccess(compact('menu_all','menus'));
             }

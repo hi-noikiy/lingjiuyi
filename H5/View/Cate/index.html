@@ -7,20 +7,14 @@
 <body class="graybg" style="position:static; height:100%; margin:0; background: #f5f5f5">
     <div class="content clearfix"  id="wrapper">
         <div id="scroller">
-            <div id="pullDown">
-                <span class="pullDownIcon"></span><span class="pullDownLabel">下拉刷新...</span>
-            </div>
             <div id="thelist"></div>
             <div id="pullUp">
-                <span class="pullUpIcon"></span><span class="pullUpLabel">上拉加载更多...</span>
+                <span class="pullUpIcon"></span><span class="pullUpLabel">点击加载更多...</span>
             </div>
         </div>
     </div>
 <script>
-    var myScroll,
-            pullDownEl, pullDownOffset,
-            pullUpEl, pullUpOffset,
-            generatedCount = 0;
+
     var id = "{$Think.get.id}";//获取当前链接中的id参数
     var sort = 'id';
     var rules = 'desc';
@@ -101,37 +95,33 @@
     }
 
     get_banner();
-    function pullDownAction () {
-        get_banner();
-        $('#thelist').empty();
-        myScroll.refresh();  //数据加载完成后，调用界面更新方法 Remember to refresh when contents are loaded (ie: on ajax completion)
-    }
-    var p = 2;
-    function pullUpAction () {
-        if(p <= localStorage.p){
-            get_list(id,p,sort,rules);
-            p++;
 
-        }
-        myScroll.refresh();  // 数据加载完成后，调用界面更新方法 Remember to refresh when contents are loaded (ie: on ajax completion)
-    }
+    $(function(){
+        //排序
+        $(document).on('click','.order-btn a',function(){
+            var $this=$(this);
+            $('.order-btn a').removeClass('ac');
+            $($this).addClass('ac');
+            sort = $this.find('i').attr('data-value');
+            if($this.find('i').hasClass('asc')){
+                $this.find('i').removeClass('asc').addClass('desc');
+                rules = 'asc';
+            }else{
+                $this.find('i').removeClass('desc').addClass('asc');
+                rules = 'desc';
+            }
+            get_list(id,1,sort,rules);
+        });
 
-$(function(){
-    //排序
-    $(document).on('click','.order-btn a',function(){
-        var $this=$(this);
-        $('.order-btn a').removeClass('ac');
-        $($this).addClass('ac');
-        sort = $this.find('i').attr('data-value');
-        if($this.find('i').hasClass('asc')){
-            $this.find('i').removeClass('asc').addClass('desc');
-            rules = 'asc';
-        }else{
-            $this.find('i').removeClass('desc').addClass('asc');
-            rules = 'desc';
-        }
-        get_list(id,1,sort,rules);
+        var p = 2;
+        $('#pullUp').click(function(){
+            if(p <= localStorage.p){
+                get_list(id,p,sort,rules);
+                p++;
+            }else{
+                $("#pullUp").find('.pullUpLabel').html('到底啦！');
+            }
+        });
+
     });
-
-})
 </script>

@@ -151,7 +151,7 @@
                 url  : '__MODULE__/Role/ajax_get_role',
                 dataType : 'json',
                 success  : function(data){
-                    var html,i;
+                    var html = '',i;
                     if(data.code == 10000){
                         for(i = 0; i < data.info.length; i++){
                             html += '<option value="'+ data.info[i].roleid+'">'+ data.info[i].rolename +'</option>';
@@ -233,7 +233,7 @@
                         $('tr').attr('style','display:show');
                         $('#main').remove();
                         $(_this_tr).attr('style','display:none');
-                        var html = '<tr class="newtwo" id="main" roleid="'+id+'">';
+                        var html = '<tr class="newtwo" id="main" userid="'+id+'">';
                         $(_this_tr).children('td').each(function (j) {
                             if(j == 0){ //第一列
                                 html += '<td>' +
@@ -243,38 +243,21 @@
                                         '</button> </span>'+
                                         '</div></td>';
                             }else if(j == 1){ //第二列
-                                html += '<td>' ;
-                                for(var i = 0; i < data.info.menu_all.length; i++){
-                                    html += '<div class="col-sm-3"><div class="checkbox i-checks">'+
-                                            '<label class="">'+
-                                            '<div class="icheckbox_square-green';
-                                    if(data.info.menus.length > 0){
-                                        for(var k = 0; k < data.info.menus.length; k++){
-                                            if(data.info.menu_all[i].menuid == data.info.menus[k].menuid){
-                                                html += ' checked';
-                                            }
-                                        }
+                                html += '<td><select class="form-control m-b" name="edit_Role">';
+                                for(var i = 0; i < data.info.length; i++){
+                                    if( $(this).text() == data.info[i].rolename){
+                                        html += '<option value="'+data.info[i].roleid+'" selected>'+data.info[i].rolename+'</option>';
+                                    }else{
+                                        html += '<option value="'+data.info[i].roleid+'">'+data.info[i].rolename+'</option>';
                                     }
-                                    html += '" style="position: relative;">' +
-                                            '<input type="checkbox"';
-                                    if(data.info.menus.length > 0){
-                                        for(var k = 0; k < data.info.menus.length; k++){
-                                            if(data.info.menu_all[i].menuid == data.info.menus[k].menuid){
-                                                html += ' checked="" pri_id="'+data.info.menus[k].id+'"';
-                                            }
-                                        }
-                                    }
-                                    html += ' value="'+ data.info.menu_all[i].menuid+
-                                            '" style="position: absolute; opacity: 0;"><ins class="iCheck-helper new_input ajax_edit"></ins></div>'+
-                                            '<i></i> '+data.info.menu_all[i].name+
-                                            '</label>'+
-                                            '</div></div>';
 
                                 }
-                                html += '</td>';
+                                html += '</select></td>';
 
-                            }else if(j == 2){ //第三列
+                            }else if(j == 4){ //第三列
                                 html += '<td>&emsp;<button class="btn bt-info btn-xs">取消</button></td>';
+                            }else{
+                                html += '<td>'+$(this).text()+'</td>';
                             }
                         });
                         html += '</tr>';
@@ -316,6 +299,29 @@
                 parent.layer.msg('不删就不删', {shift: 6});
             });
         }
+
+        $(function(){
+            $(document).on('change',"select[name='edit_Role']",function(){
+                var userid = $(this).closest('tr').attr('userid');
+                var roleid = $(this).val();
+                $.ajax({
+                    type : 'post',
+                    url  : '/Admin/edit',
+                    data : {userid:userid,roleid:roleid},
+                    dataType : 'json',
+                    success  : function(data){
+                        if(data.code == 10000){
+                            parent.layer.msg('修改成功！', {shift: 6});
+                        }else{
+                            parent.layer.msg(data.msg, {shift: 6});
+                        }
+                    },
+                    error : function(xhr){
+
+                    }
+                })
+            })
+        });
     </script>
 
 </body>
