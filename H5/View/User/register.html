@@ -186,7 +186,7 @@
                         if(data.code ==10000){
                             layer.open({content: '发送成功',skin: 'msg',time: 2});
                         }else if(data.code == 10001){
-                            //手机号已注册
+                            //邮箱已注册
                             layer.open({
                                 content: data.msg
                                 , btn: ['确认', '取消']
@@ -277,7 +277,7 @@
                 dataType : 'json',
                 success  : function(data){
                     if(data.code == 10000){
-                        layer.open({content: '注册成功！初始密码为123456abc',skin: 'msg',time: 3});
+                        layer.open({content: '邮箱验证码发送成功！',skin: 'msg',time: 3});
                         $('.email_step1').attr('style','display:none;');
                         $('.step2').attr('style','display:show;');
                     }else if(data.code == 10001){

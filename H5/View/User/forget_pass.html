@@ -124,7 +124,7 @@
                                 content: data.msg
                                 , btn: ['确认', '取消']
                                 , yes: function () {
-                                    location.href = '/User/login';
+                                    location.href = '/User/register';
                                 }
                             });
                         }else{
@@ -139,17 +139,49 @@
 
         });
 
-        //点击下一步
-        $('.submit-btn1').click(function(){
-            var tele = $("input[name='tele']").val();
-            var code = $("input[name='code']").val();
+        //点击获取邮箱验证码
+        $('.email_get_code').click(function(){
+            var email = $("input[name='email']").val();
 
-            if(tele == ''){
-                layer.open({content: '手机号不能为空',skin: 'msg',time: 2}); return false;
+            if(email == ''){
+                layer.open({content: '邮箱不能为空',skin: 'msg',time: 2});
+                return false;
+            }else{
+                var obj = $(".email_get_code");
+                settime(obj);//300秒倒计时
+                $.ajax({
+                    type : 'post',
+                    url  : '/User/sendEmailCode',
+                    data : {email:email,type:'repass_code'},
+                    dataType : 'json',
+                    success : function(data){
+                        if(data.code ==10000){
+                            layer.open({content: '发送成功，有效期为5分钟',skin: 'msg',time: 2});
+                        }else if(data.code == 10001){
+                            //邮箱不存在
+                            layer.open({
+                                content: data.msg
+                                , btn: ['确认', '取消']
+                                , yes: function () {
+                                    location.href = '/User/register';
+                                }
+                            });
+                        }else{
+                            layer.open({content: data.msg,skin: 'msg',time: 2});
+                        }
+                    },
+                    error:function(xhr){
+
+                    }
+                });
             }
-            if(code == ''){
-                layer.open({content: '手机验证码不能为空',skin: 'msg',time: 2}); return false;
-            }
+
+        });
+
+        //手机重置密码点击下一步
+        $('.submit-btn1').click(function(){
+            var tele = $("input[name='tele']").val(); if(tele == ''){ layer.open({content: '手机号不能为空',skin: 'msg',time: 2}); return false; }
+            var code = $("input[name='code']").val(); if(code == ''){ layer.open({content: '手机验证码不能为空',skin: 'msg',time: 2}); return false; }
             $.ajax({
                 type : 'post',
                 url  : '/User/check_repass_code',
@@ -159,6 +191,38 @@
                     if(data.code == 10000){
                         $('.step1').attr('style','display:none;');
                         $('.step2').attr('style','display:show;');
+                        $('.step2').attr('o_type','tele');
+                    }else if(data.code == 10001){
+                        layer.open({
+                            content: data.msg
+                            , btn: ['确认', '取消']
+                            , yes: function () {
+                                location.href = '/User/register';
+                            }
+                        });
+                    }else{
+                        layer.open({content: data.msg,skin: 'msg',time: 2})
+                    }
+                },
+                error : function(){}
+            });
+
+        });
+
+        //邮箱重置密码，点击下一步
+        $('.submit-btn2').click(function(){
+            var email = $("input[name='email']").val();  if(email == ''){ layer.open({content: '邮箱不能为空',skin: 'msg',time: 2}); return false; }
+            var email_code = $("input[name='email_code']").val();  if(email_code == ''){ layer.open({content: '邮箱验证码不能为空',skin: 'msg',time: 2}); return false; }
+            $.ajax({
+                type : 'post',
+                url  : '/User/check_repass_email_code',
+                data : {email:email,email_code:email_code},
+                dataType : 'json',
+                success  : function(data){
+                    if(data.code == 10000){
+                        $('.email_step1').attr('style','display:none;');
+                        $('.step2').attr('style','display:show;');
+                        $('.step2').attr('o_type','email');
                     }else if(data.code == 10001){
                         layer.open({
                             content: data.msg
@@ -178,14 +242,25 @@
 
         //点击确定重置
         $('.js-submit-btn').click(function(){
-            var tele = $("input[name='tele']").val();
-            var code = $("input[name='code']").val();
-            var password = $("input[name='password']").val();
-            var repassword = $("input[name='repassword']").val();
+            var password = $("input[name='password']").val(); if(password == ''){ layer.open({content: '密码不能为空',skin: 'msg',time: 2}); return false; }
+            var repassword = $("input[name='repassword']").val(); if(repassword == ''){ layer.open({content: '重复密码不能为空',skin: 'msg',time: 2}); return false; }
+            if(password != repassword){ layer.open({content: '两次密码输入不一致！',skin: 'msg',time: 2}); return false; }
+            var o_type = $('.step2').attr('o_type');
+            var data;
+            if(o_type == 'tele'){
+                var tele = $("input[name='tele']").val(); if(tele == ''){ layer.open({content: '手机号不能为空',skin: 'msg',time: 2}); return false; }
+                var code = $("input[name='code']").val(); if(code == ''){ layer.open({content: '手机验证码不能为空',skin: 'msg',time: 2}); return false; }
+                data = {password:password,repassword:repassword,tele:tele,code:code,type:'re_pass'};
+            }else if(o_type == 'email'){
+                var email = $("input[name='email']").val();  if(email == ''){ layer.open({content: '邮箱不能为空',skin: 'msg',time: 2}); return false; }
+                var email_code = $("input[name='email_code']").val();  if(email_code == ''){ layer.open({content: '邮箱验证码不能为空',skin: 'msg',time: 2}); return false; }
+                data = {password:password,repassword:repassword,email:email,email_code:email_code,type:'re_pass_email'};
+            }
+
             $.ajax({
                 type : 'post',
                 url  : '/User/edit_password',
-                data : {password:password,repassword:repassword,tele:tele,code:code,type:'re_pass'},
+                data : data,
                 dataType : 'json',
                 success  : function(data){
                     if(data.code == 10000){

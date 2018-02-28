@@ -107,7 +107,7 @@ class UserController extends CommonController {
         if(IS_POST && IS_AJAX){
             I('post.type','','string') ? $type = I('post.type','','string') : $this -> ajaxReturnData(0,'参数错误');
             if($type === 're_pass'){
-                //未登录，用户忘记密码
+                //手机号重置密码
                 $check_code = $this -> check_repass_code();
                 $check_code === true ? true : $this -> ajaxReturnData(0,'手机号验证未通过！');
                 I('post.password','','string')   ? $password = I('post.password','','string')     : $this -> ajaxReturnData(0,'密码不能为空！');
@@ -117,10 +117,26 @@ class UserController extends CommonController {
                 $password !== $repassword ? $this -> ajaxReturnData(0,'两次密码输入不一致') : true;
                 I('post.tele','','string') ? $tele = I('post.tele','','string') : $this -> ajaxReturnData(0,'手机号不能为空');
                 $data['password'] = encrypt_pwd($password);
-                $res = D('User') -> where("`phone` = $tele") -> save($data);
+                $res = D('User') -> where("`phone` = '$tele'") -> save($data);
                 session('repass_code_' . $tele,null);
                 $res !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'修改密码失败');
 
+            }elseif($type == 're_pass_email'){
+                //邮箱重置密码
+                $check_code = $this -> check_repass_email_code();
+                $check_code === true ? true : $this -> ajaxReturnData(0,'手机号验证未通过！');
+                I('post.password','','string')   ? $password = I('post.password','','string')     : $this -> ajaxReturnData(0,'密码不能为空！');
+                I('post.repassword','','string') ? $repassword = I('post.repassword','','string') : $this -> ajaxReturnData(0,'确认密码不能为空！');
+                preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $password)   == false ? $this -> ajaxReturnData(0,'密码格式不正确，只能6-20位数字和字母组成') : true;
+                preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $repassword) == false ? $this -> ajaxReturnData(0,'确认密码格式不正确，只能6-20位数字和字母组成') : true;
+                $password !== $repassword ? $this -> ajaxReturnData(0,'两次密码输入不一致') : true;
+                I('post.email','','string') ? $email = I('post.email','','string') : $this -> ajaxReturnData(0,'手机号不能为空');
+                $data['password'] = encrypt_pwd($password);
+                $data['email_code'] = '';
+                $res = D('User') -> where("`email` = '$email'") -> save($data);
+
+                session('register_email_code_sendtime' . $email,null);
+                $res !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'修改密码失败');
             }elseif($type == 'tele_register'){
                 //新用户手机号注册，设置用户名和密码
                 I('post.tele','','string') ? $tele = I('post.tele','','string') : $this -> ajaxReturnData(0,'手机号不能为空');
@@ -130,6 +146,8 @@ class UserController extends CommonController {
                 I('post.username','','string')   ? $username   = I('post.username','','string')   : $this -> ajaxReturnData(0,'用户名不能为空');
                 I('post.password','','string')   ? $password   = I('post.password','','string')   : $this -> ajaxReturnData(0,'密码不能为空');
                 I('post.repassword','','string') ? $repassword = I('post.repassword','','string') : $this -> ajaxReturnData(0,'重复密码不能为空');
+                preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $password)   == false ? $this -> ajaxReturnData(0,'密码格式不正确，只能6-20位数字和字母组成') : true;
+                preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $repassword) == false ? $this -> ajaxReturnData(0,'确认密码格式不正确，只能6-20位数字和字母组成') : true;
                 $password != $repassword ? $this -> ajaxReturnData(0,'两次密码输入不一致') : true;
 
                 $uid = D('User') -> where("phone = '$tele'") -> getField('id');
@@ -137,7 +155,7 @@ class UserController extends CommonController {
                 $invite_uid = D('User') -> where("phone = '$invite_tele'") -> getField('id');
                 empty($invite_uid) ? $this -> ajaxReturnData(0,'邀请人不存在') : true;
 
-                $sendtime = session('register_code_sendtime') ? session('register_code_sendtime') : 0;
+                $sendtime = session('register_code_sendtime' . $tele) ? session('register_code_sendtime' . $tele) : 0;
                 if(time() - $sendtime > 300){
                     session('register_code_'.$tele,null);
                     $this -> ajaxReturnData(0,'验证码已失效，请重新获取');//验证码是否过期
@@ -156,7 +174,38 @@ class UserController extends CommonController {
 
             }elseif($type == 'email_register'){
                 //新用户邮箱注册，设置用户名和密码
+                I('post.email','','string')             ? $email = I('post.email','','string')           : $this -> ajaxReturnData(0,'邮箱不能为空');
+                I('post.email_code','','intval')        ? $email_code = I('post.email_code','','intval') : $this -> ajaxReturnData(0,'邮箱验证码不能为空');
+                I('post.email_invite_tele','','string') ? $e_invite_tele = I('post.email_invite_tele','','string') : $this -> ajaxReturnData(0,'邀请码不能为空');
 
+                I('post.username','','string')   ? $username   = I('post.username','','string')   : $this -> ajaxReturnData(0,'用户名不能为空');
+                I('post.password','','string')   ? $password   = I('post.password','','string')   : $this -> ajaxReturnData(0,'密码不能为空');
+                I('post.repassword','','string') ? $repassword = I('post.repassword','','string') : $this -> ajaxReturnData(0,'重复密码不能为空');
+                preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $password)   == false ? $this -> ajaxReturnData(0,'密码格式不正确，只能6-20位数字和字母组成') : true;
+                preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $repassword) == false ? $this -> ajaxReturnData(0,'确认密码格式不正确，只能6-20位数字和字母组成') : true;
+                $password != $repassword ? $this -> ajaxReturnData(0,'两次密码输入不一致') : true;
+
+                $uEmail_code = D('User') -> where("email = '$email'") -> getField('email_code');
+                empty($uEmail_code) ? $this -> ajaxReturnData(0,'请获取验证码') : true;
+                $invite_uid = D('User') -> where("phone = '$e_invite_tele'") -> getField('id');
+                empty($invite_uid) ? $this -> ajaxReturnData(0,'邀请人不存在') : true;
+
+                //验证验证码和手机号
+                $sendtime = session('register_email_code_sendtime' . $email) ? session('register_email_code_sendtime' . $email) : 0;
+                if(time() - $sendtime > 300){
+                    $res = D('User') -> where("email = '$email'") -> save(['email_code' => '']);
+                    $res !== false ? $this -> ajaxReturnData(0,'邮箱验证码已失效，请重新获取') : $this -> ajaxReturnData(0,'更新邮箱验证码失败！');//验证码是否过期
+                }elseif($uEmail_code != $email_code){
+                    $this -> ajaxReturnData(0,'邮箱验证码不正确!');//验证验证码是否正确
+                }else{
+                    $data = array(
+                        'username'   => $username,
+                        'password'    => encrypt_pwd($password),  //定义初始密码
+                    );
+                    $res = D('User') -> where("email = '$email'") -> save($data);
+                    $res !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'注册失败！');//验证通过
+
+                }
             }else{
                 $this -> ajaxReturnData(0,'参数错误');//验证是否登录
             }
@@ -248,14 +297,18 @@ class UserController extends CommonController {
 
         if($type == 'register_code'){
             //注册
-            $sendtime = session('register_code_sendtime') ? session('register_code_sendtime') : 0;//发送频率限制,半小时
+            $sendtime = session('register_code_sendtime' . $phone) ? session('register_code_sendtime' . $phone) : 0;//发送频率限制,半小时
             time() - $sendtime < 300 ? $this -> ajaxReturnData(0,'发送太频繁，请稍后再试') : true;
 
             $uid = M('User') -> where("phone = '$phone'") -> getField('id');
             !empty($uid) ? $this -> ajaxReturnData(10001,'手机号已经注册，是否登录？') : true;//如果存在记录，说明已经注册
         }elseif($type == 'repass_code'){
-            $sendtime = session('repass_code_sendtime') ? session('repass_code_sendtime') : 0;//发送频率限制,半小时
+            //重置密码
+            $sendtime = session('repass_code_sendtime' . $phone) ? session('repass_code_sendtime' . $phone) : 0;//发送频率限制,半小时
             time() - $sendtime < 300 ? $this -> ajaxReturnData(0,'发送太频繁，请稍后再试') : true;
+
+            $uid = M('User') -> where("phone = '$phone'") -> getField('id');
+            empty($uid) ? $this -> ajaxReturnData(10001,'手机号未注册，是否去注册？') : true;//如果不存在记录，说明未注册，不能修改密码
         }else{
             $this -> ajaxReturnData(0,'参数错误');
         }
@@ -272,10 +325,10 @@ class UserController extends CommonController {
         }else{
             if($type == 'register_code'){
                 session('register_code_' . $phone, $code);//将验证码保存到session
-                session('register_code_sendtime',time());
+                session('register_code_sendtime'.$phone,time());
             }elseif($type == 'repass_code'){
                 session('repass_code_' . $phone, $code);//将验证码保存到session
-                session('repass_code_sendtime',time());
+                session('repass_code_sendtime' . $phone,time());
             }
             $this -> ajaxReturnData();
         }
@@ -290,36 +343,63 @@ class UserController extends CommonController {
 
         if($type == 'register_code'){
             //注册
-            $sendtime = session('register_email_code_sendtime') ? session('register_email_code_sendtime') : 0;//发送频率限制,半小时
+            $sendtime = session('register_email_code_sendtime' . $email) ? session('register_email_code_sendtime' . $email) : 0;//发送频率限制,半小时
             time() - $sendtime < 300 ? $this -> ajaxReturnData(0,'发送太频繁，请稍后再试') : true;
 
-            $uid = M('User') -> where("email = '$email'") -> getField('id');
-            !empty($uid) ? $this -> ajaxReturnData(10001,'邮箱已经注册，是否登录？') : true;//如果存在记录，说明已经注册
+            $is_check = M('User') -> where("email = '$email'") -> getField('is_check');
+            $is_check == 1 ? $this -> ajaxReturnData(10001,'邮箱已经注册，是否登录？') : true;//如果存在记录，说明已经注册
+
+            $email_code = rand(100000,999999);
+            if(empty($is_check) && $is_check !== 0){
+                $data = array(
+                    'username'   => 'user' . time() . rand(100,999),
+                    'email'      => $email,
+                    'email_code' => $email_code,
+                );
+                $addRes = D('User') -> add($data);
+            }else{
+                $data = array(
+                    'username'   => 'user' . time() . rand(100,999),
+                    'email_code' => $email_code,
+                );
+                $addRes = D('User') -> where("email = '$email'")-> save($data);
+            }
+
+            $addRes ? true : $this -> ajaxReturnData(0,'邮件地址保存失败！');
+
+            $subject = '零玖一商城激活';
+            $body = "<html><head><title>零玖一</title></head><body>
+					<div style='width:90%;padding:30px;'><p>尊敬的用户：</p><p>您好，感谢您注册零玖一！</p>
+					<p>您的激活验证码为：<span style='color:blue'>{$data['email_code']}</span>，30分钟内此验证码有效！</p>
+					<p>如您未做出此操作，可能是他人误填，请忽略此邮件。</p><p>本邮件为系统发送，请勿回复。</p></div></body></html>";
+            $res = sendmail($email,$subject,$body);//发送邮件
+
+            session('register_email_code_sendtime'.$email,time());
+            $res !== true ? $this -> ajaxReturnData(0,'邮件发送失败',$res) : $this -> ajaxReturnData();
+
+
         }elseif($type == 'repass_code'){
-            $sendtime = session('register_email_code_sendtime') ? session('register_email_code_sendtime') : 0;//发送频率限制,半小时
+            //重置密码
+            $sendtime = session('register_email_code_sendtime' . $email) ? session('register_email_code_sendtime' . $email) : 0;//发送频率限制,半小时
             time() - $sendtime < 300 ? $this -> ajaxReturnData(0,'发送太频繁，请稍后再试') : true;
+
+            $is_check = M('User') -> where("email = '$email'") -> getField('is_check');
+
+            empty($is_check) && $is_check !== 0 ? $this -> ajaxReturnData(10001,'邮箱不存在，去注册？') : true;//如果不存在记录，说明未注册，不能修改密码
+            $data['email_code'] = rand(100000,999999);
+            $addRes = D('User') -> where("email = '$email'") -> save($data);
+            $addRes ? true : $this -> ajaxReturnData(0,'邮件验证码保存失败！');
+            $subject = '零玖一商城修改密码';
+            $body = "<html><head><title>零玖一</title></head><body>
+					<div style='width:90%;padding:30px;'><p>尊敬的用户：</p>
+					<p>我们已经收到您修改密码的请求，您的修改密码验证码为：<span style='color:blue'>{$data['email_code']}</span>
+					，30分钟内此验证码有效！</p>
+					<p>如您未做出此操作，可能是他人误填，请忽略此邮件。</p><p>本邮件为系统发送，请勿回复。</p></div></body></html>";
+            $res = sendmail($email,$subject,$body);//发送邮件
+            session('register_email_code_sendtime'.$email,time());
+            $res !== true ? $this -> ajaxReturnData(0,'邮件发送失败',$res) : $this -> ajaxReturnData();
         }else{
             $this -> ajaxReturnData(0,'参数错误');
-        }
-
-        $code = rand(1000,9999);//验证码
-        $tpl_id = '63946';
-        $key = '2580aa6c016f2c630f5835d0aa40edb2';//APP key
-        $url = "http://v.juhe.cn/sms/send?mobile=".$phone."&tpl_id=".$tpl_id."&tpl_value=%23code%23%3d".$code."&dtype=&key=".$key;//请求地址
-        $res = curl_request($url, false, array(), true);//发送请求调用接口，使用curl发送请求
-        $result = json_decode($res, true);//转化结果为数组格式
-
-        if($result['error_code'] !== 0){
-            $this -> ajaxReturnData(0,'服务器异常');//如果请求不成功
-        }else{
-            if($type == 'register_code'){
-                session('register_email_code' . $phone, $code);//将验证码保存到session
-                session('register_email_code_sendtime',time());
-            }elseif($type == 'repass_code'){
-                session('register_email_code' . $phone, $code);//将验证码保存到session
-                session('register_email_code_sendtime',time());
-            }
-            $this -> ajaxReturnData();
         }
     }
 
@@ -333,7 +413,7 @@ class UserController extends CommonController {
         empty($user) ? $this -> ajaxReturnData(10001,'用户不存在,是否去注册？') : true;
 
         $sendCode = session('repass_code_' . $tele);
-        $sendTime =  session('repass_code_sendtime');
+        $sendTime =  session('repass_code_sendtime'.$tele);
         if($type === 're_pass'){
             //如果是修改密码验证
             if($code == $sendCode){
@@ -354,37 +434,66 @@ class UserController extends CommonController {
                 $this -> ajaxReturnData(0,'手机号与验证码不匹配！');
             }
         }
-
-
     }
+
+    //验证重置密码的邮箱验证码是否正确
+    public function check_repass_email_code(){
+        I('post.email','','string') ? $email = I('post.email','','string') : $this -> ajaxReturnData(0,'邮箱不能为空');
+        I('post.email_code','','string') ? $email_code = I('post.email_code','','string') : $this -> ajaxReturnData(0,'邮箱验证码不能为空');
+        I('post.type','','string') ? $type = I('post.type','','string') : true;
+
+        $sendCode = D('User') -> where("email = '$email'") -> getField('email_code');
+        empty($sendCode) ? $this -> ajaxReturnData(10001,'用户不存在,是否去注册？') : true;
+        $sendTime =  session('register_email_code_sendtime'.$email);
+        if($type === 're_pass_email'){
+            //如果是修改密码验证
+            if($email_code == $sendCode){
+                if(time() - $sendTime > 300){
+                    return false;
+                }else{
+                    return true;
+                }
+            }else{
+                return false;
+            }
+
+        }else{
+            //如果只是POST请求
+            if($email_code == $sendCode){
+                time() - $sendTime > 300 ? $this -> ajaxReturnData(0,'验证码已过期，请重新获取！') : $this -> ajaxReturnData();
+            }else{
+                $this -> ajaxReturnData(0,'验证码错误！');
+            }
+        }
+    }
+
 
     //ajax注册
     public function ajax_register(){
-        !IS_POST && !IS_AJAX ? $this -> ajaxReturnData(0,'请求方式错误！') : true;
-        $tele        = I('post.tele','','string')       ? I('post.tele','','string') : true;
-        $code        = I('post.code','','intval')       ? I('post.code','','intval') : true;
-        $invite_tele = I('post.invite_tele','','string') ? I('post.invite_tele','','string') : true;
-
-        $email         = I('post.email','','string')             ? I('post.email','','string') : true;
-        $email_code    = I('post.email_code','','intval')        ? I('post.email_code','','intval') : true;
-        $e_invite_tele = I('post.email_invite_tele','','string') ? I('post.email_invite_tele','','string') : true;
+        !IS_POST && !IS_AJAX ? $this -> ajaxReturnData(0,'请求方式错误！')  : true;
+        I('post.tele','','string')  ? $tele  =  I('post.tele','','string')  : true;
+        I('post.email','','string') ? $email =  I('post.email','','string') : true;
 
         //如果是手机号码注册
-        if(isset($tele)){
+        if(!empty($tele)){
+            I('post.code','','intval') ? $code = I('post.code','','intval') : $this -> ajaxReturnData(0,'手机验证码不能为空');
+            I('post.invite_tele','','string') ? $invite_tele = I('post.invite_tele','','string') : $this -> ajaxReturnData(0,'邀请人不能为空');
+
             $uid = D('User') -> where("phone = '$tele'") -> getField('id');
             empty($uid) ? true : $this -> ajaxReturnData(10001,'手机号已注册，请登录');
             $invite_uid = D('User') -> where("phone = '$invite_tele'") -> getField('id');
             empty($invite_uid) ? $this -> ajaxReturnData(0,'邀请人不存在') : true;
 
             //验证验证码和手机号
-            $sendtime = session('register_code_sendtime') ? session('register_code_sendtime') : 0;
+            $sendtime = session('register_code_sendtime' . $tele) ? session('register_code_sendtime' . $tele) : 0;
             if(time() - $sendtime > 300){
                 session('register_code_'.$tele,null);
-                $this -> ajaxReturnData(0,'验证码已失效，请重新获取');//验证码是否过期
+                $this -> ajaxReturnData(0,'手机验证码已失效，请重新获取');//验证码是否过期
             }elseif(session('register_code_'.$tele) != $code){
                 $this -> ajaxReturnData(0,'短信验证码不正确!');//验证验证码是否正确
             }else{
                 $data = array(
+                    'username'    => 'user' . time() . rand(100,999),
                     'phone'       => $tele,
                     'password'    => encrypt_pwd('123456abc'),  //定义初始密码
                     'create_time' => time(),
@@ -394,42 +503,35 @@ class UserController extends CommonController {
                 $res ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'注册失败！');//验证通过
 
             }
-        }elseif(isset($email)){
+        }elseif(!empty($email)){
+            I('post.email_code','','intval') ? $email_code = I('post.email_code','','intval') : $this -> ajaxReturnData(0,'邮箱验证码不能为空');
+            I('post.email_invite_tele','','string') ? $e_invite_tele = I('post.email_invite_tele','','string') : $this -> ajaxReturnData(0,'邀请人不能为空');
+
             //如果是邮箱注册
-            //生成一个验证码,保存到email_code字段
-            $email_code = rand(100000,999999);
-            $data['email_code'] = $email_code;//邮箱注册码
-            $model = D('User');
-            //创建数据对象
-            if(!$model->create($data)){
-                //如果添加失败，返回错误信息
-                $code = 10001;
-                $msg  = $model->getError();
+            $uEmail_code = D('User') -> where("email = '$email'") -> getField('email_code');
+            empty($uEmail_code) ? $this -> ajaxReturnData(0,'请获取验证码') : true;
+            $invite_uid = D('User') -> where("phone = '$e_invite_tele'") -> getField('id');
+            empty($invite_uid) ? $this -> ajaxReturnData(0,'邀请人不存在') : true;
+
+            //验证验证码和手机号
+            $sendtime = session('register_email_code_sendtime' . $email) ? session('register_email_code_sendtime' . $email) : 0;
+            if(time() - $sendtime > 300){
+                $res = D('User') -> where("email = '$email'") -> save(['email_code' => '']);
+                $res !== false ? $this -> ajaxReturnData(0,'邮箱验证码已失效，请重新获取') : $this -> ajaxReturnData(0,'更新邮箱验证码失败！');//验证码是否过期
+            }elseif($uEmail_code != $email_code){dump($email_code);dump($uEmail_code);
+                $this -> ajaxReturnData(0,'邮箱验证码不正确!');//验证验证码是否正确
             }else{
-                //添加到数据库
-                $res = $model->add();
-                if($res){
-                    //添加成功
-                    $email = $data['email'];//收件邮箱
-                    $subject = '【零玖一】商城激活';
-                    $url ="http://www.shop.com/index.php/Home/User/jihuo/id/{$res}/code/{$email_code}";
-                    $body = "点击一下连接进行激活:<br /><a href='{$url}'>{$url}</a>;<br/>如果点击无法跳转,请复制以上链接直接在浏览器打开.";
-                    //调用sendmail函数发送邮件
-                    $res = sendmail($email,$subject,$body);
-                    if($res !== true){
-                        //发送失败
-                        //sendmail($email,$subject,$body);
-                        $code = 10001;
-                        $msg  = '邮件发送失败,请重试';
-                    }else{
-                        $code = 10000;
-                        $msg = '邮件发送成功，请前往激活';//后期修改，根据用户邮箱类型提示用户跳转到邮箱登录页面
-                    }
-                }else{
-                    $code = 10001;
-                    $msg  = '注册失败';
-                }
+                $data = array(
+                    'is_check'   => 1,
+                    'password'    => encrypt_pwd('123456abc'),  //定义初始密码
+                    'create_time' => time(),
+                    'invite_uid'  => $invite_uid,
+                );
+                $res = D('User') -> where("email = '$email'") -> save($data);
+                $res !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'注册失败！');//验证通过
+
             }
+
         }else{
             $this -> ajaxReturnData(0,'参数错误');
         }
