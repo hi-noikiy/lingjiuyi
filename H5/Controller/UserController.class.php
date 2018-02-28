@@ -106,15 +106,18 @@ class UserController extends CommonController {
     public function edit_password(){
         if(IS_POST && IS_AJAX){
             I('post.type','','string') ? $type = I('post.type','','string') : $this -> ajaxReturnData(0,'参数错误');
+
+            I('post.password','','string')   ? $password = I('post.password','','string')     : $this -> ajaxReturnData(0,'密码不能为空！');
+            I('post.repassword','','string') ? $repassword = I('post.repassword','','string') : $this -> ajaxReturnData(0,'确认密码不能为空！');
+            preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $password)   == false ? $this -> ajaxReturnData(0,'密码格式不正确，只能6-20位数字和字母组成') : true;
+            preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $repassword) == false ? $this -> ajaxReturnData(0,'确认密码格式不正确，只能6-20位数字和字母组成') : true;
+            $password !== $repassword ? $this -> ajaxReturnData(0,'两次密码输入不一致') : true;
+
             if($type === 're_pass'){
                 //手机号重置密码
                 $check_code = $this -> check_repass_code();
                 $check_code === true ? true : $this -> ajaxReturnData(0,'手机号验证未通过！');
-                I('post.password','','string')   ? $password = I('post.password','','string')     : $this -> ajaxReturnData(0,'密码不能为空！');
-                I('post.repassword','','string') ? $repassword = I('post.repassword','','string') : $this -> ajaxReturnData(0,'确认密码不能为空！');
-                preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $password)   == false ? $this -> ajaxReturnData(0,'密码格式不正确，只能6-20位数字和字母组成') : true;
-                preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $repassword) == false ? $this -> ajaxReturnData(0,'确认密码格式不正确，只能6-20位数字和字母组成') : true;
-                $password !== $repassword ? $this -> ajaxReturnData(0,'两次密码输入不一致') : true;
+
                 I('post.tele','','string') ? $tele = I('post.tele','','string') : $this -> ajaxReturnData(0,'手机号不能为空');
                 $data['password'] = encrypt_pwd($password);
                 $res = D('User') -> where("`phone` = '$tele'") -> save($data);
@@ -125,11 +128,6 @@ class UserController extends CommonController {
                 //邮箱重置密码
                 $check_code = $this -> check_repass_email_code();
                 $check_code === true ? true : $this -> ajaxReturnData(0,'手机号验证未通过！');
-                I('post.password','','string')   ? $password = I('post.password','','string')     : $this -> ajaxReturnData(0,'密码不能为空！');
-                I('post.repassword','','string') ? $repassword = I('post.repassword','','string') : $this -> ajaxReturnData(0,'确认密码不能为空！');
-                preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $password)   == false ? $this -> ajaxReturnData(0,'密码格式不正确，只能6-20位数字和字母组成') : true;
-                preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $repassword) == false ? $this -> ajaxReturnData(0,'确认密码格式不正确，只能6-20位数字和字母组成') : true;
-                $password !== $repassword ? $this -> ajaxReturnData(0,'两次密码输入不一致') : true;
                 I('post.email','','string') ? $email = I('post.email','','string') : $this -> ajaxReturnData(0,'手机号不能为空');
                 $data['password'] = encrypt_pwd($password);
                 $data['email_code'] = '';
@@ -144,15 +142,10 @@ class UserController extends CommonController {
                 I('post.invite_tele','','string') ? $invite_tele = I('post.invite_tele','','string') : $this -> ajaxReturnData(0,'邀请码不能为空');
 
                 I('post.username','','string')   ? $username   = I('post.username','','string')   : $this -> ajaxReturnData(0,'用户名不能为空');
-                I('post.password','','string')   ? $password   = I('post.password','','string')   : $this -> ajaxReturnData(0,'密码不能为空');
-                I('post.repassword','','string') ? $repassword = I('post.repassword','','string') : $this -> ajaxReturnData(0,'重复密码不能为空');
-                preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $password)   == false ? $this -> ajaxReturnData(0,'密码格式不正确，只能6-20位数字和字母组成') : true;
-                preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $repassword) == false ? $this -> ajaxReturnData(0,'确认密码格式不正确，只能6-20位数字和字母组成') : true;
-                $password != $repassword ? $this -> ajaxReturnData(0,'两次密码输入不一致') : true;
 
-                $uid = D('User') -> where("phone = '$tele'") -> getField('id');
+                $uid = D('User') -> where("`phone` = '$tele'") -> getField('id');
                 !empty($uid) ? true : $this -> ajaxReturnData(10001,'手机号未注册，请注册');
-                $invite_uid = D('User') -> where("phone = '$invite_tele'") -> getField('id');
+                $invite_uid = D('User') -> where("`phone` = '$invite_tele'") -> getField('id');
                 empty($invite_uid) ? $this -> ajaxReturnData(0,'邀请人不存在') : true;
 
                 $sendtime = session('register_code_sendtime' . $tele) ? session('register_code_sendtime' . $tele) : 0;
@@ -167,7 +160,7 @@ class UserController extends CommonController {
                         'username'    => $username,
                         'password'    => encrypt_pwd($password),  //定义初始密码
                     );
-                    $res = D('User') -> where("phone = '$tele'") -> save($data);
+                    $res = D('User') -> where("`phone` = '$tele'") -> save($data);
                     $res !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'注册失败！');//验证通过
 
                 }
@@ -179,21 +172,16 @@ class UserController extends CommonController {
                 I('post.email_invite_tele','','string') ? $e_invite_tele = I('post.email_invite_tele','','string') : $this -> ajaxReturnData(0,'邀请码不能为空');
 
                 I('post.username','','string')   ? $username   = I('post.username','','string')   : $this -> ajaxReturnData(0,'用户名不能为空');
-                I('post.password','','string')   ? $password   = I('post.password','','string')   : $this -> ajaxReturnData(0,'密码不能为空');
-                I('post.repassword','','string') ? $repassword = I('post.repassword','','string') : $this -> ajaxReturnData(0,'重复密码不能为空');
-                preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $password)   == false ? $this -> ajaxReturnData(0,'密码格式不正确，只能6-20位数字和字母组成') : true;
-                preg_match('/^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,20}$/', $repassword) == false ? $this -> ajaxReturnData(0,'确认密码格式不正确，只能6-20位数字和字母组成') : true;
-                $password != $repassword ? $this -> ajaxReturnData(0,'两次密码输入不一致') : true;
 
-                $uEmail_code = D('User') -> where("email = '$email'") -> getField('email_code');
+                $uEmail_code = D('User') -> where("`email` = '$email'") -> getField('email_code');
                 empty($uEmail_code) ? $this -> ajaxReturnData(0,'请获取验证码') : true;
-                $invite_uid = D('User') -> where("phone = '$e_invite_tele'") -> getField('id');
+                $invite_uid = D('User') -> where("`phone` = '$e_invite_tele'") -> getField('id');
                 empty($invite_uid) ? $this -> ajaxReturnData(0,'邀请人不存在') : true;
 
                 //验证验证码和手机号
                 $sendtime = session('register_email_code_sendtime' . $email) ? session('register_email_code_sendtime' . $email) : 0;
                 if(time() - $sendtime > 300){
-                    $res = D('User') -> where("email = '$email'") -> save(['email_code' => '']);
+                    $res = D('User') -> where("`email` = '$email'") -> save(['email_code' => '']);
                     $res !== false ? $this -> ajaxReturnData(0,'邮箱验证码已失效，请重新获取') : $this -> ajaxReturnData(0,'更新邮箱验证码失败！');//验证码是否过期
                 }elseif($uEmail_code != $email_code){
                     $this -> ajaxReturnData(0,'邮箱验证码不正确!');//验证验证码是否正确
@@ -202,7 +190,7 @@ class UserController extends CommonController {
                         'username'   => $username,
                         'password'    => encrypt_pwd($password),  //定义初始密码
                     );
-                    $res = D('User') -> where("email = '$email'") -> save($data);
+                    $res = D('User') -> where("`email` = '$email'") -> save($data);
                     $res !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'注册失败！');//验证通过
 
                 }
@@ -264,7 +252,7 @@ class UserController extends CommonController {
         I('post.password','','string') ? $password = I('post.password','','string') : $this -> ajaxReturnData(0,'密码不能为空');
 
         $model     = M('user');//实例化模型
-        $where     = "username = '$username' or phone = '$username' or email = '$username'";//定义查询条件
+        $where     = "`username` = '$username' or `phone` = '$username' or `email` = '$username'";//定义查询条件
         $userinfo  = $model -> where($where) -> find();//查询密码
         empty($userinfo) ? $this -> ajaxReturnData(0,'账号不存在') : true;
         if(password_verify($password,$userinfo['password']) === true){
@@ -300,14 +288,14 @@ class UserController extends CommonController {
             $sendtime = session('register_code_sendtime' . $phone) ? session('register_code_sendtime' . $phone) : 0;//发送频率限制,半小时
             time() - $sendtime < 300 ? $this -> ajaxReturnData(0,'发送太频繁，请稍后再试') : true;
 
-            $uid = M('User') -> where("phone = '$phone'") -> getField('id');
+            $uid = M('User') -> where("`phone` = '$phone'") -> getField('id');
             !empty($uid) ? $this -> ajaxReturnData(10001,'手机号已经注册，是否登录？') : true;//如果存在记录，说明已经注册
         }elseif($type == 'repass_code'){
             //重置密码
             $sendtime = session('repass_code_sendtime' . $phone) ? session('repass_code_sendtime' . $phone) : 0;//发送频率限制,半小时
             time() - $sendtime < 300 ? $this -> ajaxReturnData(0,'发送太频繁，请稍后再试') : true;
 
-            $uid = M('User') -> where("phone = '$phone'") -> getField('id');
+            $uid = M('User') -> where("`phone` = '$phone'") -> getField('id');
             empty($uid) ? $this -> ajaxReturnData(10001,'手机号未注册，是否去注册？') : true;//如果不存在记录，说明未注册，不能修改密码
         }else{
             $this -> ajaxReturnData(0,'参数错误');
@@ -346,7 +334,7 @@ class UserController extends CommonController {
             $sendtime = session('register_email_code_sendtime' . $email) ? session('register_email_code_sendtime' . $email) : 0;//发送频率限制,半小时
             time() - $sendtime < 300 ? $this -> ajaxReturnData(0,'发送太频繁，请稍后再试') : true;
 
-            $is_check = M('User') -> where("email = '$email'") -> getField('is_check');
+            $is_check = M('User') -> where("`email` = '$email'") -> getField('is_check');
             $is_check == 1 ? $this -> ajaxReturnData(10001,'邮箱已经注册，是否登录？') : true;//如果存在记录，说明已经注册
 
             $email_code = rand(100000,999999);
@@ -362,7 +350,7 @@ class UserController extends CommonController {
                     'username'   => 'user' . time() . rand(100,999),
                     'email_code' => $email_code,
                 );
-                $addRes = D('User') -> where("email = '$email'")-> save($data);
+                $addRes = D('User') -> where("`email` = '$email'")-> save($data);
             }
 
             $addRes ? true : $this -> ajaxReturnData(0,'邮件地址保存失败！');
@@ -383,11 +371,11 @@ class UserController extends CommonController {
             $sendtime = session('register_email_code_sendtime' . $email) ? session('register_email_code_sendtime' . $email) : 0;//发送频率限制,半小时
             time() - $sendtime < 300 ? $this -> ajaxReturnData(0,'发送太频繁，请稍后再试') : true;
 
-            $is_check = M('User') -> where("email = '$email'") -> getField('is_check');
+            $is_check = M('User') -> where("`email` = '$email'") -> getField('is_check');
 
             empty($is_check) && $is_check !== 0 ? $this -> ajaxReturnData(10001,'邮箱不存在，去注册？') : true;//如果不存在记录，说明未注册，不能修改密码
             $data['email_code'] = rand(100000,999999);
-            $addRes = D('User') -> where("email = '$email'") -> save($data);
+            $addRes = D('User') -> where("`email` = '$email'") -> save($data);
             $addRes ? true : $this -> ajaxReturnData(0,'邮件验证码保存失败！');
             $subject = '零玖一商城修改密码';
             $body = "<html><head><title>零玖一</title></head><body>
@@ -442,7 +430,7 @@ class UserController extends CommonController {
         I('post.email_code','','string') ? $email_code = I('post.email_code','','string') : $this -> ajaxReturnData(0,'邮箱验证码不能为空');
         I('post.type','','string') ? $type = I('post.type','','string') : true;
 
-        $sendCode = D('User') -> where("email = '$email'") -> getField('email_code');
+        $sendCode = D('User') -> where("`email` = '$email'") -> getField('email_code');
         empty($sendCode) ? $this -> ajaxReturnData(10001,'用户不存在,是否去注册？') : true;
         $sendTime =  session('register_email_code_sendtime'.$email);
         if($type === 're_pass_email'){
@@ -479,7 +467,7 @@ class UserController extends CommonController {
             I('post.code','','intval') ? $code = I('post.code','','intval') : $this -> ajaxReturnData(0,'手机验证码不能为空');
             I('post.invite_tele','','string') ? $invite_tele = I('post.invite_tele','','string') : $this -> ajaxReturnData(0,'邀请人不能为空');
 
-            $uid = D('User') -> where("phone = '$tele'") -> getField('id');
+            $uid = D('User') -> where("`phone` = '$tele'") -> getField('id');
             empty($uid) ? true : $this -> ajaxReturnData(10001,'手机号已注册，请登录');
             $invite_uid = D('User') -> where("phone = '$invite_tele'") -> getField('id');
             empty($invite_uid) ? $this -> ajaxReturnData(0,'邀请人不存在') : true;
@@ -500,6 +488,7 @@ class UserController extends CommonController {
                     'invite_uid'  => $invite_uid,
                 );
                 $res = D('User') -> add($data);
+                D('User') -> where("`id` = $invite_uid") -> setInc('integral',10);//邀请人添加积分
                 $res ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'注册失败！');//验证通过
 
             }
@@ -508,15 +497,15 @@ class UserController extends CommonController {
             I('post.email_invite_tele','','string') ? $e_invite_tele = I('post.email_invite_tele','','string') : $this -> ajaxReturnData(0,'邀请人不能为空');
 
             //如果是邮箱注册
-            $uEmail_code = D('User') -> where("email = '$email'") -> getField('email_code');
+            $uEmail_code = D('User') -> where("`email` = '$email'") -> getField('email_code');
             empty($uEmail_code) ? $this -> ajaxReturnData(0,'请获取验证码') : true;
-            $invite_uid = D('User') -> where("phone = '$e_invite_tele'") -> getField('id');
+            $invite_uid = D('User') -> where("`phone` = '$e_invite_tele'") -> getField('id');
             empty($invite_uid) ? $this -> ajaxReturnData(0,'邀请人不存在') : true;
 
             //验证验证码和手机号
             $sendtime = session('register_email_code_sendtime' . $email) ? session('register_email_code_sendtime' . $email) : 0;
             if(time() - $sendtime > 300){
-                $res = D('User') -> where("email = '$email'") -> save(['email_code' => '']);
+                $res = D('User') -> where("`email` = '$email'") -> save(['email_code' => '']);
                 $res !== false ? $this -> ajaxReturnData(0,'邮箱验证码已失效，请重新获取') : $this -> ajaxReturnData(0,'更新邮箱验证码失败！');//验证码是否过期
             }elseif($uEmail_code != $email_code){dump($email_code);dump($uEmail_code);
                 $this -> ajaxReturnData(0,'邮箱验证码不正确!');//验证验证码是否正确
@@ -527,7 +516,8 @@ class UserController extends CommonController {
                     'create_time' => time(),
                     'invite_uid'  => $invite_uid,
                 );
-                $res = D('User') -> where("email = '$email'") -> save($data);
+                $res = D('User') -> where("`email` = '$email'") -> save($data);
+                D('User') -> where("`id` = $invite_uid") -> setInc('integral',10);//邀请人添加积分
                 $res !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'注册失败！');//验证通过
 
             }
@@ -547,8 +537,7 @@ class UserController extends CommonController {
             $msg  = '请先登录';//去登录
         }else{
 
-            $where = ['id' => $uid];
-            $user  = M('User') ->field('header_img,username') -> where($where) -> find();
+            $user  = M('User') ->field('header_img,username') -> where("`id` = $uid") -> find();
             //获取用户头像和用户名
             if($user){
                 $code = 10000;
@@ -584,7 +573,7 @@ class UserController extends CommonController {
             }else{
 
                 $field = 'id,username,phone,email,weixin,header_img,gender,birthday';//定义查询字段
-                $user  = M('User') -> field($field) -> where(['id' => $uid]) -> find();
+                $user  = M('User') -> field($field) -> where(['`id`' => $uid]) -> find();
                 if($user){
                     $code = 10000;
                     $msg  = 'success';
@@ -623,8 +612,8 @@ class UserController extends CommonController {
             $msg  = '请先登录';//去登录
         }else{
             $field = 'price,add_time,remark';
-            $price = M('User') -> where(['id' => $uid]) -> getField('balance');
-            $log   = M('User_price_log') -> field($field) -> where(['uid' => $uid]) -> order('add_time desc') -> select();
+            $price = M('User') -> where(['`id`' => $uid]) -> getField('balance');
+            $log   = M('User_price_log') -> field($field) -> where(['`uid`' => $uid]) -> order('add_time desc') -> select();
             if($log){
                 $code = 10000;
                 $msg  = 'success';
@@ -667,7 +656,7 @@ class UserController extends CommonController {
         $uid = $_SESSION['userinfo']['id'];//获取用户id
         empty($uid) ? $this -> ajaxReturnData(10002,'请先登录') : $uid;//如果用户信息为空
 
-        $addresslist = M('Address') -> where(['user_id' => $uid]) -> select();
+        $addresslist = M('Address') -> where(['`user_id`' => $uid]) -> select();
         foreach($addresslist as $key => $value){
             if(substr($addresslist[$key]['address'],6,3) === '市'){
                 $addresslist[$key]['province'] = '';
@@ -691,7 +680,7 @@ class UserController extends CommonController {
         $oid = I('post.id','','intval');
         $uid = $_SESSION['userinfo']['id'];//获取用户id
         empty($uid) ? $this -> ajaxReturnData(10002,'请先登录') : $uid;//如果用户信息为空
-        $addr = D('Address') -> where(['user_id' => $uid, 'id' => $oid]) -> find();
+        $addr = D('Address') -> where(['`user_id`' => $uid, '`id`' => $oid]) -> find();
         empty($addr) ? $this -> ajaxReturnData(0,'订单号与用户不符') : true;
         $res = D('Address') -> delete($oid);
         $res !== false ? $this -> ajaxReturnSuccess() : $this -> ajaxReturnData(0,'删除失败');
@@ -704,7 +693,7 @@ class UserController extends CommonController {
         empty($uid) ? $this -> ajaxReturnData(10002,'请先登录') : $uid;//如果用户信息为空
         $where['a.user_id'] = $uid;
         //确认订单类型
-        $where['order_type'] = I('get.type','','intval') ? I('get.type','','intval') : 0;//普通订单类型为0
+        $where['`order_type`'] = I('get.type','','intval') ? I('get.type','','intval') : 0;//普通订单类型为0
         $order_status = $_GET['status'] ? $_GET['status'] : 0;
         //订单编号，商品图片，商品名称，商品单价，购买数量，(邮费，暂时没有)，实付
         $fields = 'a.id,order_id,b.goods_id,order_sn,goods_small_img,goods_name,b.goods_price,number,order_amount,order_status';
@@ -790,10 +779,14 @@ class UserController extends CommonController {
     //ajax我的邀请码，二维码
     public function ajax_erweima(){
         //ajax获取用户基本信息
-        $phone = $_SESSION['userinfo']['phone'];//获取用户id
-        empty($phone) ? $this -> ajaxReturnData(10002,'请先登录') : $phone;//如果用户信息为空
+        $userinfo = $_SESSION['userinfo'];//获取用户id
 
-        $userimg = M('user') ->where(['phone' => $phone]) -> getField('header_img');//用户头像
+        empty(userinfo) ? $this -> ajaxReturnData(10002,'请先登录') : true;//如果用户信息为空
+
+        $phone = M('user') ->where(['id' => $userinfo['id']]) -> getField('phone');//用户头像
+        empty($phone) ? $this -> ajaxReturnData(10001,'无手机号') : true;
+
+        $userimg = M('user') ->where(['id' => $userinfo['id']]) -> getField('header_img');//用户头像
         $username = $_SESSION['userinfo.username'];//用户名称
         $path = 'Public/Uploads/erweima/';//定义保存图片地址
         if(!file_exists($path))
@@ -802,7 +795,7 @@ class UserController extends CommonController {
         }
         $filename = $path.$phone.$username['username'].'.png';//定义文件名称
         $url = 'http://'.$_SERVER['HTTP_HOST'].'/User/register/invite_tele/'.$phone;//推广链接
-        $userimg ? makecode($url, $filename ,substr($userimg,1)) : qrcode($url, $filename);
+        $userimg ? makecode($url, $filename ,$userimg) : qrcode($url, $filename);
         //如果存在用户头像，则生成带有用户头像logo的二维码,如果不存在用户头像，直接生成二维码
         $img = 'http://'.$_SERVER['SERVER_NAME'].'/'.$filename;
         $this -> ajaxReturnSuccess(compact('img','url'));

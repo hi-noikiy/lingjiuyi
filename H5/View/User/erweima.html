@@ -14,8 +14,6 @@
     <script src="__PUBLIC__/H5/js/base/layer.js" type="text/javascript"></script>
     <script src="__PUBLIC__/H5/js/base/jquery.min.js" type="text/javascript"></script>
     <script src="__PUBLIC__/H5/js/base/swiper.js" type="text/javascript"></script>
-    <script src="__PUBLIC__/H5/js/base/iscroll.js" type="text/javascript"></script>
-    <script src="__PUBLIC__/H5/js/base/pullToRefresh.mini.js" type="text/javascript"></script>
 <body class="bg-f3 pb60 user_aboutus_page ">
 <style type="text/css">
 .score-input{width:80px;margin:0 5px;text-align:center;border:1px solid #e7e7e7;border-radius:4px;line-height:18px;padding:5px 0;}
@@ -55,15 +53,15 @@
             cache: true,
             dataType: 'json',
             success: function(data){
-                if(data.code = 10000){
+                if(data.code == 10000){
                     $('img').attr('src',data.info.img);
                     $('#userlink').attr('value',data.info.url);
+                }else if(data.code == 10001){
+                    $('.col-xs-12').html('&emsp;&emsp;&emsp;添加手机号之后才能获取邀请码哦！');
+                    $('.global-submit-bot1').attr('style','display:none;');
                 }
             }
         });
-
-
-
 
     });
 
