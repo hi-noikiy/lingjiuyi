@@ -27,11 +27,11 @@
         </div>
     </div>
     <div class="login-form">
-        <div class="step1">
+        <div class="tele_step1">
             <div class="register-inp">
                 <label>手机号码</label>
                 <input type="text" name="tele" placeholder="手机号码">
-                <button class="get_code" >获取验证码</button>
+                <button class="get_code tele_get_code" >获取验证码</button>
             </div>
             <div class="register-inp">
                 <label>手机验证码</label>
@@ -42,9 +42,30 @@
                 <input type="text" name="invite_tele" placeholder="请输入邀请码">
             </div>
             <div class="row" style="padding:10px 15px">
-                <div class="col-xs-18 input-text " ><input type='checkbox' class="agree diss"> 我已阅读并同意以下协议:<a href="__CONTROLLER__/reg_intro" style="color: #79d1d6;">《零玖一平台服务协议》</a></div>
+                <div class="col-xs-18 input-text " ><input type='checkbox' name="tele_checkbox" class="agree diss"> 我已阅读并同意以下协议:<a href="__CONTROLLER__/reg_intro" style="color: #79d1d6;">《零玖一平台服务协议》</a></div>
             </div>
             <div class="register-inp"><a href="javascript:void(0);" class="submit-btn submit-btn1" >下一步</a></div>
+            <div class="login-txt"><a href="javascript:void(0);" onclick="show_email_register()">邮箱注册</a>|<a href="/User/login">去登录？</a></div>
+        </div>
+        <div class="email_step1" style="display:none;">
+            <div class="register-inp">
+                <label>邮箱地址</label>
+                <input type="text" name="email" placeholder="邮箱">
+                <button class="get_code email_get_code" >获取验证码</button>
+            </div>
+            <div class="register-inp">
+                <label>邮箱验证码</label>
+                <input type="text" name="email_code" placeholder="请输入邮箱验证码">
+            </div>
+            <div class="register-inp">
+                <label>邀请码</label>
+                <input type="text" name="email_invite_tele" placeholder="请输入邀请码">
+            </div>
+            <div class="row" style="padding:10px 15px">
+                <div class="col-xs-18 input-text " ><input type='checkbox' name="email_checkbox" class="agree diss"> 我已阅读并同意以下协议:<a href="__CONTROLLER__/reg_intro" style="color: #79d1d6;">《零玖一平台服务协议》</a></div>
+            </div>
+            <div class="register-inp"><a href="javascript:void(0);" class="submit-btn submit-btn2" >下一步</a></div>
+            <div class="login-txt"><a href="javascript:void(0);" onclick="show_tele_register()">手机号注册</a>|<a href="/User/login">去登录？</a></div>
         </div>
         <div class="step2" style="display:none">
             <div class="register-inp">
@@ -68,8 +89,11 @@
     var tele_start = href.indexOf('/invite_tele/') + 13;
     var invite_tele = href.slice(tele_start);
     if(tele_start >= 13){
+        //如果存在邀请码
         $("input[name='invite_tele']").attr('disabled',true);
         $("input[name='invite_tele']").val(invite_tele);
+        $("input[name='email_invite_tele']").attr('disabled',true);
+        $("input[name='email_invite_tele']").val(invite_tele);
     }
 
     //300秒倒计时
@@ -91,28 +115,39 @@
                 ,1000)
     }
 
+    //显示邮箱注册
+    function show_email_register(){
+        $('.tele_step1').attr('style','display:none;');
+        $('.email_step1').attr('style','display:show;');
+    }
+    //显示手机号注册
+    function show_tele_register(){
+        $('.email_step1').attr('style','display:none;');
+        $('.tele_step1').attr('style','display:show;');
+    }
 
     $(function(){
 
-        //点击获取验证码
-        $('.get_code').click(function(){
+        //点击获取短信验证码
+        $('.tele_get_code').click(function(){
             var tele = $("input[name='tele']").val();
 
             if(tele == ''){
                 layer.open({content: '手机号不能为空',skin: 'msg',time: 2});
                 return false;
             }else{
-                var obj = $(".get_code");
+                var obj = $(".tele_get_code");
                 settime(obj);//300秒倒计时
                 $.ajax({
                     type : 'post',
                     url  : '/User/sendCode',
-                    data : {phone:tele,type:'login_code'},
+                    data : {phone:tele,type:'register_code'},
                     dataType : 'json',
                     success : function(data){
                         if(data.code ==10000){
                             layer.open({content: '发送成功',skin: 'msg',time: 2});
                         }else if(data.code == 10001){
+                            //手机号已注册
                             layer.open({
                                 content: data.msg
                                 , btn: ['确认', '取消']
@@ -132,26 +167,195 @@
 
         });
 
-        //点击下一步
+        //点击获取邮箱验证码
+        $('.email_get_code').click(function(){
+            var email = $("input[name='email']").val();
+
+            if(email == ''){
+                layer.open({content: '邮箱不能为空',skin: 'msg',time: 2});
+                return false;
+            }else{
+                var obj = $(".email_get_code");
+                settime(obj);//300秒倒计时
+                $.ajax({
+                    type : 'post',
+                    url  : '/User/sendEmailCode',
+                    data : {email:email,type:'register_code'},
+                    dataType : 'json',
+                    success : function(data){
+                        if(data.code ==10000){
+                            layer.open({content: '发送成功',skin: 'msg',time: 2});
+                        }else if(data.code == 10001){
+                            //手机号已注册
+                            layer.open({
+                                content: data.msg
+                                , btn: ['确认', '取消']
+                                , yes: function () {
+                                    location.href = '/User/login';
+                                }
+                            });
+                        }else{
+                            layer.open({content: data.msg,skin: 'msg',time: 2});
+                        }
+                    },
+                    error:function(xhr){
+
+                    }
+                });
+            }
+
+        });
+
+        //点击checkbox同意协议
+        $('.agree').click(function(){
+            var checked = $(this).attr('checked');
+            if(checked == 'checked'){
+                $(this).removeAttr('checked');
+            }else if(checked == undefined){
+                $(this).attr('checked','');
+            }
+        });
+
+        //手机注册点击下一步
         $('.submit-btn1').click(function(){
             var tele = $("input[name='tele']").val();
             var code = $("input[name='code']").val();
             var invite_tele   = $("input[name='invite_tele']").val();
+
+            if(tele == ''){ layer.open({content: '手机号不能为空',skin: 'msg',time: 2}); return false; }
+            if(code == ''){ layer.open({content: '手机验证码不能为空',skin: 'msg',time: 2}); return false; }
+            if(invite_tele == ''){ layer.open({content: '邀请码不能为空',skin: 'msg',time: 2}); return false; }
+            if($("input[name='tele_checkbox']").attr('checked') !== 'checked'){ layer.open({content: '请选择同意协议',skin: 'msg',time: 2}); return false;}
+
+            //验证
+            $.ajax({
+                type : 'post',
+                url  : '/User/ajax_register',
+                data : {tele:tele,code:code,invite_tele:invite_tele},
+                dataType : 'json',
+                success  : function(data){
+                    if(data.code == 10000){
+                        layer.open({content: '注册成功！初始密码为123456',skin: 'msg',time: 2});
+                        $('.tele_step1').attr('style','display:none;');
+                        $('.step2').attr('style','display:show;');
+                    }else if(data.code == 10001){
+                        //手机号已注册
+                        layer.open({
+                            content: data.msg
+                            , btn: ['确认', '取消']
+                            , yes: function () {
+                                location.href = '/User/login';
+                            }
+                        });
+                    }else{
+                        layer.open({content: data.msg,skin: 'msg',time: 2});
+                    }
+                },
+                error : function(xhr){
+
+                }
+            });
+
+        });
+
+        //邮箱注册点击下一步
+        $('.submit-btn2').click(function(){
+            var email = $("input[name='email']").val();
+            var email_code = $("input[name='email_code']").val();
+            var email_invite_tele   = $("input[name='email_invite_tele']").val();
+
+            if(email == ''){ layer.open({content: '邮箱不能为空',skin: 'msg',time: 2}); return false; }
+            if(email_code == ''){ layer.open({content: '邮箱验证码不能为空',skin: 'msg',time: 2}); return false; }
+            if(email_invite_tele == ''){ layer.open({content: '邀请码不能为空',skin: 'msg',time: 2}); return false; }
+            if($("input[name='email_checkbox']").attr('checked') !== 'checked'){ layer.open({content: '请选择同意协议',skin: 'msg',time: 2}); return false;}
+
+            //验证
+            $.ajax({
+                type : 'post',
+                url  : '/User/ajax_register',
+                data : {email:email,email_code:email_code,email_invite_tele:email_invite_tele},
+                dataType : 'json',
+                success  : function(data){
+                    if(data.code == 10000){
+                        layer.open({content: '注册成功！初始密码为123456abc',skin: 'msg',time: 3});
+                        $('.email_step1').attr('style','display:none;');
+                        $('.step2').attr('style','display:show;');
+                    }else if(data.code == 10001){
+                        //手机号已注册
+                        layer.open({
+                            content: data.msg
+                            , btn: ['确认', '取消']
+                            , yes: function () {
+                                location.href = '/User/login';
+                            }
+                        });
+                    }else{
+                        layer.open({content: data.msg,skin: 'msg',time: 2});
+                    }
+                },
+                error : function(xhr){
+
+                }
+            });
+
+        });
+
+        //点击提交
+        $('.js-submit-btn').click(function(){
+            var tele = $("input[name='tele']").val();
+            var email = $("input[name='email']").val();
+
             var username      = $("input[name='username']").val();
             var password      = $("input[name='password']").val();
             var repassword    = $("input[name='repassword']").val();
-            if(tele == ''){
-                layer.open({content: '手机号不能为空',skin: 'msg',time: 2}); return false;
+
+            if(username == ''){ layer.open({content: '用户名不能为空',skin: 'msg',time: 2}); return false; }
+            if(password == ''){ layer.open({content: '密码不能为空',skin: 'msg',time: 2}); return false; }
+            if(repassword == ''){ layer.open({content: '重复密码不能为空',skin: 'msg',time: 2}); return false; }
+            if(password !== repassword){ layer.open({content: '两次密码输入不一致',skin: 'msg',time: 2}); return false; }
+
+            var data,code,invite_tele,email_code,email_invite_tele;
+            if(tele != '' && email == ''){
+                //手机注册
+                code = $("input[name='code']").val();
+                invite_tele   = $("input[name='invite_tele']").val();
+
+                if(tele == ''){ layer.open({content: '手机号不能为空',skin: 'msg',time: 2}); return false; }
+                if(code == ''){ layer.open({content: '手机验证码不能为空',skin: 'msg',time: 2}); return false; }
+                if(invite_tele == ''){ layer.open({content: '邀请码不能为空',skin: 'msg',time: 2}); return false; }
+
+                data = {type:'tele_register',tele:tele,code:code,invite_tele:invite_tele,username:username,password:password,repassword:repassword};
+            }else if(tele == '' && email != ''){
+                //邮箱注册
+                email_code = $("input[name='email_code']").val();
+                email_invite_tele   = $("input[name='email_invite_tele']").val();
+
+                if(email == ''){ layer.open({content: '邮箱不能为空',skin: 'msg',time: 2}); return false; }
+                if(email_code == ''){ layer.open({content: '邮箱验证码不能为空',skin: 'msg',time: 2}); return false; }
+                if(email_invite_tele == ''){ layer.open({content: '邀请码不能为空',skin: 'msg',time: 2}); return false; }
+
+                data = {type:'email_register',email:email,email_code:email_code,email_invite_tele:email_invite_tele,username:username,password:password,repassword:repassword};
             }
-            if(code == ''){
-                layer.open({content: '手机验证码不能为空',skin: 'msg',time: 2}); return false;
-            }
-            if(invite_tele == ''){
-                layer.open({content: '邀请码不能为空',skin: 'msg',time: 2}); return false;
-            }
-            if($("input[type='checkbox']").attr('checked') !== 'checked'){
-                layer.open({content: '请选择同意协议',skin: 'msg',time: 2}); return false;
-            }
+            $.ajax({
+                type : 'post',
+                url  : '/User/edit_password',
+                data : data,
+                dataType : 'json',
+                success  : function(data){
+                    if(data.code == 10000){
+                        //成功
+                        layer.open({content: '注册成功！',skin: 'msg',time: 3});
+                        location.href = '/User/login';
+                    }else if(data.code == 10001){
+                        //手机号未注册
+                        layer.open({content: data.msg,skin: 'msg',time: 2});
+                    }else{
+                        layer.open({content: data.msg,skin: 'msg',time: 2});
+                    }
+                },
+                error : function(xhr){}
+            });
+
 
         });
     });

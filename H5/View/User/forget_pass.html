@@ -31,13 +31,27 @@
             <div class="register-inp">
                 <label>手机号码</label>
                 <input type="text" name="tele" placeholder="手机号码">
-                <button class="get_code" >获取验证码</button>
+                <button class="get_code tele_get_code" >获取验证码</button>
             </div>
             <div class="register-inp">
                 <label>手机验证码</label>
                 <input type="text" name="code" placeholder="请输入手机验证码">
             </div>
             <div class="register-inp"><a href="javascript:void(0);" class="submit-btn submit-btn1" >下一步</a></div>
+            <div class="login-txt"><a href="javascript:void(0);" onclick="show_email_repass()">邮箱重置密码</a>|<a href="/User/login">去登录？</a></div>
+        </div>
+        <div class="email_step1" style="display:none">
+            <div class="register-inp">
+                <label>邮箱地址</label>
+                <input type="text" name="email" placeholder="邮箱地址">
+                <button class="get_code email_get_code" >获取验证码</button>
+            </div>
+            <div class="register-inp">
+                <label>邮箱验证码</label>
+                <input type="text" name="email_code" placeholder="请输入邮箱验证码">
+            </div>
+            <div class="register-inp"><a href="javascript:void(0);" class="submit-btn submit-btn2" >下一步</a></div>
+            <div class="login-txt"><a href="javascript:void(0);" onclick="show_tele_repass()">手机号重置密码</a>|<a href="/User/login">去登录？</a></div>
         </div>
         <div class="step2" style="display:none">
             <div class="register-inp">
@@ -74,18 +88,28 @@
                 ,1000)
     }
 
+    //显示邮箱重置密码
+    function show_email_repass(){
+        $('.step1').attr('style','display:none;');
+        $('.email_step1').attr('style','display:show;');
+    }
+    //显示手机号重置密码
+    function show_tele_repass(){
+        $('.email_step1').attr('style','display:none;');
+        $('.step1').attr('style','display:show;');
+    }
 
     $(function(){
 
-        //点击获取验证码
-        $('.get_code').click(function(){
+        //点击获取手机验证码
+        $('.tele_get_code').click(function(){
             var tele = $("input[name='tele']").val();
 
             if(tele == ''){
                 layer.open({content: '手机号不能为空',skin: 'msg',time: 2});
                 return false;
             }else{
-                var obj = $(".get_code");
+                var obj = $(".tele_get_code");
                 settime(obj);//300秒倒计时
                 $.ajax({
                     type : 'post',
