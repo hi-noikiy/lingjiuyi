@@ -14,8 +14,7 @@
 	<script src="__PUBLIC__/H5/js/base/layer.js" type="text/javascript"></script>
 	<script src="__PUBLIC__/H5/js/base/jquery.min.js" type="text/javascript"></script>
 	<script src="__PUBLIC__/H5/js/base/swiper.js" type="text/javascript"></script>
-	<script src="__PUBLIC__/H5/js/base/iscroll.js" type="text/javascript"></script>
-	<script src="__PUBLIC__/H5/js/base/pullToRefresh.mini.js" type="text/javascript"></script>
+	<script src="https://cdn.bootcss.com/socket.io/2.0.3/socket.io.js"></script>
 	<style type="text/css">
 		.user_favs_page {
 			background: #f3f3f3;
@@ -58,45 +57,23 @@
             </div>
 		</div>
 	</div>
-	<div class="row mt10 fs-13 bgwhite pt10 pb10 b-b">
-		<div class="col-xs-6 mt10">
-			今日交易额：￥{$order.days}元
-		</div>
-		<div class="col-xs-6 mt10">
-			总交易额：￥{$order.total}元
-		</div>
-		<div class="col-xs-6 mt10">
-			今日收益：￥{$commission.days}元
-		</div>
-		<div class="col-xs-6 mt10">
-			总收益：￥{$commission.total}元
-		</div>
+	<div class="row mt10 fs-13 bgwhite pt10 pb10 b-b list">
 	</div>
 
-	<div class="row bgwhite tc pt10 pb10 b-b">
-		<div class="col-xs-3">
-			下单时间
-		</div>
-		<div class="col-xs-3">
-			订单金额
-		</div>
-		<div class="col-xs-3">
-			升级状态
-		</div>
-		<div class="col-xs-3">
-			退款/提货
-		</div>
-	</div>
-
-    <div id="J_waterfall" class="container bgwhite tc fs-13" data-uri="{:U(MODULE_NAME.'/'.ACTION_NAME)}">
-
-    </div>
-
-    <if condition="$show_loading">
-        <div id="J_wall_loading" class="wall_loading tc gray"></div>
-    </if>
 </div>
 <script>
+	var uid = Date.parse(new Date());
+	// 连接服务端
+	var socket = io('http://101.201.73.190:2120');
+	// 连接后登录
+	socket.on('connect', function(){
+		socket.emit('login', uid);
+	});
+	// 后端推送来消息时
+	socket.on('new_msg', function(msg){
+		console.log(msg);
+	});
+
 	$(function(){
 		$.ajax({
 			type: 'GET',
@@ -104,7 +81,35 @@
 			cache: true,
 			dataType: 'json',
 			success: function(data){
+				var html = '',div = '';
 				if(data.code = 10000){
+					console.log(data);
+					div =   '<div class="col-xs-6 mt10">'+
+							'今日收益：￥'+ data.info.commission.today +'元'+
+							'</div>'+
+							'<div class="col-xs-6 mt10">'+
+							'总收益：￥'+ data.info.commission.total +'元'+
+							'</div>';
+					$('.list').append(div);
+
+					for(var i = 0; i < data.info.list.length; i++){
+						html += '<div class="row fs-13 bgwhite pt10 pb10 b-b data_list">'+
+								'<p class="pc-100 fl col-xs-12">'+
+								'<span class="fr green">'+ data.info.list[i].price +'</span>'+
+								'<span class="fl grey fs-12">'+ data.info.list[i].add_time +'</span>'+
+								'</p>'+
+								'<p class="pc-100 fl mt5 col-xs-12">'+
+								'<span class="grey fs-12">'+ data.info.list[i].remark +'</span>'+
+								'</p>'+
+								'</div>';
+					}
+					$('.list').after(html);
+
+					if(data.info.pager.totalPages == 1){
+						$('.data_list').after('<div class="row fs-13 bgwhite pt10 pb10 b-b" style="text-align: center;"><span class="grey fs-12">加载完成！</span></div>');
+					}else{
+						$('.data_list').after('<div class="row fs-13 bgwhite pt10 pb10 b-b load_list" style="text-align: center;"><span class="grey fs-12">点击加载...</span></div>');
+					}
 
 				}
 			}

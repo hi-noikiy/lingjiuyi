@@ -4,6 +4,7 @@ namespace H5\Controller;
 //2、引入核心控制器
 use Think\Controller;
 use Think\Upload;
+use Think\Page;
 require_once './Application/Tools/Qiniu/autoload.php';
 use Qiniu\Auth;
 use Qiniu\Storage\BucketManager;
@@ -489,6 +490,16 @@ class UserController extends CommonController {
                 );
                 $res = D('User') -> add($data);
                 D('User') -> where("`id` = $invite_uid") -> setInc('integral',10);//邀请人添加积分
+                $Log = array(
+                    'uid'      => $invite_uid,
+                    'username' => D('User') -> where("phone = '$invite_tele'") -> getField('username'),
+                    'price'   => 10,
+                    'action'   => 'Inc_integral',
+                    'add_time' => date('Y-m-d H:i:s'),
+                    'remark'   => '邀请用户' . $data['username'] . '注册获得10积分',
+                    'key_id'   => $res,
+                );
+                D('User_price_log') -> add($Log);//添加积分明细
                 $res ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'注册失败！');//验证通过
 
             }
@@ -518,6 +529,17 @@ class UserController extends CommonController {
                 );
                 $res = D('User') -> where("`email` = '$email'") -> save($data);
                 D('User') -> where("`id` = $invite_uid") -> setInc('integral',10);//邀请人添加积分
+                $data['username'] = D('User') -> where("`id` = $invite_uid") -> getField('username');
+                $Log = array(
+                    'uid'      => $invite_uid,
+                    'username' => D('User') -> where("phone = '$e_invite_tele'") -> getField('username'),
+                    'price'   => 10,
+                    'action'   => 'Inc_integral',
+                    'add_time' => date('Y-m-d H:i:s'),
+                    'remark'   => '邀请用户' . $data['username'] . '注册获得10积分',
+                    'key_id'   => $invite_uid,
+                );
+                D('User_price_log') -> add($Log);//添加积分明细
                 $res !== false ? $this -> ajaxReturnData() : $this -> ajaxReturnData(0,'注册失败！');//验证通过
 
             }
@@ -803,7 +825,30 @@ class UserController extends CommonController {
 
     //ajax邀请收益
     public function ajax_commission(){
+        $p = I('get.p','','intval') ? I('get.p','','intval') : 1;
+        $where = "`action` = 'Inc_integral'";
+        I('get.keyword','','string') ? $keyword =I('get.keyword','','string') : true;
+        if(!empty($keyword)){
+            $where .= " AND (`add_time` LIKE '%" .$keyword. "%' OR `price` LIKE '%" .$keyword. "%' OR `remark` LIKE '%" .$keyword. "%') ";
+        }
+        $count = D('User_price_log') -> where("action = 'Inc_integral'") -> count();
+        $pagesize = 10;//每次获取的数据条数
+        $pager = new Page($count,$pagesize);
+        $totalPages = $pager -> totalPages;
+        $firstRow   = $pager -> firstRow;
 
+        $list = D('User_price_log') -> field('price,add_time,remark') -> where($where) -> limit($firstRow,$pagesize) -> order('add_time desc') -> select();
+        $pager = array(
+            'nowPage' => (int)$p,//当前页
+            'pagesize'   => (int)$pagesize,
+            'totalPages' => $totalPages
+        );
+        $start = date('Y-m-d 0:0:0');
+        $end = date('Y-m-d 23:59:59');
+        $uid = session('userinfo.id');
+        $commission['today'] = D('User_price_log') -> where("`uid` = $uid AND `add_time` BETWEEN  '".$start."' AND '".$end."'") -> sum('price');
+        $commission['total'] = D('User_price_log') -> where("`uid` = $uid")-> sum('price');
+        empty($list) ? $this -> ajaxReturnData(0,'没有返佣明细') : $this -> ajaxReturnSuccess(compact('list','pager','commission'));
     }
 
     public function ajax_pay(){
