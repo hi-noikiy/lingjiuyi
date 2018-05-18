@@ -347,112 +347,47 @@
             dataType : 'json',
             data : {id:id},
             success : function(data){
+                if(data.info != ''){
+                    location.href = '__MODULE__'+ data.info.url;
+                }else{
+                    $.ajax({
+                        type : 'GET',
+                        url  : '__MODULE__/Pay/index',
+                        dataType : 'json',
+                        data : {id:id},
+                        success : function(data){
+                            if(data.code == 0){
+                                layer.open({
+                                    content: data.msg
+                                    ,skin: 'msg'
+                                    ,time: 5 //5秒后自动关闭
+                                });
+                            }else if(data.code == 10000){
+                                //支付二维码
+                                var html = '<img alt="支付二维码" src="' + data.info + ' " style="width: 100px;"><br/><span style="font-size: 10px;color:#ccc;">请扫描图中二维码！</span>';
+                                layer.open({
+                                    title:"扫码支付",
+                                    content: html,
+                                    btn: ['取消'],
+                                    yes: function(index){
+                                        location.href = '__MODULE__/User/order/type/0';
+                                    }
+                                });
+                            }else{
+                                layer.open({
+                                    content: data.msg
+                                    ,skin: 'msg'
+                                    ,time: 5 //5秒后自动关闭
+                                });
+                            }
 
-            }
-
-        });
-        $.ajax({
-            type : 'GET',
-            url  : '__MODULE__/Pay/index',
-            dataType : 'json',
-            data : {id:id},
-            success : function(data){
-                if(data.code == 0){
-                    layer.open({
-                        content: data.msg
-                        ,skin: 'msg'
-                        ,time: 5 //5秒后自动关闭
-                    });
-                }else if(data.code == 10001){
-                    var html = '<img alt="微信支付二维码" src="' + data.info + ' "><br/><span style="font-size: 10px;color:#ccc;">如在微信中请长按图片识别图中二维码！</span>';
-                    layer.open({
-                        title:"微信扫码",
-                        content: html,
-                        btn: ['取消']
-                    });
-                }else if(data.code == 10002){
-                    /*
-                    var res = JSON.parse(data.info);
-                    if(!data.info.code_url && !data.info.return_msg){
-                        wx.config({
-                            debug: false,
-                            appId: res.appId ,
-                            timestamp: res.timeStamp,
-                            nonceStr: res.noncestr,
-                            signature: res.signature,
-                            jsApiList: ['chooseWXPay']
-                        });
-                        wx.ready(function(){
-                            wx.chooseWXPay({
-                                appId: res.appId,
-                                timestamp: res.timeStamp,
-                                nonceStr: res.noncestr,
-                                package: res.package,
-                                signType: res.signType,
-                                paySign: res.paySign,
-                                success: function (res) {
-                                    console.log('OK');
-                                    //window.location.href = "{$ret_url}";
-                                },
-                                cancel: function () {
-                                    //window.location.href = "{$ret_url}";
-                                }
-                            });
-                        });
-                    }else if(data.info.code_url){
-                        var html = '<img alt="微信扫码支付" src="' + data.info.code_url + ' ">';
-                        layer.open({
-                            title:"000",
-                            content: html,
-                            btn: ['取消']
-                        });
-                    }else if(data.info.return_msg){
-                        layer.open({
-                            title:"000",
-                            content: data.info.return_msg,
-                            btn: ['取消']
-                        });
-                    }
-                    */
-
-                    layer.open({
-                        content: '贡献一下？！'
-                        , btn: ['确认', '取消']
-                        , yes: function () {
-                            callpay();
                         }
                     });
-                    //调用微信JS api 支付
-                    function jsApiCall()
-                    {
-                        WeixinJSBridge.invoke(
-                            'getBrandWCPayRequest',
-                            data.info,
-                            function(res){
-                                WeixinJSBridge.log(res.err_msg);
-                                alert(res.err_code+res.err_desc+res.err_msg);
-                            }
-                        );
-                    }
-
-                    function callpay()
-                    {
-                        if (typeof WeixinJSBridge == "undefined"){
-                            if( document.addEventListener ){
-                                document.addEventListener('WeixinJSBridgeReady', jsApiCall, false);
-                            }else if (document.attachEvent){
-                                document.attachEvent('WeixinJSBridgeReady', jsApiCall);
-                                document.attachEvent('onWeixinJSBridgeReady', jsApiCall);
-                            }
-                        }else{
-                            jsApiCall();
-                        }
-                    }
-
                 }
-
             }
+
         });
+
     });
     //查看
     $(document).on('click','.J_see',function(){

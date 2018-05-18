@@ -309,16 +309,18 @@ class CartController extends CommonController {
 		$rescart ? $rescart : $this -> ajaxReturnData(10001,'删除购物车失败！');
 
 		if($pay_type == 0){
-			//0银联
-			$this -> ajaxReturnData(10010,'暂时没有银联支付，请选择其他！');
+			//0银联 扫码
+			//$this -> ajaxReturnData(10010,'暂时没有银联支付，请选择其他！');
+			$url = '/Pay/index/id/'.$res;
+			$this -> ajaxReturnData(10020,'银联扫码支付',compact('url'));
 		}elseif($pay_type == 1){
-			//1微信
+			//1微信 扫码
 			$url = '/Pay/index/id/'.$res;
-			$this -> ajaxReturnData(10020,'微信支付',compact('url'));
+			$this -> ajaxReturnData(10020,'微信扫码支付',compact('url'));
 		}elseif($pay_type == 2){
-			//2支付宝
+			//2支付宝 手机端账号支付
 			$url = '/Pay/index/id/'.$res;
-			$this -> ajaxReturnData(10030,'支付宝支付',compact('url'));
+			$this -> ajaxReturnData(10010,'支付宝支付',compact('url'));
 
 		}elseif($pay_type == 3){
 			//3 余额付款
@@ -332,6 +334,10 @@ class CartController extends CommonController {
 			$url = '/User/order/type/'.$order_type;
 			$reso !== false ? $this -> ajaxReturnSuccess(compact('url')) : $this -> ajaxReturnData(10001,'修改订单状态失败');
 
+		}elseif($pay_type == 4){
+			//4支付宝 扫码
+			$url = '/Pay/index/id/'.$res;
+			$this -> ajaxReturnData(10020,'支付宝扫码支付',compact('url'));
 		}
 
 

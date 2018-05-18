@@ -715,7 +715,7 @@ class UserController extends CommonController {
         empty($uid) ? $this -> ajaxReturnData(10002,'请先登录') : $uid;//如果用户信息为空
         $where['a.user_id'] = $uid;
         //确认订单类型
-        $where['`order_type`'] = I('get.type','','intval') ? I('get.type','','intval') : 0;//普通订单类型为0
+        $where['order_type'] = I('get.type','','intval') ? I('get.type','','intval') : 0;//普通订单类型为0
         $order_status = $_GET['status'] ? $_GET['status'] : 0;
         //订单编号，商品图片，商品名称，商品单价，购买数量，(邮费，暂时没有)，实付
         $fields = 'a.id,order_id,b.goods_id,order_sn,goods_small_img,goods_name,b.goods_price,number,order_amount,order_status';
@@ -755,7 +755,6 @@ class UserController extends CommonController {
         }elseif($where['order_type'] === 3){
             //积分订单
         }
-
 
         $orderlist = M('Order')
             -> alias('a')
@@ -855,7 +854,8 @@ class UserController extends CommonController {
         $id = I('get.id','','intval');
         $id ? $id : $this -> ajaxReturnData(0,'参数错误！');
         $url = '/Pay/index/id/'.$id;
-        $this -> ajaxReturnSuccess(compact('url'));
+        $type = D('Order') -> where(['id' => $id]) -> getField('pay_type');
+        $type == 2 ? $this -> ajaxReturnSuccess(compact('url')) : $this -> ajaxReturnSuccess();
     }
 
     //忘记密码

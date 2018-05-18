@@ -13,21 +13,154 @@ class PayController extends CommonController {
         vendor('Alipay.Submit');
     }
 
+    public function tryPay(){
+        $type = I('get.type','','intval');
+        if($type == 1){
+            //h5支付宝支付
+            $method = 'trpay.trade.create.wap';
+            $payType = 1;
+            $string  = '支付宝账号支付';
+        }elseif($type == 2){
+            //支付宝 扫码支付
+            $method = 'trpay.trade.create.scan';
+            $payType = 1;
+            $string  = '支付宝扫码支付';
+        }elseif($type == 3){
+            //微信 扫码支付
+            $method = 'trpay.trade.create.scan';
+            $payType = 2;
+            $string  = '微信扫码支付';
+        }elseif($type == 4){
+            //银联 扫码支付
+            $method = 'trpay.trade.create.scan';
+            $payType = 3;
+            $string  = '银联扫码支付';
+        }elseif($type == 5){
+            //QQ 扫码支付
+            $method = 'trpay.trade.create.scan';
+            $payType = 4;
+            $string  = 'QQ扫码支付';
+        }else{
+            $this -> ajaxReturnData(0,'请输入参数');
+        }
+        $url = "http://pay.trsoft.xin/order/trpayGetWay";
+        //公共入参
+        $appkey = '772576d5bfe240f79bd3065f6d35b74c';
+        $timestamp = time();
+        $version = '1.0';
+        $notifyUrl = 'http://h5.lingjiuyi.cn/Pay/tryPayNotifyUrl';
+        $synNotifyUrl = 'http://h5.lingjiuyi.cn/Pay/tryPaySynNotifyUrl';
+
+        $order = D('order') -> where(['id' => I('get.id','','intval')]) -> find();
+
+        //订单参数
+        $data = [
+            'outTradeNo'   => $order['order_sn'], //订单号
+            'tradeName'    => 'a', //商品名称
+            'amount'       => 1, //订单金额 单位分
+            'appkey'       => $appkey,
+            'payType'      => $payType, //订单类型 1 支付宝、2 微信 、 3银联
+            'notifyUrl'    => $notifyUrl, //异步通知地址
+            'synNotifyUrl' => $synNotifyUrl, //同步通知地址
+            'payuserid'    => $order['user_id'], //支付用户id
+            'channel'      => 'h5', //渠道
+            'backparams'   => 'type='.$type.'&string='.$string, //回传参数
+            'ipAddress'    => $_SERVER['REMOTE_ADDR'],//客户端ip地址，当为微信扫码、qq扫码时必传
+            'method'       => $method,
+            'version'      => $version,
+            'timestamp'    => $timestamp,
+        ];
+        ksort($data);
+        $stringA = '';
+        foreach($data as $k => $v){
+            $stringA .= $k.'='.$v.'&';
+        }
+        $stringA = rtrim($stringA,'&');
+        $stringSignTemp = $stringA.'&appSceret=362a38b2c3874c39ad27c73bc9827df1';
+        $sign = strtoupper(MD5($stringSignTemp));
+        $data['sign'] = $sign;
+        $res = curl_request($url,true,$data);
+        if($type == 1){
+            echo $res;
+        }elseif($type == 2  || $type == 3 || $type == 4 || $type == 5){
+            $result = json_decode($res,true);
+            if($result['code'] == '0000'){
+                $path = 'Public/Uploads/pay_temp/';//定义保存图片地址
+                if(!file_exists($path))
+                {
+                    mkdir($path, 0777, true);//如果没有则创建目录
+                }
+                $filename = $path.$result['data']['outTradeNo'].'.png';
+                $url = $result['data']['qrcode'];
+                qrcode($url, $filename);
+                $img = 'http://'.$_SERVER['SERVER_NAME'].'/'.$filename;
+                $this -> ajaxReturnData(10000,'success',$img);
+            }else{
+                $this -> ajaxReturnError($result['code'],$result['tipMsg']);
+            }
+
+        }
+
+    }
+
+    public function tryPayNotifyUrl(){
+        $content = '';
+        foreach($_POST as $k => $v){
+            $content .= $k.'='.$v.'&';
+        }
+        $content = rtrim($content,'&');
+        D('Temp') -> add(['content' => $content]);
+        $order = D('Order') -> where(['order_sn' => $_POST['outTradeNo']]) -> find();
+        if(!empty($order)){
+            $_POST['amount'] != $order['order_amount'] * 100 ? $this -> ajaxReturnError(0,'金额不符合') : true;
+            $_POST['payUserId'] != $order['user_id'] ? $this -> ajaxReturnError(0,'用户不符合') :true;
+            $order['pay_status'] != 0 ? $this -> ajaxReturnError(0,'订单支付状态错误') : true;
+            $order['order_status'] != 0 ? $this -> ajaxReturnError(0,'订单状态错误') : true;
+            $data = [
+                'pay_status' => 1,
+                'order_status' => 1,
+            ];
+            $res = D('Order') -> where(['order_sn' => $_POST['outTradeNo']]) -> save($data);
+            if(!$res){
+                D('Temp') -> add(['content' => '订单'.$_POST['outTradeNo'].'修改订单状态错误！']);
+            }
+        }
+    }
+
+    public function tryPaySynNotifyUrl(){
+        //展示页
+        $order = D('Order') -> where(['order_sn' => $_GET['outTradeNo']]) -> find();
+        $data = [
+            'trOrderNo' => $_GET['trOrderNo'], //TrPay平台订单号
+            'tradeNo' => $_GET['tradeNo'], //第三方交易号
+        ];
+        $this -> redirect('Order/detail/id/'.$order['id']);
+    }
+
     public function index(){
         $id    = $_GET['id'];
         $type  = D('Order') ->where("id = $id") -> getField('pay_type');
         switch ($type){
             case 0:
-                //银联
-                $this -> ajaxReturnData(0,'暂时不支持银联支付');
+                //银联扫码
+                $this->redirect('Pay/tryPay',['type' => 4,'id' => $id]);
                 break;
             case 1:
-                //微信
-                $this->redirect('Pay/weixinpay',['id' => $id]);
+                //微信扫码
+                //$this->redirect('Pay/weixinpay',['id' => $id]);
+                $this->redirect('Pay/tryPay',['type' => 3,'id' => $id]);
                 break;
             case 2:
-                //支付宝
-                $this->redirect('Pay/alipay',['id' => $id]);
+                //支付宝手机端
+                //$this->redirect('Pay/alipay',['id' => $id]);
+                $this->redirect('Pay/tryPay',['type' => 1,'id' => $id]);
+                break;
+            case 3:
+                //余额
+                break;
+            case 4:
+                //支付宝扫码
+                $this->redirect('Pay/tryPay',['type' => 2,'id' => $id]);
                 break;
         }
         /*
