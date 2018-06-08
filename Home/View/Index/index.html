@@ -33,6 +33,35 @@
         <script src="__PUBLIC__/Home/js/plugin/html5shiv.js"></script>
         <script src="__PUBLIC__/Home/js/plugin/respond.js"></script>
         <![endif]-->
+
+        <script>
+            function IsPC() {
+                var userAgentInfo = navigator.userAgent;
+                var Agents = ["Android", "iPhone",
+                    "SymbianOS", "Windows Phone",
+                    "iPad", "iPod"];
+                var flag = true;
+                for (var v = 0; v < Agents.length; v++) {
+                    if (userAgentInfo.indexOf(Agents[v]) > 0) {
+                        flag = false;
+                        break;
+                    }
+                }
+                return flag;
+            }
+            var flag = IsPC(); //true为PC端，false为手机端
+            if(flag == false){
+                location.href = 'http://h5.lingjiuyi.cn';
+            }
+            var _hmt = _hmt || [];
+            (function () {
+                var hm = document.createElement("script");
+                hm.src = "https://hm.baidu.com/hm.js?c11880ab74b1d3cd437ca5f41060fd17";
+                var s = document.getElementsByTagName("script")[0];
+                s.parentNode.insertBefore(hm, s);
+            })();
+        </script>
+
     </head>
 
     <body id="home" class="wide">
